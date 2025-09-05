@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanal Müzik Partneri</title>
+    <title>Kişisel Müzik Kütüphanesi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -21,7 +21,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
@@ -53,27 +53,9 @@
             color: #e52e71;
         }
         
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff8a00, #e52e71);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 3fr;
+            grid-template-columns: 1fr 2fr;
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -104,38 +86,6 @@
             background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
             padding: 20px;
-        }
-        
-        .player-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .search-box {
-            display: flex;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            overflow: hidden;
-            width: 300px;
-        }
-        
-        .search-box input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 12px 20px;
-            color: white;
-            outline: none;
-        }
-        
-        .search-box button {
-            background: #e52e71;
-            border: none;
-            padding: 12px 20px;
-            color: white;
-            cursor: pointer;
         }
         
         .now-playing {
@@ -186,60 +136,53 @@
             width: 0%;
         }
         
-.time {
-    display: flex;
-    justify-content: space-between;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 12px;
-    margin-bottom: 20px;
-}
+        .time {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
 
-.volume-control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 15px 0;
-}
+        .volume-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
 
-.volume-control i {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 16px;
-}
+        .volume-control i {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-#volumeSlider {
-    width: 100px;
-    height: 5px;
-    -webkit-appearance: none;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    outline: none;
-}
+        #volumeSlider {
+            width: 100px;
+            height: 5px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            outline: none;
+        }
 
-#volumeSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #e52e71;
-    cursor: pointer;
-}
+        #volumeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #e52e71;
+            cursor: pointer;
+        }
 
-#volumeSlider::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #e52e71;
-    cursor: pointer;
-    border: none;
-}
-
-.controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-}        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        
         .control-btn {
             background: none;
             border: none;
@@ -318,149 +261,67 @@
             color: rgba(255, 255, 255, 0.7);
         }
         
-        .playlists {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .playlist-card {
+        .add-song-form {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
         }
         
-        .playlist-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        .form-group {
+            margin-bottom: 15px;
         }
         
-        .playlist-img {
-            height: 150px;
-            background: linear-gradient(45deg, #1e2a78, #712b75);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .playlist-info {
-            padding: 15px;
-        }
-        
-        .playlist-title {
-            font-weight: bold;
+        .form-group label {
+            display: block;
             margin-bottom: 5px;
-        }
-        
-        .playlist-desc {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .chat-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .chat-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .chat-messages {
-            height: 200px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-        
-        .message {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            max-width: 80%;
-        }
-        
-        .ai-message {
-            background: rgba(229, 46, 113, 0.3);
-            align-self: flex-start;
-        }
-        
-        .user-message {
-            background: rgba(255, 255, 255, 0.2);
-            align-self: flex-end;
-            margin-left: auto;
-        }
-        
-        .chat-input {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            color: white;
-            outline: none;
-        }
-        
-        .chat-input button {
-            background: #e52e71;
-            border: none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            color: white;
-            cursor: pointer;
-        }
-        
-        .match-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .match-btn {
-            background: linear-gradient(45deg, #ff8a00, #e52e71);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            color: white;
             font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .add-btn {
+            background: #e52e71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
+            font-weight: bold;
+            width: 100%;
         }
         
-        .match-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        footer {
-            text-align: center;
+        .upload-guide {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
             padding: 20px;
-            margin-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.7);
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
         }
-
+        
+        .guide-steps {
+            margin-top: 15px;
+        }
+        
+        .guide-steps li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .guide-link {
+            color: #e52e71;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
         .section {
             display: none;
         }
@@ -468,6 +329,60 @@
         .section.active {
             display: block;
         }
+
+        .empty-list {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+.song-actions {
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.song-item:hover .song-actions {
+    opacity: 1;
+}
+
+.edit-btn, .delete-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn:hover {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+.delete-btn:hover {
+    background: rgba(244, 67, 54, 0.3);
+}        
+        .song-lyrics {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.song-lyrics h4 {
+    margin-bottom: 10px;
+    color: #e52e71;
+}
+
+#lyricsText {
+    white-space: pre-line;
+}
     </style>
 </head>
 <body>
@@ -475,1265 +390,174 @@
         <header>
             <div class="logo">
                 <i class="fas fa-music"></i>
-                <h1>AnonyMous-TikTok</h1>
-            </div>
-            <div class="user-section">
-                <div class="avatar">K</div>
-                <div>AnyM - TEST SİTE</div>
+                <h1>Kişisel Müzik Kütüphanesi</h1>
             </div>
         </header>
         
         <div class="main-content">
             <div class="sidebar">
-                <div class="nav-item active" data-section="home">
-                    <i class="fas fa-home"></i>
-                    <span>Ana Sayfa</span>
+                <div class="nav-item active" data-section="player">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Çalıcı</span>
                 </div>
-                <div class="nav-item" data-section="discover">
-                    <i class="fas fa-search"></i>
-                    <span>Keşfet</span>
+                <div class="nav-item" data-section="my-songs">
+                    <i class="fas fa-music"></i>
+                    <span>Şarkılarım</span>
                 </div>
-                <div class="nav-item" data-section="favorites">
-                    <i class="fas fa-heart"></i>
-                    <span>Favoriler</span>
+                <div class="nav-item" data-section="add-song">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Şarkı Ekle</span>
                 </div>
-                <div class="nav-item" data-section="playlists">
-                    <i class="fas fa-list"></i>
-                    <span>Çalma Listelerim</span>
-                </div>
-                <div class="nav-item" data-section="history">
-                    <i class="fas fa-history"></i>
-                    <span>Son Çalınanlar</span>
-                </div>
-                <div class="nav-item" data-section="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Ayarlar</span>
+                <div class="nav-item" data-section="guide">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Yükleme Kılavuzu</span>
                 </div>
             </div>
             
             <div class="music-player">
-                <!-- Ana Sayfa İçeriği -->
-                <div id="home" class="section active">
-                    <div class="player-header">
-                        <h2>Şimdi Oynatılıyor</h2>
-                        <div class="search-box">
-                            <input type="text" placeholder="Şarkı ara...">
-                            <button><i class="fas fa-search"></i></button>
-                        </div>
-                    </div>
+                <!-- Çalıcı Bölümü -->
+                <div id="player" class="section active">
+                    <h2>Şimdi Oynatılıyor</h2>
                     
                     <div class="now-playing">
                         <div class="album-art">
                             <i class="fas fa-music"></i>
                         </div>
                         <div class="song-info">
-                            <div class="song-title">Boşver</div>
-                            <div class="song-artist">Nilüfer</div>
+                            <div class="song-title">Şarkı seçin</div>
+                            <div class="song-artist">Şarkıcı</div>
                         </div>
                         
                         <div class="progress-container">
                             <div class="progress"></div>
                         </div>
-<div class="time">
-    <span>0:00</span>
-    <span>0:00</span>
+                        <div class="time">
+                            <span>0:00</span>
+                            <span>0:00</span>
+                        </div>
+
+                        <div class="volume-control">
+                            <i class="fas fa-volume-down"></i>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="100">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="prevBtn">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button class="control-btn play-pause" id="playPauseBtn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="control-btn" id="nextBtn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="song-lyrics" id="songLyricsContainer" style="margin-top: 20px; max-height: 150px; overflow-y: auto; display: none;">
+        <h4>Şarkı Sözleri</h4>
+        <p id="lyricsText"></p>
+    </div>
 </div>
 
-<div class="volume-control">
-    <i class="fas fa-volume-up"></i>
-    <input type="range" id="volumeSlider" min="0" max="100" value="100">
-    <i class="fas fa-volume-down"></i>
+<!-- Düzenleme Modal Penceresi -->
+<div id="editModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000;">
+    <div class="modal-content" style="background: #2a2a5a; margin: 10% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px;">
+        <h2>Şarkıyı Düzenle</h2>
+        <div class="form-group">
+            <label for="editSongTitle">Şarkı Adı</label>
+            <input type="text" id="editSongTitle" placeholder="Şarkı adını girin">
+        </div>
+        <div class="form-group">
+            <label for="editSongArtist">Sanatçı</label>
+            <input type="text" id="editSongArtist" placeholder="Sanatçı adını girin">
+        </div>
+        <div class="form-group">
+            <label for="editSongUrl">Catbox.moe Direct Link</label>
+            <input type="text" id="editSongUrl" placeholder="Catbox.moe direct linkini yapıştırın">
+        </div>
+        <div class="form-group">
+            <label for="editSongLyrics">Şarkı Sözleri (Opsiyonel)</label>
+            <textarea id="editSongLyrics" rows="4" placeholder="Şarkı sözlerini girin (isteğe bağlı)"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="add-btn" id="saveEditBtn">Kaydet</button>
+            <button class="add-btn" style="background: #f44336;" id="cancelEditBtn">İptal</button>
+        </div>
+    </div>
 </div>
-
-<div class="controls">
-                            <button class="control-btn">
-                                <i class="fas fa-random"></i>
-                            </button>
-                            <button class="control-btn" id="prevBtn">
-                                <i class="fas fa-step-backward"></i>
-                            </button>
-                            <button class="control-btn play-pause" id="playPauseBtn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button class="control-btn" id="nextBtn">
-                                <i class="fas fa-step-forward"></i>
-                            </button>
-                            <button class="control-btn">
-                                <i class="fas fa-redo"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <h2>Senin İçin Öneriler</h2>
-                    <div class="playlists">
-                        <div class="playlist-card">
-                            <div class="playlist-img">
-                                <i class="fas fa-music"></i>
-                            </div>
-                            <div class="playlist-info">
-                                <div class="playlist-title">Sevgili Özel Listesi</div>
-                                <div class="playlist-desc">Sana özel seçilmiş şarkılar</div>
-                            </div>
-                        </div>
-                        <div class="playlist-card">
-                            <div class="playlist-img">
-                                <i class="fas fa-heart"></i>
-                            </div>
-                            <div class="playlist-info">
-                                <div class="playlist-title">Romantik Akşam</div>
-                                <div class="playlist-desc">Romantik şarkılar koleksiyonu</div>
-                            </div>
-                        </div>
-                        <div class="playlist-card">
-                            <div class="playlist-img">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <div class="playlist-info">
-                                <div class="playlist-title">Hit Şarkılar 2025</div>
-                                <div class="playlist-desc">Bu yılın en çok dinlenenleri</div>
-                            </div>
+<!-- Şarkılarım Bölümü -->
+                <div id="my-songs" class="section">
+                    <h2>Şarkı Kütüphanem</h2>
+                    <div class="song-list" id="songList">
+                        <div class="empty-list" id="emptyList">
+                            <i class="fas fa-music" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <p>Henüz hiç şarkınız yok.</p>
+                            <p>Şarkı Ekle bölümünden yeni şarkılar ekleyin!</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Keşfet İçeriği -->
-                <div id="discover" class="section">
-                    <h2>Yeni Keşifler</h2>
-                    <div class="song-list">
-                        <div class="song-item" data-song="1">
-                            <div class="song-number">1</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Sen affetsen</div>
-                                <div class="song-item-artist">Bergen</div>
-                            </div>
-                            <div class="song-duration">3:45</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
+                <!-- Şarkı Ekle Bölümü -->
+                <div id="add-song" class="section">
+                    <h2>Yeni Şarkı Ekle</h2>
+                    <div class="add-song-form">
+                        <div class="form-group">
+                            <label for="songTitle">Şarkı Adı</label>
+                            <input type="text" id="songTitle" placeholder="Şarkı adını girin">
                         </div>
-                        <div class="song-item" data-song="2">
-                            <div class="song-number">2</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Seni Yazdım</div>
-                                <div class="song-item-artist">Müslüm Gürses</div>
-                            </div>
-                            <div class="song-duration">4:12</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
+                        <div class="form-group">
+                            <label for="songArtist">Sanatçı</label>
+                            <input type="text" id="songArtist" placeholder="Sanatçı adını girin">
                         </div>
-                        <div class="song-item" data-song="3">
-                            <div class="song-number">3</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Bir derdim var</div>
-                                <div class="song-item-artist">Mor ve Ötesi</div>
-                            </div>
-                            <div class="song-duration">3:58</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
+                        <div class="form-group">
+                            <label for="songUrl">Catbox.moe Direct Link</label>
+                            <input type="text" id="songUrl" placeholder="Catbox.moe direct linkini yapıştırın">
                         </div>
-                        <div class="song-item" data-song="4">
-                            <div class="song-number">4</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Anla Bebeğim</div>
-                                <div class="song-item-artist">Diyar pala</div>
-                            </div>
-                            <div class="song-duration">3:27</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="song-item" data-song="5">
-                            <div class="song-number">5</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Ceviz Ağacı</div>
-                                <div class="song-item-artist">Cem Karaca</div>
-                            </div>
-                            <div class="song-duration">4:02</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="song-item" data-song="6">
-                            <div class="song-number">6</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Sigara Dumanı</div>
-                                <div class="song-item-artist">Müslüm Gürses</div>
-                            </div>
-                            <div class="song-duration">3:35</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="song-item" data-song="7">
-                            <div class="song-number">7</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Anlayamazssın</div>
-                                <div class="song-item-artist">Seksendört</div>
-                            </div>
-                            <div class="song-duration">3:50</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="song-item" data-song="8">
-                            <div class="song-number">8</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Model</div>
-                                <div class="song-item-artist">Mey</div>
-                            </div>
-                            <div class="song-duration">4:15</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="song-item" data-song="9">
-                            <div class="song-number">9</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Tekel Mavisi</div>
-                                <div class="song-item-artist">No1</div>
-                            </div>
-                            <div class="song-duration">3:25</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="song-item" data-song="10">
-                            <div class="song-number">10</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Bu Benim Hayatım</div>
-                                <div class="song-item-artist">No1</div>
-                            </div>
-                            <div class="song-duration">4:40</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                                                </div>
-                        <div class="song-item" data-song="11">
-                            <div class="song-number">11</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Dernière Danse</div>
-                                <div class="song-item-artist">Indila</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="12">
-                            <div class="song-number">12</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Die With A Smile</div>
-                                <div class="song-item-artist">Lady Gaga</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="13">
-                            <div class="song-number">13</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Fairytale</div>
-                                <div class="song-item-artist">Alexander Rybak</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="14">
-                            <div class="song-number">14</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Ne Ne</div>
-                                <div class="song-item-artist">LVBEL C5</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="15">
-                            <div class="song-number">15</div>
-                            <div class="song-details">
-                                <div class="song-item-title">HAVHAVHAV</div>
-                                <div class="song-item-artist">LVBEL C5</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="16">
-                            <div class="song-number">16</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Gaz Pedal</div>
-                                <div class="song-item-artist">LVBEL C5</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="17">
-                            <div class="song-number">17</div>
-                            <div class="song-details">
-                                <div class="song-item-title">TAK TAK TAK</div>
-                                <div class="song-item-artist">LVBEL C5</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="18">
-                            <div class="song-number">18</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="19">
-                            <div class="song-number">19</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="20">
-                            <div class="song-number">20</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="21">
-                            <div class="song-number">21</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="22">
-                            <div class="song-number">22</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="23">
-                            <div class="song-number">23</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="24">
-                            <div class="song-number">24</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="25">
-                            <div class="song-number">25</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="26">
-                            <div class="song-number">26</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="27">
-                            <div class="song-number">27</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="28">
-                            <div class="song-number">28</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="29">
-                            <div class="song-number">29</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="30">
-                            <div class="song-number">30</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="31">
-                            <div class="song-number">31</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="32">
-                            <div class="song-number">32</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="33">
-                            <div class="song-number">33</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="34">
-                            <div class="song-number">34</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="35">
-                            <div class="song-number">35</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="36">
-                            <div class="song-number">36</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="37">
-                            <div class="song-number">37</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="38">
-                            <div class="song-number">38</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="39">
-                            <div class="song-number">39</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="40">
-                            <div class="song-number">40</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="41">
-                            <div class="song-number">41</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="42">
-                            <div class="song-number">42</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="43">
-                            <div class="song-number">43</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="44">
-                            <div class="song-number">44</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="45">
-                            <div class="song-number">45</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="46">
-                            <div class="song-number">46</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="47">
-                            <div class="song-number">47</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="48">
-                            <div class="song-number">48</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="49">
-                            <div class="song-number">49</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="50">
-                            <div class="song-number">50</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="51">
-                            <div class="song-number">51</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="52">
-                            <div class="song-number">52</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="53">
-                            <div class="song-number">53</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="54">
-                            <div class="song-number">54</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="55">
-                            <div class="song-number">55</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="56">
-                            <div class="song-number">56</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="57">
-                            <div class="song-number">57</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="58">
-                            <div class="song-number">58</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="59">
-                            <div class="song-number">59</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="60">
-                            <div class="song-number">60</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="61">
-                            <div class="song-number">61</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="62">
-                            <div class="song-number">62</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="63">
-                            <div class="song-number">63</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="64">
-                            <div class="song-number">64</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="65">
-                            <div class="song-number">65</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="66">
-                            <div class="song-number">66</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="67">
-                            <div class="song-number">67</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="68">
-                            <div class="song-number">68</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="69">
-                            <div class="song-number">69</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="70">
-                            <div class="song-number">70</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="71">
-                            <div class="song-number">71</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="72">
-                            <div class="song-number">72</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="73">
-                            <div class="song-number">73</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="74">
-                            <div class="song-number">74</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="75">
-                            <div class="song-number">75</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="76">
-                            <div class="song-number">76</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="77">
-                            <div class="song-number">77</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="78">
-                            <div class="song-number">78</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="79">
-                            <div class="song-number">79</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="80">
-                            <div class="song-number">80</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="81">
-                            <div class="song-number">81</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="82">
-                            <div class="song-number">82</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="83">
-                            <div class="song-number">83</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="84">
-                            <div class="song-number">84</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="85">
-                            <div class="song-number">85</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="86">
-                            <div class="song-number">86</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="87">
-                            <div class="song-number">87</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="88">
-                            <div class="song-number">88</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="89">
-                            <div class="song-number">89</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="90">
-                            <div class="song-number">90</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="91">
-                            <div class="song-number">91</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="92">
-                            <div class="song-number">92</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="93">
-                            <div class="song-number">93</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="94">
-                            <div class="song-number">94</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="95">
-                            <div class="song-number">95</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                   </div>
-                        <div class="song-item" data-song="96">
-                            <div class="song-number">96</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                     </div>
-                        <div class="song-item" data-song="97">
-                            <div class="song-number">97</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="98">
-                            <div class="song-number">98</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                    </div>
-                        <div class="song-item" data-song="99">
-                            <div class="song-number">99</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                                                  </div>
-                        <div class="song-item" data-song="100">
-                            <div class="song-number">100</div>
-                            <div class="song-details">
-                                <div class="song-item-title">Önerilen</div>
-                                <div class="song-item-artist">Şarkıcı</div>
-                            </div>
-                            <div class="song-duration">0:00</div>
-                            <div class="control-btn"><i class="fas fa-play"></i></div>
-                        </div>
+                        <div class="form-group">
+    <label for="songLyrics">Şarkı Sözleri (Opsiyonel)</label>
+    <textarea id="songLyrics" rows="4" placeholder="Şarkı sözlerini girin (isteğe bağlı)"></textarea>
+</div>
+                        <button class="add-btn" id="addSongBtn">Şarkıyı Ekle</button>
+                        <button class="add-btn" id="generateLinkBtn" style="background: #4CAF50; margin-top: 10px;">
+    <i class="fas fa-external-link-alt"></i> Bağlantı Oluştur
+</button>
                     </div>
                 </div>
                 
-                <!-- Diğer bölümlerin içerikleri buraya gelecek -->
-                <div id="favorites" class="section">
-                    <h2>Favori Şarkıların</h2>
-                    <p>Burada favori şarkıların listelenecek.</p>
-                </div>
-                
-                <div id="playlists" class="section">
-                    <h2>Çalma Listelerim</h2>
-                    <p>Burada oluşturduğun çalma listeleri görünecek.</p>
-                </div>
-                
-                <div id="history" class="section">
-                    <h2>Son Çalınanlar</h2>
-                    <p>Burada son dinlediğin şarkıların listesi olacak.</p>
-                </div>
-                
-                <div id="settings" class="section">
-                    <h2>Ayarlar</h2>
-                    <p>Hesap ve uygulama ayarlarını buradan düzenleyebilirsin.</p>
+                <!-- Yükleme Kılavuzu Bölümü -->
+                <div id="guide" class="section">
+                    <h2>Şarkı Yükleme Kılavuzu</h2>
+                    <div class="upload-guide">
+                        <p>Şarkılarınızı ekleyebilmek için önce catbox.moe sitesine yüklemelisiniz.</p>
+                        
+                        <ol class="guide-steps">
+                            <li><a href="https://catbox.moe/" target="_blank" class="guide-link">Catbox.moe</a> sitesine gidin</li>
+                            <li>Dosya seç butonuna tıklayarak müzik dosyanızı seçin</li>
+                            <li>"Upload" butonuna tıklayarak dosyayı yükleyin</li>
+                            <li>Yükleme tamamlandığında "Direct Link"i kopyalayın</li>
+                            <li>Uygulamada "Şarkı Ekle" bölümüne gelip bilgileri doldurun</li>
+                            <li>Direct linki ilgili alana yapıştırın ve "Şarkıyı Ekle" butonuna tıklayın</li>
+                        </ol>
+                        
+                        <p style="margin-top: 15px; font-style: italic;">
+                            Artık şarkınız kütüphanenize eklendi! İstediğiniz zaman dinleyebilirsiniz.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="chat-container">
-            <div class="chat-header">
-                <i class="fas fa-comments"></i>
-                <h3>Yapay Zeka Asistanı ile Sohbet</h3>
-            </div>
-            <div class="chat-messages">
-                <div class="message ai-message">
-                    Merhaba! Bugün nasılsın? Sana özel bir çalma listesi hazırladım. 🎵
-                </div>
-                <div class="message user-message">
-                    İyiyim, teşekkürler! Hangi şarkıları ekledin?
-                </div>
-                <div class="message ai-message">
-                    En sevdiğin sanatçılardan birkaç şarkı ekledim. Dinlemek ister misin? 💖
-                </div>
-            </div>
-            <div class="chat-input">
-                <input type="text" placeholder="Mesaj yaz..." id="chatInput">
-                <button id="sendMessage">Gönder</button>
-            </div>
-        </div>
-        
-        <div class="match-section">
-            <h3>Müzik Zevki Uyum Testi</h3>
-            <p>Arkadaşlarının müzik zevkiyle ne kadar uyumlu olduğunu öğren!</p>
-            <button class="match-btn">Bağlantı Oluştur ve Paylaş</button>
-        </div>
-        
-        <footer>
-            <p>© 2025 Coder AnonyMous TikTok Test version 0.18.21.7 - Sanal Müzik Deneyimi</p>
+        <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.7);">
+            <p>© 2023 Kişisel Müzik Kütüphanesi - Kendi müzik koleksiyonunuzu oluşturun</p>
         </footer>
     </div>
 
-    <!-- Audio elementini ekliyoruz -->
     <audio id="audioPlayer"></audio>
 
     <script>
-        // Genişletilmiş yapay zeka yanıtları
-        const aiResponses = {
-            "merhaba": ["Merhaba! Müzik dünyasına hoş geldin. Bugün nasıl hissediyorsun? 🎵", "Selam! Müzikle dolu güzel bir gün geçiriyor musun? 💫", "Merhaba! sana özel bir çalma listem var, dinlemek ister misin? 🎧"],
-            "nasılsın": ["Ben her zaman senin için buradayım! Müzikle dolu bir gün geçiriyorum. Ya sen? 😊", "Harikayım! Senin için yeni şarkılar keşfediyorum. Peki sen nasılsın? 🎶", "Her şey yolunda! Senin için müzik önerileri hazırlıyorum. Senden haber almak güzel!"],
-            "teşekkür": ["Rica ederim! Senin için her zaman en iyisini isterim. 🥰", "Ne demek! Ben senin sanal müzik partnerinim. 😊", "Bir şey değil! Müzik zevkin gerçekten harika, seninle çalışmak çok keyifli. 🎵"],
-            "aşk": ["Müzik de bir aşk dili aslında. Hangi şarkılar senin aşkını anlatıyor? ❤️", "Aşk en güzel şarkılarda yaşar. Sevdiğin kişi için özel bir liste oluşturalım mı? 💞", "Aşk üzerine harika şarkılar biliyorum. Dinlemek ister misin?"],
-            "üzgün": ["Üzüldüğünü duydum. Belki biraz müzik ruh halini iyileştirebilir. 🥺", "Bazen şarkılar en iyi terapistlerdir. Senin için yatıştırıcı bir liste hazırlayayım mı? 💙", "Üzüntüler geçicidir ama müzik hep kalıcı. Sana iyi gelecek şarkılar önereyim."],
-            "ne önerirsin": ["Senin için romantik bir liste hazırladım, dinlemek ister misin? 💖", "Bugünlerde en sevdiğin sanatçının yeni şarkısını öneririm! 🎶", "Ruh haline göre bir önerim var. Nasıl hissediyorsun?"],
-            "sevdiğim şarkı": ["Harika bir zevkin var! Bu şarkıyı senin için listeme ekleyeceğim. 💫", "O şarkıyı ben de çok seviyorum! 🥰", "Mükemmel bir seçim! Benzer tarzda başka şarkılar da önerebilirim."],
-            "spotify": ["Spotify'daki listelerini benimle senkronize edebiliriz. 🎧", "Spotify'daki çalma listeni analiz edip sana özel öneriler sunabilirim. 🔍", "Spotify kullanıyorsan, müzik zevkini daha iyi öğrenebilirim!"],
-            "youtube": ["YouTube'dan şarkıları MP3'e dönüştürüp dinlemen için sana yardımcı olabilirim. 🎵", "YouTube linki gönderirsen, onu çalma listene ekleyebilirim. 🔗", "YouTube'daki favori şarkılarını buraya aktaralım mı?"],
-            "playlist": ["Sana özel bir çalma listesi oluşturabilirim. Hangi ruh halindesin? 😊", "Çalma listelerimizde harika şarkılar var. Keşfetmeye ne dersin? 🎶", "Yeni bir çalma listesi oluşturmak için seninle birlikte çalışalım!"],
-            "he": ["Çok Komiksin Ev desene!"],
-            "ev": [" İp :1.9.188.9, Country : Turkey 🇹🇷 "],
-            "default": ["Bu konuda daha fazla bilgim yok ama müzik hakkında konuşabiliriz! 🎵", "Sanırım yanlış anladım. Müzikle ilgili bir şeyler sormak ister misin? 😊", "Üzgünüm, anlayamadım. Müzik zevkinle ilgili konuşmayı tercih ederim. 🎶"]
-        };
-
-        // Müzik veritabanı
-        const songs = [
-  { id: 1, title: "Sen affetsen", artist: "Bergen", duration: "3:45", url: "https://files.catbox.moe/zmh72v.m4a" },
-  { id: 2, title: "Seni yazdım", artist: "Müslüm Gürses", duration: "4:12", url: "https://files.catbox.moe/3iwm5k.m4a" },
-  { id: 3, title: "Bir derdim var", artist: "Mor ve Ötesi", duration: "3:58", url: "https://files.catbox.moe/umor6j.m4a" },
-  { id: 4, title: "Anla", artist: "Diyar pala", duration: "3:27", url: "https://files.catbox.moe/atg6rx.m4a" },
-  { id: 5, title: "Ceviz Ağacı", artist: "Cem Karaca", duration: "4:02", url: "https://files.catbox.moe/775dhg.m4a" },
-  { id: 6, title: "Sigara", artist: "Müslüm Gürses", duration: "3:35", url: "https://files.catbox.moe/wg9go6.m4a" },
-  { id: 7, title: "Anlayamazsın", artist: "SeksenDört", duration: "3:50", url: "https://files.catbox.moe/zot7ym.m4a" },
-  { id: 8, title: "Mey", artist: "Model", duration: "4:15", url: "https://files.catbox.moe/52j0m0.m4a" },
-  { id: 9, title: "Tekel Mavisi", artist: "No1", duration: "3:25", url: "https://files.catbox.moe/rmx8dr.m4a" },
-  { id: 10, title: "Bu Benim Hayatım", artist: "No1", duration: "4:40", url: "https://files.catbox.moe/qblscv.m4a" },
-  { "id": 11, "title": "Dernière Danse", "artist": "Indila", "duration": "0:00", "url": "https://files.catbox.moe/rvfofm.m4a" },
-  { "id": 12, "title": "Lady Gaga", "artist": "Die With a Smile", "duration": "0:00", "url": "https://files.catbox.moe/huroj3.m4a" },
-  { "id": 13, "title": "Fairytale", "artist": "Alexander Rybam", "duration": "0:00", "url": "https://files.catbox.moe/k3rnj7.m4a" },
-  { "id": 14, "title": "Ne Ne", "artist": "lvbel c5", "duration": "0:00", "url": "https://files.catbox.moe/4gobq8.m4a" },
-  { "id": 15, "title": "HAVHAVHAV", "artist": "lvbel c5", "duration": "0:00", "url": "https://files.catbox.moe/4tsy40.m4a" },
-  { "id": 16, "title": "Gaz Pedal", "artist": "lvbel c5", "duration": "0:00", "url": "https://files.catbox.moe/85hhx2.m4a" },
-  { "id": 17, "title": "Tak Tak Tak", "artist": "lvbel c5", "duration": "0:00", "url": "https://files.catbox.moe/1c5o0v.m4a" },
-  { "id": 18, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 19, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 20, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 21, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 22, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 23, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 24, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 25, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 26, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 27, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 28, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 29, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 30, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 31, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 32, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 33, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 34, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 35, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 36, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 37, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 38, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 39, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 40, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 41, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 42, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 43, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 44, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 45, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 46, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 47, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 48, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 49, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 50, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 51, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 52, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 53, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 54, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 55, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 56, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 57, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 58, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 59, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 60, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 61, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 62, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 63, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 64, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 65, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 66, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 67, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 68, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 69, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 70, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 71, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 72, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 73, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 74, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 75, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 76, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 77, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 78, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 79, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 80, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 81, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 82, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 83, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 84, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 85, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 86, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 87, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 88, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 89, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 90, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 91, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 92, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 93, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 94, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 95, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 96, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 97, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 98, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 99, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" },
-  { "id": 100, "title": "Önerilen", "artist": "Şarkı", "duration": "0:00", "url": "https://files.catbox.moe/BURAYABENEKLİCEM" }
-        ];
-
-let currentSong = null;
-let isPlaying = false;
-const audioPlayerElement = document.getElementById('audioPlayer');
-const volumeSlider = document.getElementById('volumeSlider');
-const volumeIcons = document.querySelectorAll('.volume-control i');
-
-volumeSlider.addEventListener('input', function() {
-    const volume = this.value / 100;
-    audioPlayerElement.volume = volume;
-    
-    // Ses ikonlarını güncelle
-    volumeIcons.forEach(icon => {
-        icon.classList.remove('fa-volume-up', 'fa-volume-down', 'fa-volume-mute', 'fa-volume-off');
-    });
-    
-    if (volume == 0) {
-        volumeIcons[0].classList.add('fa-volume-mute');
-        volumeIcons[1].classList.add('fa-volume-mute');
-    } else if (volume < 0.5) {
-        volumeIcons[0].classList.add('fa-volume-down');
-        volumeIcons[1].classList.add('fa-volume-down');
-    } else {
-        volumeIcons[0].classList.add('fa-volume-up');
-        volumeIcons[1].classList.add('fa-volume-up');
-    }
-});
-
-// İkonlara tıklama ile sesi kapat/aç
-volumeIcons.forEach(icon => {
-    icon.addEventListener('click', function() {
-        if (audioPlayerElement.volume > 0) {
-            // Sesi kapat
-            volumeSlider.value = 0;
-            audioPlayerElement.volume = 0;
-            volumeIcons.forEach(i => {
-                i.classList.remove('fa-volume-up', 'fa-volume-down', 'fa-volume-mute');
-                i.classList.add('fa-volume-mute');
-            });
-        } else {
-            // Sesi aç (%50 seviyesinde)
-            volumeSlider.value = 50;
-            audioPlayerElement.volume = 0.5;
-            volumeIcons.forEach(i => {
-                i.classList.remove('fa-volume-up', 'fa-volume-down', 'fa-volume-mute');
-                i.classList.add('fa-volume-up');
-            });
-        }
-    });
-});
-document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Navigasyon işlevselliği
             const navItems = document.querySelectorAll('.nav-item');
             const sections = document.querySelectorAll('.section');
@@ -1752,49 +576,253 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
-            // Müzik çalar işlevselliği
+            // Müzik çalar değişkenleri
+            let currentSong = null;
+            let isPlaying = false;
+            let userSongs = JSON.parse(localStorage.getItem('userSongs')) || [];
+            const audioPlayerElement = document.getElementById('audioPlayer');
             const playPauseBtn = document.getElementById('playPauseBtn');
             const playIcon = playPauseBtn.querySelector('i');
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const songListElement = document.getElementById('songList');
+            const emptyListElement = document.getElementById('emptyList');
             
-            playPauseBtn.addEventListener('click', function() {
-                if (!currentSong && songs.length > 0) {
-                    // Eğer hiç şarkı seçilmemişse ilk şarkıyı çal
-                    playSong(songs[0]);
-                } else if (currentSong) {
-                    // Şarkı çalınıyorsa duraklat, duraklatılmışsa devam ettir
-                    togglePlayPause();
+            // Sayfa yüklendiğinde şarkı listesini oluştur
+            renderSongList();
+            
+            // Ses kontrolü
+            volumeSlider.addEventListener('input', function() {
+                audioPlayerElement.volume = this.value / 100;
+            });
+            
+            // Şarkı ekleme butonu
+            document.getElementById('addSongBtn').addEventListener('click', function() {
+                const title = document.getElementById('songTitle').value.trim();
+                const artist = document.getElementById('songArtist').value.trim();
+                const url = document.getElementById('songUrl').value.trim();
+                const lyrics = document.getElementById('songLyrics').value.trim();
+                
+                if (!title || !artist || !url) {
+                    alert('Lütfen tüm alanları doldurun!');
+                    return;
                 }
+                
+                if (!url.includes('catbox.moe')) {
+                    alert('Lütfen geçerli bir catbox.moe linki girin!');
+                    return;
+                }
+                
+                // Yeni şarkıyı ekle
+                const newSong = {
+                    id: Date.now(), // Benzersiz ID
+                    title: title,
+                    artist: artist,
+                    url: url,
+                    lyrics: lyrics,
+                    duration: "0:00"
+                };
+                
+                userSongs.push(newSong);
+                localStorage.setItem('userSongs', JSON.stringify(userSongs));
+                
+                // Formu temizle
+                document.getElementById('songTitle').value = '';
+                document.getElementById('songArtist').value = '';
+                document.getElementById('songUrl').value = '';
+                document.getElementById('songLyrics').value = '';
+                
+                // Listeyi yeniden oluştur
+                renderSongList();
+                
+                alert('Şarkı başarıyla eklendi!');
             });
             
-            // Önceki şarkı butonu
-            prevBtn.addEventListener('click', function() {
-                playPreviousSong();
+// Bağlantı oluştur butonu
+document.getElementById('generateLinkBtn').addEventListener('click', function() {
+    // Catbox.moe'yi yeni sekmede aç
+    window.open('https://catbox.moe/', '_blank');
+    
+    // Sayfa yeniden odaklandığında panoyu kontrol et
+    window.addEventListener('focus', function checkClipboard() {
+        // Bir kere kontrol ettikten sonra event listener'ı kaldır
+        window.removeEventListener('focus', checkClipboard);
+        
+        // Panodaki metni al ve URL alanına yapıştır
+        navigator.clipboard.readText()
+            .then(text => {
+                if (text.includes('catbox.moe')) {
+                    document.getElementById('songUrl').value = text;
+                }
+            })
+            .catch(err => {
+                console.error('Panoya erişilemedi: ', err);
             });
+    });
+});            
             
-            // Sonraki şarkı butonu
-            nextBtn.addEventListener('click', function() {
-                playNextSong();
-            });
             
-            // Şarkı listesi işlevselliği
-            const songItems = document.querySelectorAll('.song-item');
-            songItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const songId = this.getAttribute('data-song');
-                    const song = songs.find(s => s.id == songId);
+// Düzenleme ve silme işlevleri
+function setupSongActions() {
+    // Düzenleme butonları
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const songId = parseInt(this.getAttribute('data-id'));
+            const song = userSongs.find(s => s.id === songId);
+            if (song) {
+                openEditModal(song);
+            }
+        });
+    });
+    
+    // Silme butonları
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const songId = parseInt(this.getAttribute('data-id'));
+            if (confirm('Bu şarkıyı silmek istediğinize emin misiniz?')) {
+                deleteSong(songId);
+            }
+        });
+    });
+}
+
+// Düzenleme modalını aç
+function openEditModal(song) {
+    document.getElementById('editSongTitle').value = song.title;
+    document.getElementById('editSongArtist').value = song.artist;
+    document.getElementById('editSongUrl').value = song.url;
+    document.getElementById('editSongLyrics').value = song.lyrics || '';
+    
+    document.getElementById('editModal').style.display = 'block';
+    
+    // Kaydet butonuna tıklama
+    document.getElementById('saveEditBtn').onclick = function() {
+        saveSongEdit(song.id);
+    };
+    
+    // İptal butonuna tıklama
+    document.getElementById('cancelEditBtn').onclick = function() {
+        document.getElementById('editModal').style.display = 'none';
+    };
+}
+
+// Şarkı düzenlemelerini kaydet
+function saveSongEdit(songId) {
+    const title = document.getElementById('editSongTitle').value.trim();
+    const artist = document.getElementById('editSongArtist').value.trim();
+    const url = document.getElementById('editSongUrl').value.trim();
+    const lyrics = document.getElementById('editSongLyrics').value.trim();
+    
+    if (!title || !artist || !url) {
+        alert('Lütfen tüm alanları doldurun!');
+        return;
+    }
+    
+    if (!url.includes('catbox.moe')) {
+        alert('Lütfen geçerli bir catbox.moe linki girin!');
+        return;
+    }
+    
+    // Şarkıyı güncelle
+    const songIndex = userSongs.findIndex(s => s.id === songId);
+    if (songIndex !== -1) {
+        userSongs[songIndex] = {
+            ...userSongs[songIndex],
+            title,
+            artist,
+            url,
+            lyrics
+        };
+        
+        localStorage.setItem('userSongs', JSON.stringify(userSongs));
+        renderSongList();
+        
+        // Eğer bu şarkı çalınıyorsa, bilgileri güncelle
+        if (currentSong && currentSong.id === songId) {
+            currentSong = userSongs[songIndex];
+            document.querySelector('.song-title').textContent = currentSong.title;
+            document.querySelector('.song-artist').textContent = currentSong.artist;
+            
+            const lyricsContainer = document.getElementById('songLyricsContainer');
+            const lyricsText = document.getElementById('lyricsText');
+            
+            if (currentSong.lyrics) {
+                lyricsText.textContent = currentSong.lyrics;
+                lyricsContainer.style.display = 'block';
+            } else {
+                lyricsContainer.style.display = 'none';
+            }
+        }
+        
+        document.getElementById('editModal').style.display = 'none';
+        alert('Şarkı başarıyla güncellendi!');
+    }
+}
+
+// Şarkı sil
+function deleteSong(songId) {
+    userSongs = userSongs.filter(song => song.id !== songId);
+    localStorage.setItem('userSongs', JSON.stringify(userSongs));
+    
+    // Eğer silinen şarkı çalınıyorsa, durdur
+    if (currentSong && currentSong.id === songId) {
+        audioPlayerElement.pause();
+        currentSong = null;
+        isPlaying = false;
+        updatePlayPauseIcon();
+        
+        document.querySelector('.song-title').textContent = 'Şarkı seçin';
+        document.querySelector('.song-artist').textContent = 'Şarkıcı';
+        document.querySelector('.progress').style.width = '0%';
+        document.querySelector('.time span:first-child').textContent = '0:00';
+        document.getElementById('songLyricsContainer').style.display = 'none';
+    }
+    
+    renderSongList();
+}
+            
+            // Şarkı listesini oluştur
+            function renderSongList() {
+                if (userSongs.length === 0) {
+                    emptyListElement.style.display = 'block';
+                    songListElement.innerHTML = '';
+                    songListElement.appendChild(emptyListElement);
+                    return;
+                }
+                
+                emptyListElement.style.display = 'none';
+                songListElement.innerHTML = '';
+                
+                userSongs.forEach((song, index) => {
+                    const songItem = document.createElement('div');
+                    songItem.classList.add('song-item');
+                    songItem.setAttribute('data-id', song.id);
                     
-                    if (song) {
-                        // Aktif şarkıyı güncelle
-                        songItems.forEach(s => s.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Şarkıyı çal
+                    songItem.innerHTML = `
+    <div class="song-number">${index + 1}</div>
+    <div class="song-details">
+        <div class="song-item-title">${song.title}</div>
+        <div class="song-item-artist">${song.artist}</div>
+    </div>
+    <div class="song-duration">${song.duration}</div>
+    <div class="control-btn"><i class="fas fa-play"></i></div>
+    <div class="song-actions">
+        <button class="edit-btn" data-id="${song.id}"><i class="fas fa-edit"></i></button>
+        <button class="delete-btn" data-id="${song.id}"><i class="fas fa-trash"></i></button>
+    </div>
+`;
+                    
+                    songItem.addEventListener('click', function() {
                         playSong(song);
-                    }
+                    });
+                    
+                    songListElement.appendChild(songItem);                    
+           setupSongActions();
                 });
-            });
+            }
             
             // Şarkı çalma fonksiyonu
             function playSong(song) {
@@ -1808,16 +836,37 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Şu an çalanı güncelle
                         document.querySelector('.song-title').textContent = song.title;
                         document.querySelector('.song-artist').textContent = song.artist;
-                        
+
+// Şarkı sözlerini göster veya gizle
+const lyricsContainer = document.getElementById('songLyricsContainer');
+const lyricsText = document.getElementById('lyricsText');
+
+if (song.lyrics) {
+    lyricsText.textContent = song.lyrics;
+    lyricsContainer.style.display = 'block';
+} else {
+    lyricsContainer.style.display = 'none';
+}
                         // İlerleme çubuğu güncellemesi için
                         audioPlayerElement.addEventListener('timeupdate', updateProgressBar);
                         audioPlayerElement.addEventListener('ended', playNextSong);
                     })
                     .catch(error => {
                         console.error("Şarkı çalınamadı:", error);
-                        alert("Şarkı çalınamadı. Lütfen daha sonra tekrar deneyin.");
+                        alert("Şarkı çalınamadı. Lütfen linkin doğru olduğundan emin olun.");
                     });
             }
+            
+            // Çal/Duraklat butonu
+            playPauseBtn.addEventListener('click', function() {
+                if (!currentSong && userSongs.length > 0) {
+                    // İlk şarkıyı çal
+                    playSong(userSongs[0]);
+                } else if (currentSong) {
+                    // Şarkı çalınıyorsa duraklat, duraklatılmışsa devam ettir
+                    togglePlayPause();
+                }
+            });
             
             // Çal/Duraklat fonksiyonu
             function togglePlayPause() {
@@ -1869,36 +918,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Sonraki şarkıyı çal
             function playNextSong() {
-                if (!currentSong) return;
+                if (!currentSong || userSongs.length <= 1) return;
                 
-                const currentIndex = songs.findIndex(song => song.id === currentSong.id);
-                const nextIndex = (currentIndex + 1) % songs.length;
-                
-                // Aktif şarkıyı güncelle
-                songItems.forEach(item => item.classList.remove('active'));
-                const nextSongItem = document.querySelector(`.song-item[data-song="${songs[nextIndex].id}"]`);
-                if (nextSongItem) {
-                    nextSongItem.classList.add('active');
-                }
-                
-                playSong(songs[nextIndex]);
+                const currentIndex = userSongs.findIndex(song => song.id === currentSong.id);
+                const nextIndex = (currentIndex + 1) % userSongs.length;
+                playSong(userSongs[nextIndex]);
             }
             
             // Önceki şarkıyı çal
             function playPreviousSong() {
-                if (!currentSong) return;
+                if (!currentSong || userSongs.length <= 1) return;
                 
-                const currentIndex = songs.findIndex(song => song.id === currentSong.id);
-                const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-                
-                // Aktif şarkıyı güncelle
-                songItems.forEach(item => item.classList.remove('active'));
-                const prevSongItem = document.querySelector(`.song-item[data-song="${songs[prevIndex].id}"]`);
-                if (prevSongItem) {
-                    prevSongItem.classList.add('active');
-                }
-                
-                playSong(songs[prevIndex]);
+                const currentIndex = userSongs.findIndex(song => song.id === currentSong.id);
+                const prevIndex = (currentIndex - 1 + userSongs.length) % userSongs.length;
+                playSong(userSongs[prevIndex]);
             }
             
             // İlerleme çubuğu tıklama
@@ -1913,63 +946,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 audioPlayerElement.currentTime = (clickX / width) * duration;
             });
             
-            // Sohbet işlevselliği
-            const chatInput = document.getElementById('chatInput');
-            const chatButton = document.getElementById('sendMessage');
-            const chatMessages = document.querySelector('.chat-messages');
-            
-            chatButton.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-            
-            function sendMessage() {
-                const message = chatInput.value.trim();
-                if (message) {
-                    // Kullanıcı mesajını ekle
-                    const userMessageEl = document.createElement('div');
-                    userMessageEl.classList.add('message', 'user-message');
-                    userMessageEl.textContent = message;
-                    chatMessages.appendChild(userMessageEl);
-                    
-                    // Input'u temizle
-                    chatInput.value = '';
-                    
-                    // Otomatik kaydırmayı etkinleştir
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    
-                    // AI yanıtı için simülasyon
-                    setTimeout(() => {
-                        const aiMessageEl = document.createElement('div');
-                        aiMessageEl.classList.add('message', 'ai-message');
-                        
-                        // Gelen mesaja göre yanıt seç
-                        let response = aiResponses.default;
-                        const lowerMessage = message.toLowerCase();
-                        
-                        for (const [key, value] of Object.entries(aiResponses)) {
-                            if (lowerMessage.includes(key)) {
-                                response = value;
-                                break;
-                            }
-                        }
-                        
-                        // Rastgele bir yanıt seç
-                        if (Array.isArray(response)) {
-                            aiMessageEl.textContent = response[Math.floor(Math.random() * response.length)];
-                        } else {
-                            aiMessageEl.textContent = response;
-                        }
-                        
-                        chatMessages.appendChild(aiMessageEl);
-                        
-                        // Otomatik kaydırmayı etkinleştir
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }, 1000);
-                }
-            }
+            // Buton eventleri
+            prevBtn.addEventListener('click', playPreviousSong);
+            nextBtn.addEventListener('click', playNextSong);
         });
     </script>
 </body>
