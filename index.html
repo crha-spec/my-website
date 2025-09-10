@@ -2,97 +2,105 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Müzik Uygulaması</title>
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #2c3e50; }
-    form { margin-top: 20px; }
-    input { margin: 5px; padding: 8px; }
-    button { padding: 8px 12px; }
-    ul { margin-top: 20px; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+    h1 { text-align: center; }
+    #adminPanel { display: none; margin: 20px auto; padding: 15px; background: white; border-radius: 10px; width: 400px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);}
+    #songList { margin-top: 20px; }
+    .song { background: white; margin: 10px 0; padding: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    input { display: block; margin: 5px 0; padding: 8px; width: 100%; }
+    button { margin-top: 10px; padding: 10px; width: 100%; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #0056b3; }
   </style>
 </head>
 <body>
-  <h1 id="title">🎵 Müzik Listesi</h1>
+  <h1>🎵 Müzik Kütüphanesi</h1>
 
-  <!-- Kullanıcılar için liste -->
-  <ul id="song-list"></ul>
+  <!-- Kullanıcıların göreceği şarkı listesi -->
+  <div id="songList"></div>
 
-  <!-- Admin için form -->
-  <div id="admin-panel" style="display:none;">
-    <h2>Admin Paneli</h2>
-    <form id="songForm">
-      <input type="text" id="titleInput" placeholder="Şarkı adı" required>
-      <input type="text" id="artistInput" placeholder="Sanatçı" required>
-      <input type="text" id="urlInput" placeholder="Şarkı URL" required>
-      <button type="submit">Şarkı Ekle</button>
-    </form>
+  <!-- Admin paneli (sadece senin IP'de açılır) -->
+  <div id="adminPanel">
+    <h2>Şarkı Ekle</h2>
+    <input type="text" id="songName" placeholder="Şarkı adı">
+    <input type="text" id="songArtist" placeholder="Sanatçı">
+    <input type="text" id="songUrl" placeholder="Şarkı URL">
+    <input type="text" id="username" placeholder="Kullanıcı adı">
+    <button id="addSongBtn">Ekle</button>
   </div>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
+  <script>
     // 🔑 Senin Supabase bilgilerin
     const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 🔒 Buraya senin IP’ni yazacağız
+    // Senin IP adresin (admin kontrolü için)
     const ADMIN_IP = "151.250.4.2";
 
-    async function checkIpAndLoad() {
-      const res = await fetch("https://api.ipify.org?format=json");
-      const data = await res.json();
-      const userIp = data.ip;
-
-      if (userIp === ADMIN_IP) {
-        // Admin görünümü
-        document.getElementById("admin-panel").style.display = "block";
-        document.getElementById("title").innerText = "🎵 Admin Paneli";
+    // IP öğrenme
+    async function getIP() {
+      try {
+        let res = await fetch("https://api64.ipify.org?format=json");
+        let data = await res.json();
+        return data.ip;
+      } catch {
+        return "bilinmiyor";
       }
-
-      loadSongs();
     }
 
+    // Şarkıları listele
     async function loadSongs() {
-      const { data, error } = await supabase.from("Songs").select("*").order("id", { ascending: true });
+      const { data, error } = await supabase.from("Songs").select("*");
+      const listDiv = document.getElementById("songList");
+      listDiv.innerHTML = "";
       if (error) {
-        console.error("Hata:", error);
+        listDiv.innerHTML = "Hata: " + error.message;
         return;
       }
-
-      const list = document.getElementById("song-list");
-      list.innerHTML = "";
       data.forEach(song => {
-        const li = document.createElement("li");
-        li.innerHTML = `<b>${song.title}</b> - ${song.artist} <br>
-                        <a href="${song.url}" target="_blank">Şarkıyı Aç</a>`;
-        list.appendChild(li);
+        const div = document.createElement("div");
+        div.className = "song";
+        div.innerHTML = `
+          <b>${song.name}</b> - ${song.artist} <br>
+          <a href="${song.url}" target="_blank">Dinle</a> <br>
+          👤 ${song.username || "Bilinmiyor"} | 🌍 ${song.ip || ""}
+        `;
+        listDiv.appendChild(div);
       });
     }
 
-    // Admin şarkı ekleme
-    const form = document.getElementById("songForm");
-    form?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const title = document.getElementById("titleInput").value;
-      const artist = document.getElementById("artistInput").value;
-      const url = document.getElementById("urlInput").value;
+    // Şarkı ekleme
+    document.getElementById("addSongBtn").addEventListener("click", async () => {
+      const name = document.getElementById("songName").value;
+      const artist = document.getElementById("songArtist").value;
+      const url = document.getElementById("songUrl").value;
+      const username = document.getElementById("username").value;
 
-      const { error } = await supabase.from("Songs").insert([{ title, artist, url }]);
+      const ip = await getIP();
+
+      const { error } = await supabase.from("Songs").insert([
+        { name, artist, url, username, ip }
+      ]);
 
       if (error) {
         alert("Hata: " + error.message);
       } else {
         alert("Şarkı eklendi!");
-        form.reset();
         loadSongs();
       }
     });
 
-    checkIpAndLoad();
+    // Admin panel kontrol
+    (async () => {
+      const ip = await getIP();
+      if (ip === ADMIN_IP) {
+        document.getElementById("adminPanel").style.display = "block";
+      }
+      loadSongs();
+    })();
   </script>
 </body>
 </html>
