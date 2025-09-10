@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+</head>
+<body>
+  <h1>🎵 Admin Panel</h1>
+
+  <input type="text" id="title" placeholder="Şarkı Adı"><br>
+  <input type="text" id="artist" placeholder="Sanatçı"><br>
+  <input type="text" id="url" placeholder="Catbox Linki"><br>
+  <textarea id="lyrics" placeholder="Şarkı Sözleri"></textarea><br>
+  <button onclick="addSong()">Şarkıyı Ekle</button>
+
+  <script>
+    const SONGS_API = "https://api.npoint.io/f3a97b0447f902932a5a";
+
+    async function addSong() {
+      const res = await fetch(SONGS_API);
+      const songs = await res.json();
+
+      const newSong = {
+        title: document.getElementById("title").value,
+        artist: document.getElementById("artist").value,
+        url: document.getElementById("url").value,
+        lyrics: document.getElementById("lyrics").value
+      };
+
+      songs.push(newSong);
+
+      await fetch(SONGS_API, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(songs)
+      });
+
+      alert("✅ Şarkı eklendi!");
+    }
+  </script>
+</body>
+</html>
