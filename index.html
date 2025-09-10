@@ -2,33 +2,77 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Müzik Uygulaması</title>
-  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Müzik Kütüphanesi</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
-    h1 { text-align: center; }
-    #adminPanel { display: none; margin: 20px auto; padding: 15px; background: white; border-radius: 10px; width: 400px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);}
-    #songList { margin-top: 20px; }
-    .song { background: white; margin: 10px 0; padding: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    input { display: block; margin: 5px 0; padding: 8px; width: 100%; }
-    button { margin-top: 10px; padding: 10px; width: 100%; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    button:hover { background: #0056b3; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { color: #1db954; }
+    form, .song-list, .admin {
+      margin: 20px auto;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 600px;
+      background: #222;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      background: #1db954;
+      color: #fff;
+      cursor: pointer;
+    }
+    .danger {
+      background: #e63946;
+    }
+    .edit {
+      background: #ffb703;
+      color: #000;
+    }
+    .song {
+      margin: 10px 0;
+      padding: 10px;
+      background: #333;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <h1>🎵 Müzik Kütüphanesi</h1>
+  <h1>🎶 Müzik Kütüphanesi</h1>
 
-  <!-- Kullanıcıların göreceği şarkı listesi -->
-  <div id="songList"></div>
+  <!-- Şarkı Ekleme Formu -->
+  <form id="songForm">
+    <input type="text" id="name" placeholder="Şarkı Adı" required><br>
+    <input type="text" id="artist" placeholder="Sanatçı" required><br>
+    <input type="text" id="url" placeholder="YouTube / MP3 URL" required><br>
+    <button type="submit">Ekle</button>
+  </form>
 
-  <!-- Admin paneli (sadece senin IP'de açılır) -->
-  <div id="adminPanel">
-    <h2>Şarkı Ekle</h2>
-    <input type="text" id="songName" placeholder="Şarkı adı">
-    <input type="text" id="songArtist" placeholder="Sanatçı">
-    <input type="text" id="songUrl" placeholder="Şarkı URL">
-    <input type="text" id="username" placeholder="Kullanıcı adı">
-    <button id="addSongBtn">Ekle</button>
+  <!-- Şarkı Listesi -->
+  <div class="song-list" id="songList">
+    <h2>Şarkılar</h2>
+    <div id="songs"></div>
+  </div>
+
+  <!-- Admin Paneli -->
+  <div class="admin" id="adminPanel" style="display:none;">
+    <h2>🔑 Admin Paneli</h2>
+    <p>Hoş geldin Admin! (IP kontrolünden geçtin)</p>
   </div>
 
   <script>
@@ -37,70 +81,110 @@
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Senin IP adresin (admin kontrolü için)
-    const ADMIN_IP = "151.250.4.2";
+    const ADMIN_IP = "151.250.4.2"; // senin ip
+    let isAdmin = false;
 
-    // IP öğrenme
-    async function getIP() {
-      try {
-        let res = await fetch("https://api64.ipify.org?format=json");
-        let data = await res.json();
-        return data.ip;
-      } catch {
-        return "bilinmiyor";
-      }
-    }
+    // IP kontrolü
+    fetch("https://api64.ipify.org?format=json")
+      .then(res => res.json())
+      .then(data => {
+        if (data.ip === ADMIN_IP) {
+          document.getElementById("adminPanel").style.display = "block";
+          isAdmin = true;
+          loadSongs();
+        } else {
+          loadSongs();
+        }
+      });
 
-    // Şarkıları listele
+    // Şarkı listele
     async function loadSongs() {
-      const { data, error } = await supabase.from("Songs").select("*");
-      const listDiv = document.getElementById("songList");
-      listDiv.innerHTML = "";
+      const { data, error } = await supabase.from("Songs").select("*").order("created_at", { ascending: false });
       if (error) {
-        listDiv.innerHTML = "Hata: " + error.message;
+        console.error(error);
         return;
       }
+      const songsDiv = document.getElementById("songs");
+      songsDiv.innerHTML = "";
       data.forEach(song => {
         const div = document.createElement("div");
         div.className = "song";
         div.innerHTML = `
-          <b>${song.name}</b> - ${song.artist} <br>
-          <a href="${song.url}" target="_blank">Dinle</a> <br>
-          👤 ${song.username || "Bilinmiyor"} | 🌍 ${song.ip || ""}
+          <b>${song.name}</b> - ${song.artist} <br> 
+          <a href="${song.url}" target="_blank">Dinle</a>
         `;
-        listDiv.appendChild(div);
+
+        if (isAdmin) {
+          const delBtn = document.createElement("button");
+          delBtn.className = "danger";
+          delBtn.textContent = "Sil";
+          delBtn.onclick = () => deleteSong(song.id);
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "edit";
+          editBtn.textContent = "Düzenle";
+          editBtn.onclick = () => editSong(song);
+
+          div.appendChild(document.createElement("br"));
+          div.appendChild(delBtn);
+          div.appendChild(editBtn);
+        }
+
+        songsDiv.appendChild(div);
       });
     }
 
     // Şarkı ekleme
-    document.getElementById("addSongBtn").addEventListener("click", async () => {
-      const name = document.getElementById("songName").value;
-      const artist = document.getElementById("songArtist").value;
-      const url = document.getElementById("songUrl").value;
-      const username = document.getElementById("username").value;
+    document.getElementById("songForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const artist = document.getElementById("artist").value;
+      const url = document.getElementById("url").value;
 
-      const ip = await getIP();
-
-      const { error } = await supabase.from("Songs").insert([
-        { name, artist, url, username, ip }
-      ]);
-
+      const { error } = await supabase.from("Songs").insert([{ name, artist, url }]);
       if (error) {
         alert("Hata: " + error.message);
       } else {
-        alert("Şarkı eklendi!");
+        alert("✅ Şarkı eklendi!");
+        document.getElementById("songForm").reset();
         loadSongs();
       }
     });
 
-    // Admin panel kontrol
-    (async () => {
-      const ip = await getIP();
-      if (ip === ADMIN_IP) {
-        document.getElementById("adminPanel").style.display = "block";
+    // Şarkı silme (admin)
+    async function deleteSong(id) {
+      if (confirm("Bu şarkıyı silmek istediğine emin misin?")) {
+        const { error } = await supabase.from("Songs").delete().eq("id", id);
+        if (error) {
+          alert("Hata: " + error.message);
+        } else {
+          alert("🗑️ Şarkı silindi!");
+          loadSongs();
+        }
       }
-      loadSongs();
-    })();
+    }
+
+    // Şarkı düzenleme (admin)
+    async function editSong(song) {
+      const newName = prompt("Yeni şarkı adı:", song.name);
+      const newArtist = prompt("Yeni sanatçı:", song.artist);
+      const newUrl = prompt("Yeni URL:", song.url);
+
+      if (newName && newArtist && newUrl) {
+        const { error } = await supabase.from("Songs").update({
+          name: newName,
+          artist: newArtist,
+          url: newUrl
+        }).eq("id", song.id);
+
+        if (error) {
+          alert("Hata: " + error.message);
+        } else {
+          alert("✏️ Şarkı güncellendi!");
+          loadSongs();
+        }
+      }
+    }
   </script>
 </body>
 </html>
