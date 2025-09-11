@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Kişisel Müzik Kütüphanesi - Admin + Kullanıcı</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -317,96 +317,6 @@
             margin-top: 15px;
         }
         
-        .lyrics-container {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            color: white;
-        }
-        
-        .lyrics-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: white;
-        }
-        
-        .requests-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .request-item {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .request-info {
-            flex: 1;
-        }
-        
-        .request-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .upload-area {
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-            color: white;
-        }
-        
-        .upload-area:hover {
-            border-color: var(--accent);
-            background: rgba(247, 37, 133, 0.1);
-        }
-        
-        .upload-icon {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-        
-        .status-message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin: 16px 0;
-            font-weight: 500;
-        }
-        
-        .status-error {
-            background: rgba(230, 57, 70, 0.2);
-            color: #ff6b6b;
-            border-left: 4px solid var(--danger);
-        }
-        
-        .status-success {
-            background: rgba(76, 201, 240, 0.2);
-            color: #4cc9f0;
-            border-left: 4px solid var(--success);
-        }
-        
-        .status-info {
-            background: rgba(252, 163, 17, 0.2);
-            color: #fca311;
-            border-left: 4px solid var(--warning);
-        }
-        
         .player-container {
             position: fixed;
             bottom: 0;
@@ -523,13 +433,29 @@
             margin-top: 50px;
         }
         
-        .tablo-hata {
-            background: rgba(230, 57, 70, 0.2);
-            padding: 15px;
+        .status-message {
+            padding: 12px 16px;
             border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid var(--danger);
+            margin: 16px 0;
+            font-weight: 500;
+        }
+        
+        .status-error {
+            background: rgba(230, 57, 70, 0.2);
             color: #ff6b6b;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .status-success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+            border-left: 4px solid var(--success);
+        }
+        
+        .status-info {
+            background: rgba(252, 163, 17, 0.2);
+            color: #fca311;
+            border-left: 4px solid var(--warning);
         }
         
         @media (max-width: 992px) {
@@ -563,16 +489,6 @@
         }
         
         @media (max-width: 768px) {
-            .request-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .request-actions {
-                align-self: flex-end;
-            }
-            
             .player-container {
                 flex-direction: column;
                 gap: 15px;
@@ -652,10 +568,6 @@
                                 <input id="song-image" placeholder="https://..." />
                             </div>
                             <div class="form-group">
-                                <label>Şarkı Sözleri (isteğe bağlı)</label>
-                                <textarea id="song-lyrics" placeholder="Şarkı sözlerini buraya yazın..." rows="5"></textarea>
-                            </div>
-                            <div class="form-group">
                                 <label>Dosya URL (catbox veya mp3 linki)</label>
                                 <input id="song-url" placeholder="https://..." />
                             </div>
@@ -678,9 +590,7 @@
                         <div class="card">
                             <h3>Şarkı İstekleri</h3>
                             <div id="song-requests-container">
-                                <div class="requests-list" id="song-requests-list">
-                                    <!-- İstekler buraya dinamik olarak eklenecek -->
-                                </div>
+                                <ul id="song-requests-list" class="requests-list"></ul>
                             </div>
                         </div>
                     </div>
@@ -689,17 +599,12 @@
                     <div id="access-requests-section" class="panel">
                         <div class="card">
                             <h3>Giriş Onayları</h3>
-                            <div id="tablo-hata-mesaji" class="tablo-hata" style="display:none;">
-                                AccessRequests tablosu bulunamadı. Lütfen Supabase'de tabloyu oluşturun.
-                            </div>
                             <button id="approveAllBtn" class="btn btn-secondary" style="margin-bottom: 20px;">
                                 <i class="fas fa-check-double"></i>
                                 Tümünü Onayla
                             </button>
                             <div id="access-requests-container">
-                                <div class="requests-list" id="access-requests-list">
-                                    <!-- İstekler buraya dinamik olarak eklenecek -->
-                                </div>
+                                <ul id="access-requests-list" class="requests-list"></ul>
                             </div>
                         </div>
                     </div>
@@ -751,26 +656,14 @@
                                 <label>Sanatçı</label>
                                 <input id="request-song-artist" placeholder="Örnek: Alan Walker" />
                             </div>
-                            <div class="form-group">
-                                <label>Şarkı Sözleri (isteğe bağlı)</label>
-                                <textarea id="request-song-lyrics" placeholder="Şarkı sözlerini buraya yazın..." rows="5"></textarea>
-                            </div>
-                            
-                            <div class="upload-area" id="upload-area">
-                                <div class="upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <h4>Dosya Yükleme Talimatları</h4>
-                                <p>Catbox.moe'ya giderek dosyanızı yükleyin ve elde ettiğiniz linki aşağıya yapıştırın</p>
-                                <button class="btn btn-outline" style="margin-top: 15px;" onclick="window.open('https://catbox.moe/', '_blank')">
-                                    <i class="fas fa-external-link-alt"></i>
-                                    Catbox.moe'ya Git
-                                </button>
-                            </div>
                             
                             <div class="form-group">
-                                <label>Catbox.moe Dosja Linki</label>
+                                <label>Catbox.moe Dosya Linki</label>
                                 <input id="request-song-url" placeholder="https://files.catbox.moe/..." />
+                                <p class="hint" style="color: rgba(255,255,255,0.7); margin-top: 5px;">
+                                    <i class="fas fa-info-circle"></i> Catbox.moe'ya giderek dosyanızı yükleyin ve elde ettiğiniz linki buraya yapıştırın.
+                                    <a href="https://catbox.moe/" target="_blank" style="color: var(--accent);">Catbox.moe'ya Git</a>
+                                </p>
                             </div>
                             
                             <div style="display:flex; gap:12px; margin-top:15px">
@@ -857,7 +750,6 @@
         const clearBtn = document.getElementById('clearBtn');
         const sendRequestBtn = document.getElementById('sendRequestBtn');
         const approveAllBtn = document.getElementById('approveAllBtn');
-        const tabloHataMesaji = document.getElementById('tablo-hata-mesaji');
         const searchInput = document.getElementById('search-input');
         
         // Müzik çalar elemanları
@@ -878,7 +770,7 @@
         let isPlaying = false;
         let currentSongIndex = 0;
         let songs = [];
-        
+
         // Onaylanmış IP'ler (localStorage'da saklanacak)
         let approvedIPs = JSON.parse(localStorage.getItem('approvedIPs')) || [];
 
@@ -946,18 +838,8 @@
                     .select('*')
                     .eq('ip', ip);
 
-                if (checkError && checkError.message.includes('schema cache')) {
-                    console.error("AccessRequests tablosu bulunamadı:", checkError);
-                    // Tablo yoksa localStorage'a kaydet
-                    const requests = JSON.parse(localStorage.getItem('accessRequests')) || [];
-                    if (!requests.some(req => req.ip === ip)) {
-                        requests.push({ 
-                            ip: ip, 
-                            status: 'pending',
-                            created_at: new Date().toISOString()
-                        });
-                        localStorage.setItem('accessRequests', JSON.stringify(requests));
-                    }
+                if (checkError) {
+                    console.error("Erişim isteği kontrol hatası:", checkError);
                     return;
                 }
 
@@ -988,7 +870,6 @@
             const name = document.getElementById('song-name').value.trim();
             const artist = document.getElementById('song-artist').value.trim();
             const image = document.getElementById('song-image').value.trim();
-            const lyrics = document.getElementById('song-lyrics').value.trim();
             const url = document.getElementById('song-url').value.trim();
 
             if (!name || !artist || !url) {
@@ -1005,8 +886,7 @@
                     name, 
                     artist, 
                     url,
-                    image: image || "https://placehold.co/400x400/4361ee/white?text=♪",
-                    lyrics: lyrics || null
+                    image: image || "https://placehold.co/400x400/4361ee/white?text=♪"
                 };
                 
                 const { data, error } = await supabase
@@ -1027,7 +907,6 @@
                     document.getElementById('song-name').value = '';
                     document.getElementById('song-artist').value = '';
                     document.getElementById('song-image').value = '';
-                    document.getElementById('song-lyrics').value = '';
                     document.getElementById('song-url').value = '';
                     await loadSongs();
                 }
@@ -1046,7 +925,6 @@
             
             const name = document.getElementById('request-song-name').value.trim();
             const artist = document.getElementById('request-song-artist').value.trim();
-            const lyrics = document.getElementById('request-song-lyrics').value.trim();
             const url = document.getElementById('request-song-url').value.trim();
 
             if (!name || !artist || !url) {
@@ -1068,7 +946,6 @@
                     name, 
                     artist, 
                     file_url: url,
-                    lyrics: lyrics || null,
                     status: 'pending' // pending, approved, rejected
                 };
                 
@@ -1084,7 +961,6 @@
                     // form temizle
                     document.getElementById('request-song-name').value = '';
                     document.getElementById('request-song-artist').value = '';
-                    document.getElementById('request-song-lyrics').value = '';
                     document.getElementById('request-song-url').value = '';
                 }
             } catch (err) {
@@ -1097,76 +973,29 @@
 
         // Giriş isteklerini yükle (admin için)
         async function loadAccessRequests() {
-            accessRequestsList.innerHTML = '<div class="status-message status-info">Yükleniyor...</div>';
+            accessRequestsList.innerHTML = '<li class="status-message status-info">Yükleniyor...</li>';
             try {
                 const { data, error } = await supabase
                     .from('AccessRequests')
                     .select('*')
                     .order('created_at', { ascending: false });
 
-                if (error && error.message.includes('schema cache')) {
-                    // Tablo yoksa localStorage'dan yükle
-                    tabloHataMesaji.style.display = 'block';
-                    approveAllBtn.style.display = 'none';
-                    
-                    const requests = JSON.parse(localStorage.getItem('accessRequests')) || [];
-                    
-                    if (requests.length === 0) {
-                        accessRequestsList.innerHTML = '<div class="status-message status-info">Henüz giriş isteği yok.</div>';
-                        return;
-                    }
-
-                    accessRequestsList.innerHTML = '';
-                    requests.forEach(request => {
-                        const requestEl = document.createElement('div');
-                        requestEl.className = 'request-item';
-                        requestEl.innerHTML = `
-                            <div class="request-info">
-                                <div style="font-weight: 600; font-size: 1.1rem; color: white;">IP Adresi: ${escapeHtml(request.ip || '')}</div>
-                                <div style="color: rgba(255,255,255,0.7); margin: 8px 0;">Durum: ${request.status || 'pending'}</div>
-                                <div style="color: rgba(255,255,255,0.7);">İstek Zamanı: ${new Date(request.created_at).toLocaleString('tr-TR')}</div>
-                            </div>
-                            ${request.status === 'pending' ? `
-                                <div class="request-actions">
-                                    <button class="btn btn-sm approve-access-btn" data-ip="${escapeAttr(request.ip)}">
-                                        <i class="fas fa-check"></i> Onayla
-                                    </button>
-                                </div>
-                            ` : ''}
-                        `;
-                        accessRequestsList.appendChild(requestEl);
-                    });
-
-                    // Onayla butonlarına event ekle
-                    document.querySelectorAll('.approve-access-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const ip = btn.getAttribute('data-ip');
-                            approveAccessRequest(ip);
-                        });
-                    });
-                    
-                    return;
-                }
-
                 if (error) {
-                    accessRequestsList.innerHTML = '<div class="status-message status-error">İstekler yüklenemedi: ' + error.message + '</div>';
+                    accessRequestsList.innerHTML = '<li class="status-message status-error">İstekler yüklenemedi: ' + error.message + '</li>';
                     console.error("Supabase select error:", error);
                     return;
                 }
 
                 if (!data || data.length === 0) {
-                    accessRequestsList.innerHTML = '<div class="status-message status-info">Henüz giriş isteği yok.</div>';
+                    accessRequestsList.innerHTML = '<li class="status-message status-info">Henüz giriş isteği yok.</li>';
                     return;
                 }
 
-                tabloHataMesaji.style.display = 'none';
-                approveAllBtn.style.display = 'block';
-                
                 accessRequestsList.innerHTML = '';
                 data.forEach(request => {
-                    const requestEl = document.createElement('div');
-                    requestEl.className = 'request-item';
-                    requestEl.innerHTML = `
+                    const li = document.createElement('li');
+                    li.className = 'request-item';
+                    li.innerHTML = `
                         <div class="request-info">
                             <div style="font-weight: 600; font-size: 1.1rem; color: white;">IP Adresi: ${escapeHtml(request.ip || '')}</div>
                             <div style="color: rgba(255,255,255,0.7); margin: 8px 0;">Durum: ${request.status || 'pending'}</div>
@@ -1180,7 +1009,7 @@
                             </div>
                         ` : ''}
                     `;
-                    accessRequestsList.appendChild(requestEl);
+                    accessRequestsList.appendChild(li);
                 });
 
                 // Onayla butonlarına event ekle
@@ -1192,7 +1021,7 @@
                 });
 
             } catch (err) {
-                accessRequestsList.innerHTML = '<div class="status-message status-error">Beklenmeyen istek yükleme hatası: ' + (err.message || err) + '</div>';
+                accessRequestsList.innerHTML = '<li class="status-message status-error">Beklenmeyen istek yükleme hatası: ' + (err.message || err) + '</li>';
                 console.error(err);
             }
         }
@@ -1200,41 +1029,10 @@
         // Tüm giriş isteklerini onayla
         async function approveAllAccessRequests() {
             try {
-                // Önce Supabase'den verileri çekmeyi dene
                 const { data: requests, error: fetchError } = await supabase
                     .from('AccessRequests')
                     .select('*')
                     .eq('status', 'pending');
-
-                if (fetchError && fetchError.message.includes('schema cache')) {
-                    // Tablo yoksa localStorage'daki verileri işle
-                    const localRequests = JSON.parse(localStorage.getItem('accessRequests')) || [];
-                    const pendingRequests = localRequests.filter(req => req.status === 'pending');
-                    
-                    if (pendingRequests.length === 0) {
-                        alert("Onay bekleyen istek bulunamadı.");
-                        return;
-                    }
-
-                    // Tüm bekleyen istekleri onayla
-                    for (const request of pendingRequests) {
-                        request.status = 'approved';
-                        // Onaylanan IP'yi localStorage'a ekle
-                        if (!approvedIPs.includes(request.ip)) {
-                            approvedIPs.push(request.ip);
-                        }
-                    }
-
-                    // localStorage'ı güncelle
-                    localStorage.setItem('accessRequests', JSON.stringify(localRequests));
-                    localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
-                    
-                    // Listeyi yenile
-                    await loadAccessRequests();
-                    
-                    alert("Tüm istekler onaylandı!");
-                    return;
-                }
 
                 if (fetchError) {
                     console.error("İstekleri getirme hatası:", fetchError);
@@ -1278,34 +1076,23 @@
         // Giriş isteğini onayla
         async function approveAccessRequest(ip) {
             try {
-                // Önce Supabase'de güncellemeyi dene
                 const { error } = await supabase
                     .from('AccessRequests')
                     .update({ status: 'approved' })
                     .eq('ip', ip);
 
-                if (error && error.message.includes('schema cache')) {
-                    // Tablo yoksa localStorage'daki veriyi güncelle
-                    const requests = JSON.parse(localStorage.getItem('accessRequests')) || [];
-                    const requestIndex = requests.findIndex(req => req.ip === ip);
-                    
-                    if (requestIndex !== -1) {
-                        requests[requestIndex].status = 'approved';
-                        localStorage.setItem('accessRequests', JSON.stringify(requests));
-                    }
-                } else if (error) {
+                if (error) {
                     console.error("İstek onaylama hatası:", error);
-                    return;
+                } else {
+                    // Onaylanan IP'yi localStorage'a ekle
+                    if (!approvedIPs.includes(ip)) {
+                        approvedIPs.push(ip);
+                        localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+                    }
+                    
+                    // Listeyi yenile
+                    await loadAccessRequests();
                 }
-
-                // Onaylanan IP'yi localStorage'a ekle
-                if (!approvedIPs.includes(ip)) {
-                    approvedIPs.push(ip);
-                    localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
-                }
-                
-                // Listeyi yenile
-                await loadAccessRequests();
             } catch (err) {
                 console.error("İstek onaylama hatası:", err);
             }
@@ -1313,7 +1100,7 @@
 
         // Şarkı isteklerini yükle (admin için)
         async function loadSongRequests() {
-            songRequestsList.innerHTML = '<div class="status-message status-info">Yükleniyor...</div>';
+            songRequestsList.innerHTML = '<li class="status-message status-info">Yükleniyor...</li>';
             try {
                 const { data, error } = await supabase
                     .from('SongRequests')
@@ -1321,30 +1108,24 @@
                     .order('created_at', { ascending: false });
 
                 if (error) {
-                    songRequestsList.innerHTML = '<div class="status-message status-error">İstekler yüklenemedi: ' + error.message + '</div>';
+                    songRequestsList.innerHTML = '<li class="status-message status-error">İstekler yüklenemedi: ' + error.message + '</li>';
                     console.error("Supabase select error:", error);
                     return;
                 }
 
                 if (!data || data.length === 0) {
-                    songRequestsList.innerHTML = '<div class="status-message status-info">Henüz şarkı isteği yok.</div>';
+                    songRequestsList.innerHTML = '<li class="status-message status-info">Henüz şarkı isteği yok.</li>';
                     return;
                 }
 
                 songRequestsList.innerHTML = '';
                 data.forEach(request => {
-                    const requestEl = document.createElement('div');
-                    requestEl.className = 'request-item';
-                    requestEl.innerHTML = `
+                    const li = document.createElement('li');
+                    li.className = 'request-item';
+                    li.innerHTML = `
                         <div class="request-info">
                             <div style="font-weight: 600; font-size: 1.1rem; color: white;">${escapeHtml(request.name || '')} - ${escapeHtml(request.artist || '')}</div>
                             <div style="color: rgba(255,255,255,0.7); margin: 8px 0;">Durum: ${request.status || 'pending'}</div>
-                            ${request.lyrics ? `
-                                <div class="lyrics-container">
-                                    <div class="lyrics-title">Şarkı Sözleri:</div>
-                                    <div>${escapeHtml(request.lyrics)}</div>
-                                </div>
-                            ` : ''}
                             <div style="margin-top: 10px;">
                                 <a href="${escapeAttr(request.file_url || '')}" target="_blank" class="btn btn-sm btn-outline">
                                     <i class="fas fa-play"></i> Dinle
@@ -1353,7 +1134,7 @@
                         </div>
                         <div class="request-actions">
                             ${request.status === 'pending' ? `
-                                <button class="btn btn-sm approve-btn" data-id="${request.id}" data-name="${escapeAttr(request.name)}" data-artist="${escapeAttr(request.artist)}" data-url="${escapeAttr(request.file_url)}" data-lyrics="${escapeAttr(request.lyrics || '')}">
+                                <button class="btn btn-sm approve-btn" data-id="${request.id}" data-name="${escapeAttr(request.name)}" data-artist="${escapeAttr(request.artist)}" data-url="${escapeAttr(request.file_url)}">
                                     <i class="fas fa-check"></i> Onayla
                                 </button>
                                 <button class="btn btn-sm btn-danger reject-btn" data-id="${request.id}">
@@ -1362,7 +1143,7 @@
                             ` : ''}
                         </div>
                     `;
-                    songRequestsList.appendChild(requestEl);
+                    songRequestsList.appendChild(li);
                 });
 
                 // Onayla butonlarına event ekle
@@ -1372,13 +1153,11 @@
                         const name = btn.getAttribute('data-name');
                         const artist = btn.getAttribute('data-artist');
                         const fileUrl = btn.getAttribute('data-url');
-                        const lyrics = btn.getAttribute('data-lyrics');
                         
                         // Şarkı ekleme formunu doldur
                         document.getElementById('song-name').value = name;
                         document.getElementById('song-artist').value = artist;
                         document.getElementById('song-url').value = fileUrl;
-                        document.getElementById('song-lyrics').value = lyrics || '';
                         
                         // Şarkı isteğini onayla
                         approveSongRequest(id);
@@ -1397,7 +1176,7 @@
                 });
 
             } catch (err) {
-                songRequestsList.innerHTML = '<div class="status-message status-error">Beklenmeyen istek yükleme hatası: ' + (err.message || err) + '</div>';
+                songRequestsList.innerHTML = '<li class="status-message status-error">Beklenmeyen istek yükleme hatası: ' + (err.message || err) + '</li>';
                 console.error(err);
             }
         }
@@ -1492,12 +1271,6 @@
                             <div class="song-info">
                                 <div class="song-title">${escapeHtml(s.name || '')}</div>
                                 <div class="song-artist">${escapeHtml(s.artist || '')}</div>
-                                ${s.lyrics ? `
-                                    <div class="lyrics-container">
-                                        <div class="lyrics-title">Şarkı Sözleri:</div>
-                                        <div>${escapeHtml(truncateText(s.lyrics, 100))}</div>
-                                    </div>
-                                ` : ''}
                                 <div class="song-actions">
                                     <button class="btn btn-sm btn-outline" onclick="playSong(${index})">
                                         <i class="fas fa-play"></i> Oynat
@@ -1681,7 +1454,6 @@
                 document.getElementById('song-name').value = '';
                 document.getElementById('song-artist').value = '';
                 document.getElementById('song-image').value = '';
-                document.getElementById('song-lyrics').value = '';
                 document.getElementById('song-url').value = '';
                 adminMsg.innerText = '';
                 adminMsg.className = "status-message";
@@ -1767,12 +1539,6 @@
             if (type === "error") element.classList.add("status-error");
             if (type === "success") element.classList.add("status-success");
             if (type === "info") element.classList.add("status-info");
-        }
-
-        // Metni kısalt
-        function truncateText(text, maxLength) {
-            if (text.length <= maxLength) return text;
-            return text.substring(0, maxLength) + '...';
         }
 
         // Basit escaping yardımcıları
