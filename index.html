@@ -13,7 +13,7 @@
     .sidebar button { padding:10px; border:0; border-radius:8px; background:transparent; color:#fff; cursor:pointer; text-align:left; }
     .sidebar button.active { background:#f72585; }
     .card { background:rgba(0,0,0,0.2); border-radius:12px; padding:18px; margin-top:10px; }
-    .controls { display:flex; gap:10px; margin-bottom:10px; }
+    .controls { display:flex; gap:10px; margin-bottom:10px; flex-wrap: wrap; }
     input,textarea,select { padding:8px; border-radius:6px; border:0; width:100%; margin-bottom:8px; }
     .btn { padding:6px 12px; border-radius:8px; border:0; cursor:pointer; margin-left:4px; }
     .btn.danger { background:#e63946; color:#fff; }
@@ -25,6 +25,7 @@
     .edit-form { display:none; margin-top:10px; padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; }
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center; }
     .modal-content { background:#2d3748; padding:20px; border-radius:12px; width:80%; max-width:500px; }
+    .delete-all-btn { background:#e63946; color:white; padding:10px; border-radius:8px; border:none; cursor:pointer; margin-top:10px; }
   </style>
 </head>
 <body>
@@ -52,6 +53,7 @@
           <option value="artist">Sanatçıya Göre</option>
         </select>
       </div>
+      <button id="delete-all-btn" class="delete-all-btn">Tüm Şarkıları Sil</button>
       <ul id="songs-list"></ul>
     </div>
 
@@ -130,6 +132,18 @@
   </div>
 </div>
 
+<!-- Tümünü Sil Onay Modalı -->
+<div id="deleteAllModal" class="modal">
+  <div class="modal-content">
+    <h3>Tüm Şarkıları Sil</h3>
+    <p>Bu işlem tüm şarkıları kalıcı olarak silecektir. Emin misiniz?</p>
+    <div style="margin-top:10px;">
+      <button id="confirmDeleteAllBtn" class="btn danger">Evet, Tümünü Sil</button>
+      <button id="cancelDeleteAllBtn" class="btn">İptal</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co",
@@ -159,14 +173,14 @@ let currentEditId = null;
       document.getElementById("user-type").textContent="Kullanıcı"; 
       setupUserButtons();
     }
-    loadSongs();
+    await loadSongs();
   } catch (error) {
     console.error("IP alma hatası:", error);
     // Admin panelini varsayılan olarak göster (geliştirme için)
     document.getElementById("admin-panel").style.display="block"; 
     document.getElementById("user-type").textContent="Admin"; 
     setupAdminButtons();
-    loadSongs();
+    await loadSongs();
   }
 })();
 
@@ -201,7 +215,7 @@ function renderList(list,data,isAdmin){
         <button class="btn play" data-index="${i}">Çal</button>
         ${isAdmin ? `
           <button class="btn edit" data-id="${s.id}">Düzenle</button>
-          <button class="btn danger" data-id="${s.id}">Sil</button>
+          <button class="btn danger delete-song" data-id="${s.id}">Sil</button>
         ` : ""}
       </div>`;
     
@@ -211,7 +225,7 @@ function renderList(list,data,isAdmin){
   list.querySelectorAll(".play").forEach(b=>b.addEventListener('click', ()=>playSong(parseInt(b.dataset.index))));
   
   if(isAdmin){
-    list.querySelectorAll(".danger").forEach(b=>b.addEventListener('click', ()=>deleteSong(b.dataset.id)));
+    list.querySelectorAll(".delete-song").forEach(b=>b.addEventListener('click', ()=>deleteSong(b.dataset.id)));
     list.querySelectorAll(".edit").forEach(b=>b.addEventListener('click', ()=>openEditModal(b.dataset.id)));
   }
 }
@@ -252,7 +266,7 @@ async function saveSongEdit() {
   try {
     const { error } = await supabase
       .from("Songs")
-      .update({ name, artist, url, lyrics })
+      .update({ name, artist, url, lyrics, updated_at: new Date() })
       .eq("id", currentEditId);
 
     if (error) {
@@ -308,39 +322,83 @@ function togglePlay(){
   else mainPlayer.pause(); 
 }
 
-// Şarkı silme - DÜZELTİLMİŞ VERSİYON
+// Şarkı silme - GELİŞTİRİLMİŞ VERSİYON
 async function deleteSong(id){
   if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
 
   try {
-    const { error } = await supabase.from("Songs").delete().eq("id", id);
+    console.log("Silinecek şarkı ID:", id);
     
+    const { error } = await supabase
+      .from("Songs")
+      .delete()
+      .eq("id", id);
+
     if(error){ 
       alert("Silme hatası: " + error.message);
       console.error("Silme hatası:", error);
-    } else {
-      // Şarkıyı yerel listeden de kaldır
-      allSongs = allSongs.filter(song => song.id !== id);
-      
-      // Listeleri yeniden yükle
-      await loadSongs();
-      alert("✅ Şarkı tamamen silindi");
-      
-      // Eğer silinen şarkı çalınıyorsa, çalmayı durdur
-      if (currentIndex !== -1 && allSongs[currentIndex] && allSongs[currentIndex].id === id) {
-        mainPlayer.pause();
-        mainPlayer.src = "";
-        playerInfo.textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("now-playing-info").textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("user-now-playing-info").textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("user-now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
-        currentIndex = -1;
-      }
+      return;
+    }
+    
+    // Şarkıyı yerel listeden de kaldır
+    allSongs = allSongs.filter(song => song.id !== id);
+    
+    // Listeleri yeniden yükle
+    await loadSongs();
+    alert("✅ Şarkı tamamen silindi");
+    
+    // Eğer silinen şarkı çalınıyorsa, çalmayı durdur
+    if (currentIndex !== -1 && allSongs[currentIndex] && allSongs[currentIndex].id === id) {
+      mainPlayer.pause();
+      mainPlayer.src = "";
+      playerInfo.textContent = "Henüz şarkı seçilmedi";
+      document.getElementById("now-playing-info").textContent = "Henüz şarkı seçilmedi";
+      document.getElementById("user-now-playing-info").textContent = "Henüz şarkı seçilmedi";
+      document.getElementById("now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
+      document.getElementById("user-now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
+      currentIndex = -1;
     }
   } catch (err) {
     alert("Bir hata oluştu: " + err.message);
     console.error("Silme hatası:", err);
+  }
+}
+
+// Tüm şarkıları silme fonksiyonu
+async function deleteAllSongs() {
+  try {
+    // Tüm şarkıları veritabanından sil
+    const { error } = await supabase
+      .from("Songs")
+      .delete()
+      .neq('id', 0); // Tüm kayıtları sil
+
+    if (error) {
+      alert("Tüm şarkıları silme hatası: " + error.message);
+      console.error("Tüm şarkıları silme hatası:", error);
+      return;
+    }
+    
+    // Yerel listeyi temizle
+    allSongs = [];
+    
+    // Listeleri yeniden yükle
+    await loadSongs();
+    
+    // Çalmayı durdur
+    mainPlayer.pause();
+    mainPlayer.src = "";
+    playerInfo.textContent = "Henüz şarkı seçilmedi";
+    document.getElementById("now-playing-info").textContent = "Henüz şarkı seçilmedi";
+    document.getElementById("user-now-playing-info").textContent = "Henüz şarkı seçilmedi";
+    document.getElementById("now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
+    document.getElementById("user-now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
+    currentIndex = -1;
+    
+    alert("✅ Tüm şarkılar başarıyla silindi");
+  } catch (err) {
+    alert("Tüm şarkıları silerken bir hata oluştu: " + err.message);
+    console.error("Tüm şarkıları silme hatası:", err);
   }
 }
 
@@ -401,6 +459,20 @@ function setupAdminButtons(){
   // Modal olayları
   document.getElementById("saveEditBtn").addEventListener('click', saveSongEdit);
   document.getElementById("cancelEditBtn").addEventListener('click', closeEditModal);
+  
+  // Tümünü sil butonu
+  document.getElementById("delete-all-btn").addEventListener('click', () => {
+    document.getElementById("deleteAllModal").style.display = "flex";
+  });
+  
+  document.getElementById("confirmDeleteAllBtn").addEventListener('click', async () => {
+    document.getElementById("deleteAllModal").style.display = "none";
+    await deleteAllSongs();
+  });
+  
+  document.getElementById("cancelDeleteAllBtn").addEventListener('click', () => {
+    document.getElementById("deleteAllModal").style.display = "none";
+  });
 }
 
 // User menü
@@ -446,9 +518,14 @@ document.getElementById("user-sort").addEventListener('change', e => {
 
 // Modal dışına tıklanınca kapat
 window.addEventListener('click', (e) => {
-  const modal = document.getElementById("editModal");
-  if (e.target === modal) {
+  const editModal = document.getElementById("editModal");
+  const deleteModal = document.getElementById("deleteAllModal");
+  
+  if (e.target === editModal) {
     closeEditModal();
+  }
+  if (e.target === deleteModal) {
+    deleteModal.style.display = "none";
   }
 });
 </script>
