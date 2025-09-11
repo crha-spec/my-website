@@ -1,211 +1,445 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kişisel Müzik Kütüphanesi</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; display:flex; height:100vh; }
-    #sidebar { width:220px; background:#222; color:white; padding:20px; display:flex; flex-direction:column; }
-    #sidebar h2 { font-size:18px; margin-bottom:12px; }
-    #sidebar button { margin:6px 0; padding:10px; cursor:pointer; background:#444; color:white; border:none; border-radius:6px; text-align:left; }
-    #sidebar button:hover { background:#666; }
-    #content { flex:1; padding:20px; overflow:auto; background:#f6f7fb; }
-    .panel { display:none; background:white; padding:16px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
-    input, file { padding:8px; margin:6px 0; width:100%; box-sizing:border-box; }
-    button.action { padding:10px 14px; margin-top:8px; cursor:pointer; background:#1976d2; color:white; border:none; border-radius:6px; }
-    ul { list-style:none; padding:0; }
-    li { padding:8px 0; border-bottom:1px solid #eee; }
-    audio { width:100%; max-width:600px; margin-top:6px; }
-    .hint { color:#555; font-size:13px; }
-    .ok { color:green; }
-    .error { color:red; }
+    body { 
+      font-family: Arial, Helvetica, sans-serif; 
+      padding:20px; 
+      background: #f6f7fb; 
+      color:#111; 
+      margin: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    .panel-container {
+      display: flex;
+      gap: 20px;
+    }
+    #sidebar {
+      width: 220px;
+      background: #222;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      height: fit-content;
+    }
+    #sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    #sidebar button {
+      margin: 6px 0;
+      padding: 10px;
+      cursor: pointer;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      text-align: left;
+      width: 100%;
+    }
+    #sidebar button:hover {
+      background: #666;
+    }
+    #content {
+      flex: 1;
+    }
+    .panel {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button.action {
+      padding: 12px 16px;
+      margin-top: 10px;
+      cursor: pointer;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    button.action:hover {
+      background: #1565c0;
+    }
+    button.secondary {
+      background: #757575;
+    }
+    button.secondary:hover {
+      background: #616161;
+    }
+    ul#songs-list {
+      list-style: none;
+      padding: 0;
+    }
+    li.song-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      background: #f9f9f9;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .hint {
+      color: #666;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .error {
+      color: #c62828;
+      font-weight: 700;
+    }
+    .ok {
+      color: #2e7d32;
+      font-weight: 700;
+    }
+    .ip-info {
+      background: #e3f2fd;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+    footer {
+      margin-top: 30px;
+      color: #666;
+      font-size: 13px;
+      text-align: center;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+    }
+    audio {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 10px;
+      height: 40px;
+    }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <h2>Menü</h2>
-    <button onclick="showPanel('library')">📀 Kitaplık</button>
-    <button onclick="showPanel('request')">➕ Şarkı İsteği</button>
-    <button id="adminBtn" style="display:none" onclick="showPanel('admin')">🎧 Admin Paneli</button>
-    <button id="requestsBtn" style="display:none" onclick="showPanel('requests')">📨 İstekler</button>
+  <div class="container">
+    <header>
+      <h1>Kişisel Müzik Kütüphanesi</h1>
+      <div id="user-ip" class="ip-info">IP adresi yükleniyor...</div>
+    </header>
+
+    <div class="panel-container">
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <h2>Menü</h2>
+        <button type="button" onclick="showPanel('library')">📀 Kitaplık</button>
+        <button type="button" onclick="showPanel('request')">➕ Şarkı İsteği</button>
+        <button type="button" id="adminBtn" style="display:none" onclick="showPanel('admin')">🎧 Admin Paneli</button>
+        <button type="button" id="requestsBtn" style="display:none" onclick="showPanel('requests')">📨 İstekler</button>
+      </div>
+
+      <!-- Content -->
+      <div id="content">
+        <!-- Kitaplık Paneli -->
+        <div id="library" class="panel">
+          <h2>📀 Müzik Kitaplığı</h2>
+          <ul id="songs-list"></ul>
+          <p id="library-msg" class="hint"></p>
+        </div>
+
+        <!-- Şarkı İsteği Paneli -->
+        <div id="request" class="panel">
+          <h2>➕ Şarkı İsteği</h2>
+          <input type="text" id="req-name" placeholder="Şarkı Adı" />
+          <input type="text" id="req-artist" placeholder="Sanatçı" />
+          <input type="file" id="req-file" accept="audio/*" />
+          <button class="action" onclick="sendRequest()">Gönder</button>
+          <p id="req-msg" class="hint"></p>
+        </div>
+
+        <!-- Admin Paneli -->
+        <div id="admin" class="panel">
+          <h2>🎧 Admin Paneli</h2>
+          <input type="text" id="song-name" placeholder="Şarkı Adı" />
+          <input type="text" id="song-artist" placeholder="Sanatçı" />
+          <input type="text" id="song-url" placeholder="Dosya URL (catbox veya mp3 linki)" />
+          <button class="action" id="addSongBtn" onclick="addSong()">Şarkıyı Ekle</button>
+          <button class="action secondary" id="clearBtn" onclick="clearForm()">Temizle</button>
+          <p id="admin-msg" class="hint"></p>
+        </div>
+
+        <!-- İstekler Paneli -->
+        <div id="requests" class="panel">
+          <h2>📨 Gelen İstekler</h2>
+          <ul id="requests-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Kişisel Müzik Kütüphanesi © 2023</p>
+    </footer>
   </div>
 
-  <!-- Content -->
-  <div id="content">
-    <!-- Kitaplık -->
-    <div id="library" class="panel">
-      <h2>📀 Müzik Kitaplığı</h2>
-      <ul id="songs-list"></ul>
-      <p id="library-msg" class="hint"></p>
-    </div>
-
-    <!-- Şarkı İsteği -->
-    <div id="request" class="panel">
-      <h2>➕ Şarkı İsteği</h2>
-      <input id="req-name" placeholder="Şarkı adı" />
-      <input id="req-artist" placeholder="Sanatçı" />
-      <input type="file" id="req-file" accept="audio/*" />
-      <button class="action" onclick="sendRequest()">İstek Gönder</button>
-      <p id="req-msg" class="hint"></p>
-    </div>
-
-    <!-- Admin Paneli -->
-    <div id="admin" class="panel">
-      <h2>🎧 Admin Paneli</h2>
-      <input id="song-name" placeholder="Şarkı adı" />
-      <input id="song-artist" placeholder="Sanatçı" />
-      <input id="song-url" placeholder="Şarkı URL" />
-      <button class="action" onclick="addSong()">Şarkı Ekle</button>
-      <p id="admin-msg" class="hint"></p>
-    </div>
-
-    <!-- İstekler -->
-    <div id="requests" class="panel">
-      <h2>📨 Gelen İstekler</h2>
-      <ul id="requests-list"></ul>
-    </div>
-  </div>
-
-  <!-- Script -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // Supabase ayarları
+    // --- SUPABASE BİLGİLERİ ---
     const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // --- ADMIN IP ---
     const ADMIN_IP = "151.250.4.2";
     let currentIp = null;
 
-    // Panel göster
+    // Panel yönlendirme fonksiyonu
     function showPanel(id) {
+      // Tüm panelleri gizle
       document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-      const panel = document.getElementById(id);
-      if (panel) panel.style.display = 'block';
+      
+      // İstenen paneli göster
+      document.getElementById(id).style.display = 'block';
+      
+      // Paneller arası geçişte içerikleri yenile
+      if (id === 'library') loadSongs();
+      if (id === 'requests' && currentIp === ADMIN_IP) loadRequests();
     }
 
-    // Başlat
+    // Form temizleme
+    function clearForm() {
+      document.getElementById('song-name').value = '';
+      document.getElementById('song-artist').value = '';
+      document.getElementById('song-url').value = '';
+      document.getElementById('admin-msg').innerText = '';
+    }
+
+    // Sayfa açılınca IP'yi al, admin mi kontrol et, şarkıları yükle
     async function init() {
       try {
         const res = await fetch("https://api64.ipify.org?format=json");
-        currentIp = (await res.json()).ip;
-      } catch {
+        const d = await res.json();
+        currentIp = d.ip || 'unknown';
+        
+        // IP bilgisini göster
+        document.getElementById('user-ip').innerText = `IP adresiniz: ${currentIp}`;
+        
+        // admin görünümü kontrolü
+        if (currentIp === ADMIN_IP) {
+          document.getElementById('adminBtn').style.display = 'block';
+          document.getElementById('requestsBtn').style.display = 'block';
+          showPanel('admin');
+        } else {
+          showPanel('library');
+        }
+
+        await loadSongs();
+        if (currentIp === ADMIN_IP) await loadRequests();
+      } catch (err) {
+        // IP alınamazsa default kullanıcı görünümü
         currentIp = 'unknown';
-      }
-
-      if (currentIp === ADMIN_IP) {
-        document.getElementById('adminBtn').style.display = 'block';
-        document.getElementById('requestsBtn').style.display = 'block';
-        showPanel('admin');
-      } else {
+        console.warn("IP alınamadı:", err);
+        document.getElementById('user-ip').innerText = "IP adresi alınamadı";
         showPanel('library');
+        await loadSongs();
       }
-
-      await loadSongs();
-      if (currentIp === ADMIN_IP) await loadRequests();
     }
 
-    // Şarkı ekle (Admin)
+    // Şarkı ekle (admin)
     async function addSong() {
       const name = document.getElementById('song-name').value.trim();
       const artist = document.getElementById('song-artist').value.trim();
       const url = document.getElementById('song-url').value.trim();
       const msg = document.getElementById('admin-msg');
+      const addSongBtn = document.getElementById('addSongBtn');
+      
+      msg.innerText = '';
 
-      if (!name || !artist || !url) {
-        msg.textContent = "Tüm alanları doldurun!";
-        msg.className = 'error';
-        return;
+      if (!name || !artist || !url) { 
+        msg.innerText = "Lütfen tüm alanları doldurun (name, artist, url)."; 
+        msg.className = 'error'; 
+        return; 
       }
 
-      const { error } = await supabase.from('Songs').insert([{ name, artist, url }]);
-      if (error) {
-        msg.textContent = "Hata: " + error.message;
+      try {
+        msg.innerText = "Kaydediliyor...";
+        msg.className = 'hint';
+        addSongBtn.disabled = true;
+        
+        const { data, error } = await supabase.from('Songs').insert([{ name, artist, url }]);
+        
+        if (error) {
+          msg.innerText = "Hata: " + error.message;
+          msg.className = 'error';
+          console.error("Insert error:", error);
+          
+          // Eğer RLS hatasıysa kullanıcıya SQL düzeltmesi gerektiğini söyle
+          if (error.message && error.message.toLowerCase().includes('row-level')) {
+            msg.innerText += " — RLS policy izinlerini kontrol et (SQL tarafında insert izni ver).";
+          }
+        } else {
+          msg.innerText = "Şarkı başarıyla eklendi ✅";
+          msg.className = 'ok';
+          clearForm();
+          await loadSongs();
+        }
+      } catch (err) {
+        msg.innerText = "Beklenmeyen hata: " + (err.message || err);
         msg.className = 'error';
-      } else {
-        msg.textContent = "Şarkı eklendi ✅";
-        msg.className = 'ok';
-        document.getElementById('song-name').value = '';
-        document.getElementById('song-artist').value = '';
-        document.getElementById('song-url').value = '';
-        await loadSongs();
+        console.error("Insert exception:", err);
+      } finally {
+        addSongBtn.disabled = false;
       }
     }
 
-    // Şarkı listesi
+    // Şarkıları yükle
     async function loadSongs() {
       const list = document.getElementById('songs-list');
-      list.innerHTML = "Yükleniyor...";
-      const { data, error } = await supabase.from('Songs').select('*').order('id',{ascending:false});
-      if (error) { list.innerHTML = "<li class='error'>Liste yüklenemedi: "+error.message+"</li>"; return; }
-      if (!data || data.length === 0) { list.innerHTML = "<li>Henüz şarkı yok.</li>"; return; }
-      list.innerHTML = "";
-      data.forEach(s => {
-        const li = document.createElement('li');
-        li.innerHTML = `<b>${escapeHtml(s.name)}</b> - ${escapeHtml(s.artist)}<br>
-                        <audio controls src="${escapeAttr(s.url)}"></audio>`;
-        list.appendChild(li);
-      });
+      const msg = document.getElementById('library-msg');
+      
+      list.innerHTML = 'Yükleniyor...';
+      msg.innerText = '';
+      
+      try {
+        const { data, error } = await supabase.from('Songs').select('*').order('id', { ascending: false });
+        
+        if (error) { 
+          list.innerHTML = `<li class="error">Liste yüklenemedi: ${error.message}</li>`; 
+          console.error("Supabase select error:", error);
+          return; 
+        }
+        
+        if (!data || data.length === 0) { 
+          list.innerHTML = '<li class="hint">Henüz şarkı yok.</li>'; 
+          return; 
+        }
+        
+        list.innerHTML = '';
+        data.forEach(s => {
+          const li = document.createElement('li');
+          li.className = 'song-item';
+          li.innerHTML = `<strong>${escapeHtml(s.name || '')}</strong> - ${escapeHtml(s.artist || '')} 
+                          <div style="margin-top:10px">
+                            <audio controls preload="none" src="${escapeAttr(s.url || '')}"></audio>
+                          </div>`;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        list.innerHTML = `<li class="error">Beklenmeyen liste hatası: ${err.message || err}</li>`;
+        console.error(err);
+      }
     }
 
-    // Şarkı isteği (Kullanıcı)
+    // İstek gönder (kullanıcı -> storage + SongRequests tablosu)
     async function sendRequest() {
       const name = document.getElementById('req-name').value.trim();
       const artist = document.getElementById('req-artist').value.trim();
       const file = document.getElementById('req-file').files[0];
       const msg = document.getElementById('req-msg');
+      msg.innerText = '';
 
-      if (!name || !artist || !file) {
-        msg.textContent = "Tüm alanları doldurun!";
-        msg.className = 'error';
-        return;
+      if (!name || !artist || !file) { 
+        msg.innerText = "Tüm alanları doldurun"; 
+        msg.className = 'error'; 
+        return; 
       }
 
+      // bucket: "song-requests" olmalı (Supabase Storage'da oluştur)
       const path = 'requests/' + Date.now() + '_' + file.name;
       const { error: upErr } = await supabase.storage.from('song-requests').upload(path, file);
-      if (upErr) { msg.textContent = "Yükleme hatası: " + upErr.message; msg.className = 'error'; return; }
+      
+      if (upErr) { 
+        msg.innerText = "Yükleme hatası: " + upErr.message; 
+        msg.className = 'error'; 
+        return; 
+      }
 
-      const { data: urlData } = supabase.storage.from('song-requests').getPublicUrl(path);
-      const publicURL = urlData.publicUrl;
+      const { publicURL, error: urlErr } = supabase.storage.from('song-requests').getPublicUrl(path);
+      if (urlErr) { 
+        msg.innerText = "URL alma hatası: " + urlErr.message; 
+        msg.className = 'error'; 
+        return; 
+      }
 
-      const { error } = await supabase.from('SongRequests').insert([{ name, artist, ip: currentIp, file_url: publicURL }]);
-      if (error) { msg.textContent = "Veritabanı hatası: " + error.message; msg.className = 'error'; return; }
+      const { data, error } = await supabase.from('SongRequests').insert([{ 
+        name, 
+        artist, 
+        ip: currentIp, 
+        file_url: publicURL 
+      }]);
+      
+      if (error) { 
+        msg.innerText = "Veritabanı hatası: " + error.message; 
+        msg.className = 'error'; 
+        return; 
+      }
 
-      msg.textContent = "İstek gönderildi ✅";
+      msg.innerText = "İstek gönderildi ✅";
       msg.className = 'ok';
       document.getElementById('req-name').value = '';
       document.getElementById('req-artist').value = '';
       document.getElementById('req-file').value = '';
+      
       if (currentIp === ADMIN_IP) await loadRequests();
     }
 
-    // Gelen istekler (Admin)
+    // Admin: gelen istekleri yükle
     async function loadRequests() {
       const list = document.getElementById('requests-list');
-      list.innerHTML = "Yükleniyor...";
-      const { data, error } = await supabase.from('SongRequests').select('*').order('id',{ascending:false});
-      if (error) { list.innerHTML = "<li class='error'>Liste yüklenemedi: "+error.message+"</li>"; return; }
-      if (!data || data.length === 0) { list.innerHTML = "<li>İstek yok.</li>"; return; }
-      list.innerHTML = "";
+      list.innerHTML = 'Yükleniyor...';
+      
+      const { data, error } = await supabase.from('SongRequests').select('*').order('id', { ascending: false });
+      
+      if (error) { 
+        list.innerHTML = `<li class="error">Liste yüklenemedi: ${error.message}</li>`; 
+        return; 
+      }
+      
+      if (!data || data.length === 0) { 
+        list.innerHTML = '<li>İstek yok.</li>'; 
+        return; 
+      }
+      
+      list.innerHTML = '';
       data.forEach(r => {
         const li = document.createElement('li');
-        li.innerHTML = `<b>${escapeHtml(r.name)}</b> - ${escapeHtml(r.artist)} (${escapeHtml(r.ip||'?')})<br>
-                        <a href="${escapeAttr(r.file_url)}" target="_blank">Dosyayı indir</a>`;
+        li.className = 'song-item';
+        li.innerHTML = `<b>${escapeHtml(r.name)}</b> - ${escapeHtml(r.artist)} (${escapeHtml(r.ip || '?' )})<br>
+                        <a href="${escapeAttr(r.file_url)}" target="_blank" rel="noopener">Dosyayı indir</a>`;
         list.appendChild(li);
       });
     }
 
-    // Yardımcı fonksiyonlar
-    function escapeHtml(text) {
-      if (!text) return '';
-      return String(text).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    // HTML escaping fonksiyonları
+    function escapeHtml(text) { 
+      if (!text) return ''; 
+      return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); 
     }
-    function escapeAttr(t) { return escapeHtml(t); }
+    
+    function escapeAttr(text) { 
+      return escapeHtml(text); 
+    }
 
-    init();
+    // Sayfa yüklendiğinde init fonksiyonunu çalıştır
+    window.onload = init;
   </script>
 </body>
 </html>
