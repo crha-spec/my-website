@@ -139,12 +139,10 @@ function renderList(list,data,isAdmin){
 // Şarkı silme
 async function deleteSong(id,element){
   if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
+  if(element) element.remove(); // DOM'dan hemen kaldır
   const {error}=await supabase.from("Songs").delete().eq("id",id);
   if(error){alert("Silme hatası: "+error.message);}
-  else{
-    if(element) element.remove(); // DOM'dan anında kaldır
-    alert("✅ Şarkı silindi");
-  }
+  else{alert("✅ Şarkı silindi");}
 }
 
 // Şarkı ekleme
@@ -162,7 +160,6 @@ async function addSong(){
     document.getElementById("song-name").value="";
     document.getElementById("song-artist").value="";
     document.getElementById("song-url").value="";
-    // Yeni eklenen şarkıyı listeye direkt ekle
     renderList(songsList,[data],true);
     renderList(userSongsList,[data],false);
   }
