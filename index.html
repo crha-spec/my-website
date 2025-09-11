@@ -123,9 +123,10 @@ let sortField="id"; let searchTerm="";
   loadSongs();
 })();
 
-// Şarkıları yükle
+// Şarkı listeleme
 async function loadSongs(){
-  const {data}=await supabase.from("Songs").select("*").order(sortField,{ascending:true});
+  const {data,error}=await supabase.from("Songs").select("*").order(sortField,{ascending:true});
+  if(error){console.error(error);return;}
   const filter=d=>d.name.toLowerCase().includes(searchTerm)||d.artist.toLowerCase().includes(searchTerm);
   renderList(songsList,data.filter(filter),true);
   renderList(userSongsList,data.filter(filter),false);
@@ -135,35 +136,31 @@ function renderList(list,data,isAdmin){
   data.forEach(s=>{
     const li=document.createElement("li"); li.className="song";
     li.innerHTML=`<div class="meta"><strong>${s.name}</strong><div>${s.artist}</div></div>
-      <div><button class="btn play" data-url="${s.url}" data-name="${s.name}" data-artist="${s.artist}">Çal</button>
-      ${isAdmin?`<button class="btn danger" data-id="${s.id}">Sil</button>`:""}</div>`;
+      <div>
+        <button class="btn play" data-url="${s.url}" data-name="${s.name}" data-artist="${s.artist}">Çal</button>
+        ${isAdmin?`<button class="btn danger" data-id="${s.id}">Sil</button>`:""}
+      </div>`;
     list.appendChild(li);
   });
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>{mainPlayer.src=b.dataset.url; playerInfo.textContent=`${b.dataset.name} - ${b.dataset.artist}`; mainPlayer.play();});
   if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
 }
-// Şarkı silme (Admin)
+
+// Şarkı silme
 async function deleteSong(id){
   if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
-
-  const { error } = await supabase.from("Songs").delete().eq("id", id);
-  if(error){
-    alert("Silme hatası: " + error.message);
-    console.error(error);
-  } else {
-    alert("Şarkı başarıyla silindi ✅");
-    loadSongs();
-  }
+  const {error}=await supabase.from("Songs").delete().eq("id",id);
+  if(error){alert("Silme hatası: "+error.message);}
+  else{alert("✅ Şarkı silindi"); loadSongs();}
 }
-// Şarkı ekleme (Admin)
+
+// Şarkı ekleme
 async function addSong(){
   const name=document.getElementById("song-name").value.trim();
   const artist=document.getElementById("song-artist").value.trim();
   const url=document.getElementById("song-url").value.trim();
   const msg=document.getElementById("admin-msg");
-
   if(!name||!artist||!url){msg.textContent="Lütfen tüm alanları doldurun.";return;}
-
   msg.textContent="Kaydediliyor...";
   const {error}=await supabase.from("Songs").insert([{name,artist,url}]);
   if(error){ msg.textContent="Hata: "+error.message; console.error(error);}
@@ -175,10 +172,9 @@ async function addSong(){
     loadSongs();
   }
 }
-
-// Buton eventini bağla
 document.getElementById("addSongBtn").onclick=addSong;
-// Admin sidebar
+
+// Admin menü
 function setupAdminButtons(){
   const sections=["library-section","add-song-section","song-requests-section","access-requests-section"];
   ["btn-library","btn-add-song","btn-song-requests","btn-access-requests"].forEach((id,i)=>{
@@ -189,7 +185,7 @@ function setupAdminButtons(){
     };
   });
 }
-// User sidebar
+// User menü
 function setupUserButtons(){
   const sections=["user-library-section","user-song-request-section"];
   ["user-btn-library","user-btn-song-request"].forEach((id,i)=>{
@@ -201,7 +197,7 @@ function setupUserButtons(){
   });
 }
 
-// Arama & Sıralama
+// Arama & sıralama
 document.getElementById("admin-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
 document.getElementById("user-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
 document.getElementById("admin-sort").onchange=e=>{sortField=e.target.value;loadSongs();}
