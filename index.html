@@ -143,7 +143,29 @@ function renderList(list,data,isAdmin){
   if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
 }
 async function deleteSong(id){await supabase.from("Songs").delete().eq("id",id); loadSongs();}
+// Şarkı ekleme (Admin)
+async function addSong(){
+  const name=document.getElementById("song-name").value.trim();
+  const artist=document.getElementById("song-artist").value.trim();
+  const url=document.getElementById("song-url").value.trim();
+  const msg=document.getElementById("admin-msg");
 
+  if(!name||!artist||!url){msg.textContent="Lütfen tüm alanları doldurun.";return;}
+
+  msg.textContent="Kaydediliyor...";
+  const {error}=await supabase.from("Songs").insert([{name,artist,url}]);
+  if(error){ msg.textContent="Hata: "+error.message; console.error(error);}
+  else{
+    msg.textContent="✅ Şarkı eklendi";
+    document.getElementById("song-name").value="";
+    document.getElementById("song-artist").value="";
+    document.getElementById("song-url").value="";
+    loadSongs();
+  }
+}
+
+// Buton eventini bağla
+document.getElementById("addSongBtn").onclick=addSong;
 // Admin sidebar
 function setupAdminButtons(){
   const sections=["library-section","add-song-section","song-requests-section","access-requests-section"];
