@@ -3,54 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kişisel Müzik Kütüphanesi - Admin + Kullanıcı</title>
+  <title>Kişisel Müzik Kütüphanesi</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root{
-      --bg1: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-      --card-bg: rgba(255,255,255,0.06);
-      --accent: #f72585;
-      --muted: rgba(255,255,255,0.75);
-      --transition: all .25s ease;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Segoe UI',sans-serif; background:var(--bg1); color:#fff; padding:24px; padding-bottom:120px; }
+    body { font-family:'Segoe UI',sans-serif; background:#667eea; color:#fff; padding:24px; padding-bottom:120px; }
     .app { max-width:1200px; margin:0 auto; }
-    header { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.06); padding:18px 24px; border-radius:12px; margin-bottom:20px; }
-    .logo { display:flex; gap:12px; align-items:center; font-weight:700; }
-    .logo i { color:var(--accent); }
-    .sidebar { background:var(--card-bg); padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:8px; }
-    .sidebar button { display:flex; gap:10px; align-items:center; padding:12px; border-radius:10px; border:0; background:transparent; color:var(--muted); cursor:pointer; font-weight:600; }
-    .sidebar button.active { background:rgba(247,37,133,0.12); color:#fff; border-left:4px solid var(--accent); }
-    .card { background:rgba(255,255,255,0.04); border-radius:12px; padding:18px; margin-top:10px; }
+    header { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.1); padding:18px 24px; border-radius:12px; margin-bottom:20px; }
+    .sidebar { background:rgba(255,255,255,0.1); padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+    .sidebar button { padding:10px; border:0; border-radius:8px; background:transparent; color:#fff; cursor:pointer; text-align:left; }
+    .sidebar button.active { background:#f72585; }
+    .card { background:rgba(0,0,0,0.2); border-radius:12px; padding:18px; margin-top:10px; }
     .controls { display:flex; gap:10px; margin-bottom:10px; }
-    input[type="text"], input[type="url"] { padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; }
-    select { padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; }
-    .btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:600; }
+    input,select { padding:8px; border-radius:6px; border:0; }
+    .btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; }
     .btn.danger { background:#e63946; color:#fff; }
     .btn.play { background:#4361ee; color:#fff; }
-    .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); }
-    .meta { flex:1; }
-    .hint { font-size:13px; color:var(--muted); margin-top:5px; }
-    #player-bar { position:fixed; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; z-index:9999; }
+    .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.2); }
+    #player-bar { position:fixed; left:0; right:0; bottom:0; background:#000; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
   </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <div class="logo"><i class="fas fa-music"></i> Kişisel Müzik Kütüphanesi</div>
+    <div>🎵 Müzik Kütüphanesi</div>
     <div><span id="user-type"></span></div>
   </header>
 
   <!-- Admin Panel -->
   <div id="admin-panel" style="display:none;">
-    <h2>🎧 Admin Paneli</h2>
+    <h2>Admin Paneli</h2>
     <div class="sidebar">
       <button id="btn-library" class="active">Kitaplık</button>
       <button id="btn-add-song">Şarkı Ekle</button>
       <button id="btn-song-requests">Şarkı İstekleri</button>
       <button id="btn-access-requests">Giriş Onayları</button>
     </div>
+
     <div id="library-section" class="card">
       <div class="controls">
         <input type="text" id="admin-search" placeholder="Ara...">
@@ -62,16 +50,19 @@
       </div>
       <ul id="songs-list"></ul>
     </div>
+
     <div id="add-song-section" class="card" style="display:none;">
       <input id="song-name" placeholder="Şarkı adı">
       <input id="song-artist" placeholder="Sanatçı">
       <input id="song-url" placeholder="URL">
       <button id="addSongBtn" class="btn">Ekle</button>
-      <div id="admin-msg" class="hint"></div>
+      <div id="admin-msg"></div>
     </div>
+
     <div id="song-requests-section" class="card" style="display:none;">
       <ul id="song-requests-list"></ul>
     </div>
+
     <div id="access-requests-section" class="card" style="display:none;">
       <ul id="access-requests-list"></ul>
     </div>
@@ -79,11 +70,12 @@
 
   <!-- User Panel -->
   <div id="user-panel" style="display:none;">
-    <h2>📀 Kullanıcı Paneli</h2>
+    <h2>Kullanıcı Paneli</h2>
     <div class="sidebar">
       <button id="user-btn-library" class="active">Kitaplık</button>
       <button id="user-btn-song-request">Şarkı İsteği</button>
     </div>
+
     <div id="user-library-section" class="card">
       <div class="controls">
         <input type="text" id="user-search" placeholder="Ara...">
@@ -95,12 +87,13 @@
       </div>
       <ul id="user-songs-list"></ul>
     </div>
+
     <div id="user-song-request-section" class="card" style="display:none;">
       <input id="request-song-name" placeholder="Şarkı adı">
       <input id="request-song-artist" placeholder="Sanatçı">
       <input id="request-song-url" placeholder="Catbox URL">
       <button id="sendRequestBtn" class="btn">Gönder</button>
-      <div id="user-request-msg" class="hint"></div>
+      <div id="user-request-msg"></div>
     </div>
   </div>
 </div>
@@ -115,7 +108,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g");
-const ADMIN_IP = "151.250.4.2";
+const ADMIN_IP="151.250.4.2";
 const songsList=document.getElementById("songs-list");
 const userSongsList=document.getElementById("user-songs-list");
 const mainPlayer=document.getElementById("main-player");
@@ -125,15 +118,14 @@ let sortField="id"; let searchTerm="";
 // IP kontrol
 (async()=>{
   const ip=(await (await fetch("https://api64.ipify.org?format=json")).json()).ip;
-  if(ip===ADMIN_IP){document.getElementById("admin-panel").style.display="block"; document.getElementById("user-type").textContent="Admin";}
-  else{document.getElementById("user-panel").style.display="block"; document.getElementById("user-type").textContent="Kullanıcı";}
+  if(ip===ADMIN_IP){document.getElementById("admin-panel").style.display="block"; document.getElementById("user-type").textContent="Admin"; setupAdminButtons();}
+  else{document.getElementById("user-panel").style.display="block"; document.getElementById("user-type").textContent="Kullanıcı"; setupUserButtons();}
   loadSongs();
 })();
 
 // Şarkıları yükle
 async function loadSongs(){
-  const {data,error}=await supabase.from("Songs").select("*").order(sortField,{ascending:true});
-  if(error){console.error(error);return;}
+  const {data}=await supabase.from("Songs").select("*").order(sortField,{ascending:true});
   const filter=d=>d.name.toLowerCase().includes(searchTerm)||d.artist.toLowerCase().includes(searchTerm);
   renderList(songsList,data.filter(filter),true);
   renderList(userSongsList,data.filter(filter),false);
@@ -151,6 +143,29 @@ function renderList(list,data,isAdmin){
   if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
 }
 async function deleteSong(id){await supabase.from("Songs").delete().eq("id",id); loadSongs();}
+
+// Admin sidebar
+function setupAdminButtons(){
+  const sections=["library-section","add-song-section","song-requests-section","access-requests-section"];
+  ["btn-library","btn-add-song","btn-song-requests","btn-access-requests"].forEach((id,i)=>{
+    document.getElementById(id).onclick=()=>{
+      sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
+      document.querySelectorAll("#admin-panel .sidebar button").forEach(b=>b.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    };
+  });
+}
+// User sidebar
+function setupUserButtons(){
+  const sections=["user-library-section","user-song-request-section"];
+  ["user-btn-library","user-btn-song-request"].forEach((id,i)=>{
+    document.getElementById(id).onclick=()=>{
+      sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
+      document.querySelectorAll("#user-panel .sidebar button").forEach(b=>b.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    };
+  });
+}
 
 // Arama & Sıralama
 document.getElementById("admin-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
