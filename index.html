@@ -1,232 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Kişisel Müzik Kütüphanesi - Admin + Kullanıcı</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
-    :root {
-      --primary: #4361ee;
-      --secondary: #3a0ca3;
+    :root{
+      --bg1: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --card-bg: rgba(255,255,255,0.06);
       --accent: #f72585;
-      --light: #f8f9fa;
-      --dark: #212529;
-      --success: #4cc9f0;
-      --danger: #e63946;
-      --warning: #fca311;
-      --gray: #6c757d;
-      --card-shadow: 0 10px 20px rgba(0,0,0,0.12);
-      --transition: all 0.3s ease;
+      --muted: rgba(255,255,255,0.75);
+      --transition: all .25s ease;
     }
-
-    * { margin:0; padding:0; box-sizing:border-box; }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: var(--dark);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .app-container { max-width: 1400px; margin: 0 auto; }
-
-    header {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      color: white;
-      padding: 1.5rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 16px;
-      margin-bottom: 2rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .logo { display:flex; align-items:center; gap:12px; font-size:1.8rem; font-weight:700; }
-    .logo i { color: var(--accent); font-size:2.2rem; }
-
-    .user-info {
-      display:flex; align-items:center; gap:12px;
-      background: rgba(255,255,255,0.15);
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-weight: 500;
-    }
-
-    h2 { margin:1.5rem 0; border-left:4px solid var(--accent); padding-left:15px; color:white; }
-    h3 { color:white; margin-bottom:1rem; }
-
-    .grid-container { display:grid; grid-template-columns:280px 1fr; gap:25px; }
-    .sidebar {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 20px 0;
-    }
-    .sidebar button {
-      display:flex; align-items:center; gap:15px;
-      width:100%; padding:16px 25px;
-      background:none; border:none;
-      color: rgba(255,255,255,0.8);
-      font-weight:500; cursor:pointer;
-      border-left:4px solid transparent;
-      transition: var(--transition);
-    }
-    .sidebar button:hover { background: rgba(255,255,255,0.15); color:white; }
-    .sidebar button.active { background: rgba(255,255,255,0.2); color:white; border-left:4px solid var(--accent); }
-
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      padding: 25px;
-      border-radius: 16px;
-      margin-bottom: 25px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    ul { list-style:none; padding:0; }
-
-    .song-item {
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 15px;
-      color:white;
-      margin-bottom: 10px;
-    }
-
-    .status-message { margin-top:10px; font-weight:500; }
-    .status-error { color:#ff6b6b; }
-    .status-success { color:#4cc9f0; }
-    .status-info { color:#fca311; }
-
-    footer { margin-top:30px; text-align:center; color:rgba(255,255,255,0.7); }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',sans-serif; background:var(--bg1); color:#fff; padding:24px; padding-bottom:120px; }
+    .app { max-width:1200px; margin:0 auto; }
+    header { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.06); padding:18px 24px; border-radius:12px; margin-bottom:20px; }
+    .logo { display:flex; gap:12px; align-items:center; font-weight:700; }
+    .logo i { color:var(--accent); }
+    .sidebar { background:var(--card-bg); padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:8px; }
+    .sidebar button { display:flex; gap:10px; align-items:center; padding:12px; border-radius:10px; border:0; background:transparent; color:var(--muted); cursor:pointer; font-weight:600; }
+    .sidebar button.active { background:rgba(247,37,133,0.12); color:#fff; border-left:4px solid var(--accent); }
+    .card { background:rgba(255,255,255,0.04); border-radius:12px; padding:18px; margin-top:10px; }
+    .controls { display:flex; gap:10px; margin-bottom:10px; }
+    input[type="text"], input[type="url"] { padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; }
+    select { padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; }
+    .btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:600; }
+    .btn.danger { background:#e63946; color:#fff; }
+    .btn.play { background:#4361ee; color:#fff; }
+    .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .meta { flex:1; }
+    .hint { font-size:13px; color:var(--muted); margin-top:5px; }
+    #player-bar { position:fixed; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); padding:12px 24px; display:flex; justify-content:space-between; align-items:center; z-index:9999; }
   </style>
 </head>
-
 <body>
-  <div class="app-container">
-    <header>
-      <div class="logo">
-        <i class="fas fa-music"></i>
-        <span>Kişisel Müzik Kütüphanesi</span>
-      </div>
-      <div class="user-info">
-        <i class="fas fa-user"></i>
-        <span id="user-type">Kullanıcı</span>
-      </div>
-    </header>
+<div class="app">
+  <header>
+    <div class="logo"><i class="fas fa-music"></i> Kişisel Müzik Kütüphanesi</div>
+    <div><span id="user-type"></span></div>
+  </header>
 
-    <!-- Admin Panel -->
-    <div id="admin-panel" style="display:none;">
-      <h2>🎧 Admin Paneli</h2>
-      <div class="grid-container">
-        <div class="sidebar">
-          <button id="btn-library" class="active"><i class="fas fa-compact-disc"></i> Kitaplık</button>
-          <button id="btn-add-song"><i class="fas fa-plus-circle"></i> Şarkı Ekle</button>
-          <button id="btn-song-requests"><i class="fas fa-envelope"></i> Şarkı İstekleri</button>
-          <button id="btn-access-requests"><i class="fas fa-user-check"></i> Giriş Onayları</button>
-        </div>
-        <div class="main-content">
-          <div id="library-section" class="card"> <h3>Müzik Kitaplığı</h3><ul id="songs-list"></ul></div>
-          <div id="add-song-section" class="card" style="display:none;">
-            <h3>Şarkı Ekle</h3>
-            <input id="song-name" placeholder="Şarkı adı" />
-            <input id="song-artist" placeholder="Sanatçı" />
-            <input id="song-url" placeholder="Dosya URL" />
-            <button id="addSongBtn">Ekle</button>
-            <button id="clearBtn">Temizle</button>
-            <div id="admin-msg" class="status-message"></div>
-          </div>
-          <div id="song-requests-section" class="card" style="display:none;"><h3>Şarkı İstekleri</h3><ul id="song-requests-list"></ul></div>
-          <div id="access-requests-section" class="card" style="display:none;"><h3>Giriş Onayları</h3><button id="approveAllBtn">Tümünü Onayla</button><ul id="access-requests-list"></ul></div>
-        </div>
-      </div>
+  <!-- Admin Panel -->
+  <div id="admin-panel" style="display:none;">
+    <h2>🎧 Admin Paneli</h2>
+    <div class="sidebar">
+      <button id="btn-library" class="active">Kitaplık</button>
+      <button id="btn-add-song">Şarkı Ekle</button>
+      <button id="btn-song-requests">Şarkı İstekleri</button>
+      <button id="btn-access-requests">Giriş Onayları</button>
     </div>
-
-    <!-- User Panel -->
-    <div id="user-panel" style="display:none;">
-      <h2>📀 Müzik Kitaplığı</h2>
-      <div class="grid-container">
-        <div class="sidebar">
-          <button id="user-btn-library" class="active"><i class="fas fa-compact-disc"></i> Kitaplık</button>
-          <button id="user-btn-song-request"><i class="fas fa-plus-circle"></i> Şarkı İsteği</button>
-        </div>
-        <div class="main-content">
-          <div id="user-library-section" class="card"><h3>Popüler Şarkılar</h3><ul id="user-songs-list"></ul></div>
-          <div id="user-song-request-section" class="card" style="display:none;">
-            <h3>Şarkı İsteği Gönder</h3>
-            <input id="request-song-name" placeholder="Şarkı adı" />
-            <input id="request-song-artist" placeholder="Sanatçı" />
-            <input id="request-song-url" placeholder="Catbox.moe linki" />
-            <button id="sendRequestBtn">Gönder</button>
-            <div id="user-request-msg" class="status-message"></div>
-          </div>
-        </div>
+    <div id="library-section" class="card">
+      <div class="controls">
+        <input type="text" id="admin-search" placeholder="Ara...">
+        <select id="admin-sort">
+          <option value="id">En Yeni</option>
+          <option value="name">Ada Göre</option>
+          <option value="artist">Sanatçıya Göre</option>
+        </select>
       </div>
-      <p id="user-ip" style="color:white;"></p>
-      <p id="user-msg" style="color:white;"></p>
+      <ul id="songs-list"></ul>
     </div>
-
-    <footer>
-      <div id="debug"></div>
-      <p>Kişisel Müzik Kütüphanesi © 2023</p>
-    </footer>
+    <div id="add-song-section" class="card" style="display:none;">
+      <input id="song-name" placeholder="Şarkı adı">
+      <input id="song-artist" placeholder="Sanatçı">
+      <input id="song-url" placeholder="URL">
+      <button id="addSongBtn" class="btn">Ekle</button>
+      <div id="admin-msg" class="hint"></div>
+    </div>
+    <div id="song-requests-section" class="card" style="display:none;">
+      <ul id="song-requests-list"></ul>
+    </div>
+    <div id="access-requests-section" class="card" style="display:none;">
+      <ul id="access-requests-list"></ul>
+    </div>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  <!-- User Panel -->
+  <div id="user-panel" style="display:none;">
+    <h2>📀 Kullanıcı Paneli</h2>
+    <div class="sidebar">
+      <button id="user-btn-library" class="active">Kitaplık</button>
+      <button id="user-btn-song-request">Şarkı İsteği</button>
+    </div>
+    <div id="user-library-section" class="card">
+      <div class="controls">
+        <input type="text" id="user-search" placeholder="Ara...">
+        <select id="user-sort">
+          <option value="id">En Yeni</option>
+          <option value="name">Ada Göre</option>
+          <option value="artist">Sanatçıya Göre</option>
+        </select>
+      </div>
+      <ul id="user-songs-list"></ul>
+    </div>
+    <div id="user-song-request-section" class="card" style="display:none;">
+      <input id="request-song-name" placeholder="Şarkı adı">
+      <input id="request-song-artist" placeholder="Sanatçı">
+      <input id="request-song-url" placeholder="Catbox URL">
+      <button id="sendRequestBtn" class="btn">Gönder</button>
+      <div id="user-request-msg" class="hint"></div>
+    </div>
+  </div>
+</div>
 
-    const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
-    const SUPABASE_KEY = "senin keyin"; // kendi keyini koy
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+<!-- Player -->
+<div id="player-bar">
+  <div id="player-info">Henüz şarkı seçilmedi</div>
+  <audio id="main-player" controls></audio>
+</div>
 
-    const ADMIN_IP = "151.250.4.2";
-    const adminPanel = document.getElementById('admin-panel');
-    const userPanel = document.getElementById('user-panel');
-    const userIpP = document.getElementById('user-ip');
-    const userType = document.getElementById('user-type');
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g");
+const ADMIN_IP = "151.250.4.2";
+const songsList=document.getElementById("songs-list");
+const userSongsList=document.getElementById("user-songs-list");
+const mainPlayer=document.getElementById("main-player");
+const playerInfo=document.getElementById("player-info");
+let sortField="id"; let searchTerm="";
 
-    async function init() {
-      const res = await fetch("https://api64.ipify.org?format=json");
-      const d = await res.json();
-      const ip = d.ip || 'unknown';
-      if (ip === ADMIN_IP) {
-        adminPanel.style.display = 'block';
-        userPanel.style.display = 'none';
-        userType.textContent = 'Yönetici';
-      } else {
-        adminPanel.style.display = 'none';
-        userPanel.style.display = 'block';
-        userType.textContent = 'Kullanıcı';
-        userIpP.innerText = "IP: " + ip;
-      }
-    }
+// IP kontrol
+(async()=>{
+  const ip=(await (await fetch("https://api64.ipify.org?format=json")).json()).ip;
+  if(ip===ADMIN_IP){document.getElementById("admin-panel").style.display="block"; document.getElementById("user-type").textContent="Admin";}
+  else{document.getElementById("user-panel").style.display="block"; document.getElementById("user-type").textContent="Kullanıcı";}
+  loadSongs();
+})();
 
-    function setupSidebarButtons() {
-      document.getElementById('btn-library').addEventListener('click', () => showSection('library-section','btn-library'));
-      document.getElementById('btn-add-song').addEventListener('click', () => showSection('add-song-section','btn-add-song'));
-      document.getElementById('btn-song-requests').addEventListener('click', () => showSection('song-requests-section','btn-song-requests'));
-      document.getElementById('btn-access-requests').addEventListener('click', () => showSection('access-requests-section','btn-access-requests'));
-      document.getElementById('user-btn-library').addEventListener('click', () => showSection('user-library-section','user-btn-library',true));
-      document.getElementById('user-btn-song-request').addEventListener('click', () => showSection('user-song-request-section','user-btn-song-request',true));
-    }
+// Şarkıları yükle
+async function loadSongs(){
+  const {data,error}=await supabase.from("Songs").select("*").order(sortField,{ascending:true});
+  if(error){console.error(error);return;}
+  const filter=d=>d.name.toLowerCase().includes(searchTerm)||d.artist.toLowerCase().includes(searchTerm);
+  renderList(songsList,data.filter(filter),true);
+  renderList(userSongsList,data.filter(filter),false);
+}
+function renderList(list,data,isAdmin){
+  list.innerHTML="";
+  data.forEach(s=>{
+    const li=document.createElement("li"); li.className="song";
+    li.innerHTML=`<div class="meta"><strong>${s.name}</strong><div>${s.artist}</div></div>
+      <div><button class="btn play" data-url="${s.url}" data-name="${s.name}" data-artist="${s.artist}">Çal</button>
+      ${isAdmin?`<button class="btn danger" data-id="${s.id}">Sil</button>`:""}</div>`;
+    list.appendChild(li);
+  });
+  list.querySelectorAll(".play").forEach(b=>b.onclick=()=>{mainPlayer.src=b.dataset.url; playerInfo.textContent=`${b.dataset.name} - ${b.dataset.artist}`; mainPlayer.play();});
+  if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
+}
+async function deleteSong(id){await supabase.from("Songs").delete().eq("id",id); loadSongs();}
 
-    function showSection(sectionId,btnId,isUser=false){
-      const panelSelector = isUser ? '#user-panel .main-content > div' : '#admin-panel .main-content > div';
-      const btnSelector = isUser ? '#user-panel .sidebar button' : '#admin-panel .sidebar button';
-      document.querySelectorAll(panelSelector).forEach(sec=>sec.style.display='none');
-      document.getElementById(sectionId).style.display='block';
-      document.querySelectorAll(btnSelector).forEach(btn=>btn.classList.remove('active'));
-      document.getElementById(btnId).classList.add('active');
-    }
-
-    init();
-    setupSidebarButtons();
-  </script>
+// Arama & Sıralama
+document.getElementById("admin-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
+document.getElementById("user-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
+document.getElementById("admin-sort").onchange=e=>{sortField=e.target.value;loadSongs();}
+document.getElementById("user-sort").onchange=e=>{sortField=e.target.value;loadSongs();}
+</script>
 </body>
 </html>
