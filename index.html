@@ -35,8 +35,6 @@
     <div class="sidebar">
       <button id="btn-library" class="active">Kitaplık</button>
       <button id="btn-add-song">Şarkı Ekle</button>
-      <button id="btn-song-requests">Şarkı İstekleri</button>
-      <button id="btn-access-requests">Giriş Onayları</button>
     </div>
 
     <div id="library-section" class="card">
@@ -57,14 +55,6 @@
       <input id="song-url" placeholder="URL">
       <button id="addSongBtn" class="btn">Ekle</button>
       <div id="admin-msg"></div>
-    </div>
-
-    <div id="song-requests-section" class="card" style="display:none;">
-      <ul id="song-requests-list"></ul>
-    </div>
-
-    <div id="access-requests-section" class="card" style="display:none;">
-      <ul id="access-requests-list"></ul>
     </div>
   </div>
 
@@ -134,7 +124,7 @@ async function loadSongs(){
 function renderList(list,data,isAdmin){
   list.innerHTML="";
   data.forEach(s=>{
-    const li=document.createElement("li"); li.className="song";
+    const li=document.createElement("li"); li.className="song"; li.dataset.id=s.id;
     li.innerHTML=`<div class="meta"><strong>${s.name}</strong><div>${s.artist}</div></div>
       <div>
         <button class="btn play" data-url="${s.url}" data-name="${s.name}" data-artist="${s.artist}">Çal</button>
@@ -143,15 +133,18 @@ function renderList(list,data,isAdmin){
     list.appendChild(li);
   });
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>{mainPlayer.src=b.dataset.url; playerInfo.textContent=`${b.dataset.name} - ${b.dataset.artist}`; mainPlayer.play();});
-  if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
+  if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id,b.closest("li"))); }
 }
 
 // Şarkı silme
-async function deleteSong(id){
+async function deleteSong(id,element){
   if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
   const {error}=await supabase.from("Songs").delete().eq("id",id);
   if(error){alert("Silme hatası: "+error.message);}
-  else{alert("✅ Şarkı silindi"); loadSongs();}
+  else{
+    if(element) element.remove(); // DOM'dan anında kaldır
+    alert("✅ Şarkı silindi");
+  }
 }
 
 // Şarkı ekleme
@@ -162,22 +155,24 @@ async function addSong(){
   const msg=document.getElementById("admin-msg");
   if(!name||!artist||!url){msg.textContent="Lütfen tüm alanları doldurun.";return;}
   msg.textContent="Kaydediliyor...";
-  const {error}=await supabase.from("Songs").insert([{name,artist,url}]);
+  const {data,error}=await supabase.from("Songs").insert([{name,artist,url}]).select().single();
   if(error){ msg.textContent="Hata: "+error.message; console.error(error);}
   else{
     msg.textContent="✅ Şarkı eklendi";
     document.getElementById("song-name").value="";
     document.getElementById("song-artist").value="";
     document.getElementById("song-url").value="";
-    loadSongs();
+    // Yeni eklenen şarkıyı listeye direkt ekle
+    renderList(songsList,[data],true);
+    renderList(userSongsList,[data],false);
   }
 }
 document.getElementById("addSongBtn").onclick=addSong;
 
 // Admin menü
 function setupAdminButtons(){
-  const sections=["library-section","add-song-section","song-requests-section","access-requests-section"];
-  ["btn-library","btn-add-song","btn-song-requests","btn-access-requests"].forEach((id,i)=>{
+  const sections=["library-section","add-song-section"];
+  ["btn-library","btn-add-song"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
       sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
       document.querySelectorAll("#admin-panel .sidebar button").forEach(b=>b.classList.remove("active"));
