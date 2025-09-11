@@ -2,30 +2,24 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Müzik Kütüphanesi</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    h1 { text-align: center; }
-    .song { padding: 10px; margin: 10px 0; background: white; border-radius: 8px; }
-    #adminPanel { display: none; margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; }
-    input, button { padding: 8px; margin: 5px 0; width: 100%; }
-    button { background: #007bff; color: white; border: none; cursor: pointer; }
-    button:hover { background: #0056b3; }
-  </style>
+  <title>Müzik Uygulaması</title>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
 </head>
 <body>
-  <h1>🎵 Müzik Kütüphanesi</h1>
-  <div id="songList"></div>
-
   <!-- Admin Paneli -->
-  <div id="adminPanel">
-    <h2>🔑 Admin Paneli</h2>
-    <input type="text" id="songName" placeholder="Şarkı adı">
-    <input type="text" id="artist" placeholder="Sanatçı">
-    <input type="text" id="url" placeholder="Şarkı URL'si">
-    <button onclick="addSong()">➕ Şarkı Ekle</button>
+  <div id="admin-panel" style="display:none;">
+    <h2>🎵 Admin Paneli</h2>
+    <input id="song-name" placeholder="Şarkı Adı"><br>
+    <input id="song-artist" placeholder="Sanatçı"><br>
+    <input id="song-url" placeholder="Şarkı URL (mp3/catbox)"><br>
+    <button onclick="addSong()">Şarkıyı Ekle</button>
+    <hr>
+  </div>
+
+  <!-- Kullanıcı Paneli -->
+  <div id="user-panel" style="display:none;">
+    <h2>📀 Şarkı Listesi</h2>
+    <ul id="songs-list"></ul>
   </div>
 
   <script>
@@ -34,51 +28,73 @@
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const ADMIN_IP = "151.250.4.2"; // senin IP
+    // 🔑 Admin IP
+    const ADMIN_IP = "151.250.4.2";
 
-    // Şarkıları listele
-    async function loadSongs() {
-      const { data, error } = await supabase.from("Songs").select("*");
-      if (error) {
-        console.error(error);
-        return;
+    // IP kontrolü
+    async function checkIP() {
+      try {
+        const res = await fetch("https://api64.ipify.org?format=json");
+        const data = await res.json();
+        console.log("Senin IP:", data.ip);
+
+        if (data.ip === ADMIN_IP) {
+          document.getElementById("admin-panel").style.display = "block";
+        } else {
+          document.getElementById("user-panel").style.display = "block";
+        }
+        loadSongs();
+      } catch (err) {
+        console.error("IP kontrol hatası:", err);
       }
-      const songList = document.getElementById("songList");
-      songList.innerHTML = "";
-      data.forEach(song => {
-        const div = document.createElement("div");
-        div.className = "song";
-        div.innerHTML = `<strong>${song.name}</strong> - ${song.artist} <br>
-                         <a href="${song.url}" target="_blank">Dinle</a>`;
-        songList.appendChild(div);
-      });
     }
 
-    // Şarkı ekle (sadece admin ekleyebilir)
+    // Şarkı ekleme
     async function addSong() {
-      const name = document.getElementById("songName").value;
-      const artist = document.getElementById("artist").value;
-      const url = document.getElementById("url").value;
+      const name = document.getElementById("song-name").value;
+      const artist = document.getElementById("song-artist").value;
+      const url = document.getElementById("song-url").value;
+
+      if (!name || !artist || !url) {
+        alert("Lütfen tüm alanları doldurun!");
+        return;
+      }
 
       const { error } = await supabase.from("Songs").insert([{ name, artist, url }]);
+
       if (error) {
-        alert("❌ Şarkı eklenemedi: " + error.message);
+        alert("Hata: " + error.message);
       } else {
         alert("✅ Şarkı eklendi!");
+        document.getElementById("song-name").value = "";
+        document.getElementById("song-artist").value = "";
+        document.getElementById("song-url").value = "";
         loadSongs();
       }
     }
 
-    // IP kontrolü
-    async function checkIP() {
-      const res = await fetch("https://api64.ipify.org?format=json");
-      const data = await res.json();
-      if (data.ip === ADMIN_IP) {
-        document.getElementById("adminPanel").style.display = "block";
+    // Şarkı listesi yükleme
+    async function loadSongs() {
+      const { data, error } = await supabase.from("Songs").select("*").order("id", { ascending: false });
+      const list = document.getElementById("songs-list");
+      list.innerHTML = "";
+
+      if (error) {
+        console.error(error);
+        return;
       }
-      loadSongs();
+
+      data.forEach(song => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <b>${song.name}</b> - ${song.artist}<br>
+          <audio controls src="${song.url}"></audio>
+          <hr>`;
+        list.appendChild(li);
+      });
     }
 
+    // Çalıştır
     checkIP();
   </script>
 </body>
