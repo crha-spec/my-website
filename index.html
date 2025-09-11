@@ -8,7 +8,7 @@
     body { font-family: Arial, sans-serif; margin:0; display:flex; height:100vh; }
     #sidebar { width:220px; background:#222; color:white; padding:20px; display:flex; flex-direction:column; }
     #sidebar h2 { font-size:18px; margin-bottom:12px; }
-    #sidebar button { margin:6px 0; padding:10px; border:none; cursor:pointer; background:#444; color:white; border-radius:6px; }
+    #sidebar button { margin:6px 0; padding:10px; cursor:pointer; background:#444; color:white; border:none; border-radius:6px; text-align:left; }
     #sidebar button:hover { background:#666; }
     #content { flex:1; padding:20px; overflow:auto; background:#f6f7fb; }
     .panel { display:none; background:white; padding:16px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
@@ -26,21 +26,19 @@
   <!-- Sidebar -->
   <div id="sidebar">
     <h2>Menü</h2>
-    <button onclick="showPanel('library')">📀 Kitaplık</button>
-    <button id="requestBtn" onclick="showPanel('request')">➕ Şarkı İsteği</button>
-    <button id="adminBtn" style="display:none" onclick="showPanel('admin')">🎧 Admin Paneli</button>
-    <button id="requestsBtn" style="display:none" onclick="showPanel('requests')">📨 İstekler</button>
+    <button type="button" onclick="showPanel('library')">📀 Kitaplık</button>
+    <button type="button" id="requestBtn" onclick="showPanel('request')">➕ Şarkı İsteği</button>
+    <button type="button" id="adminBtn" style="display:none" onclick="showPanel('admin')">🎧 Admin Paneli</button>
+    <button type="button" id="requestsBtn" style="display:none" onclick="showPanel('requests')">📨 İstekler</button>
   </div>
 
   <!-- Content -->
   <div id="content">
-    <!-- Şarkı Kitaplığı -->
     <div id="library" class="panel">
       <h2>📀 Müzik Kitaplığı</h2>
       <ul id="songs-list"></ul>
     </div>
 
-    <!-- Kullanıcı Şarkı İsteği -->
     <div id="request" class="panel">
       <h2>➕ Şarkı İsteği Gönder</h2>
       <label>Şarkı Adı</label>
@@ -53,7 +51,6 @@
       <p id="req-msg" class="hint"></p>
     </div>
 
-    <!-- Admin Panel -->
     <div id="admin" class="panel">
       <h2>🎧 Admin Paneli</h2>
       <label>Şarkı Adı</label>
@@ -66,7 +63,6 @@
       <p id="admin-msg" class="hint"></p>
     </div>
 
-    <!-- Admin: İstekler -->
     <div id="requests" class="panel">
       <h2>📨 Kullanıcı Şarkı İstekleri</h2>
       <ul id="requests-list"></ul>
@@ -78,20 +74,17 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
+    const SUPABASE_KEY = "ANON_KEYIN"; // 🔑 buraya kendi anon key’in gelecek
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_IP = "151.250.4.2";
-
     let currentIp = null;
 
-    // Panel göster
     function showPanel(id) {
       document.querySelectorAll('.panel').forEach(p => p.style.display='none');
       document.getElementById(id).style.display = 'block';
     }
 
-    // Başlat
     async function init() {
       const res = await fetch("https://api64.ipify.org?format=json");
       const d = await res.json();
@@ -108,13 +101,11 @@
       if (currentIp === ADMIN_IP) loadRequests();
     }
 
-    // Şarkı ekle (admin)
     async function addSong() {
       const name = document.getElementById('song-name').value.trim();
       const artist = document.getElementById('song-artist').value.trim();
       const url = document.getElementById('song-url').value.trim();
       const msg = document.getElementById('admin-msg');
-
       if (!name || !artist || !url) { msg.innerText="Tüm alanları doldurun"; return; }
 
       const { error } = await supabase.from('Songs').insert([{ name, artist, url }]);
@@ -122,7 +113,6 @@
       await loadSongs();
     }
 
-    // Şarkıları listele
     async function loadSongs() {
       const { data, error } = await supabase.from('Songs').select('*').order('id',{ascending:false});
       const list = document.getElementById('songs-list');
@@ -136,7 +126,6 @@
       });
     }
 
-    // Kullanıcı istek gönder
     async function sendRequest() {
       const name=document.getElementById('req-name').value.trim();
       const artist=document.getElementById('req-artist').value.trim();
@@ -144,18 +133,15 @@
       const msg=document.getElementById('req-msg');
       if (!name || !artist || !file) { msg.innerText="Tüm alanları doldurun"; return; }
 
-      // dosya storage yükle
       const path = Date.now()+"_"+file.name;
       const { error:upErr } = await supabase.storage.from('song-requests').upload(path, file);
       if (upErr) { msg.innerText="Yükleme hatası: "+upErr.message; return; }
 
       const { data:pub } = supabase.storage.from('song-requests').getPublicUrl(path);
-
       const { error } = await supabase.from('SongRequests').insert([{ name, artist, ip:currentIp, file_url:pub.publicUrl }]);
       msg.innerText = error ? "Hata: "+error.message : "İstek gönderildi ✅";
     }
 
-    // Admin istekleri listele
     async function loadRequests() {
       const { data, error } = await supabase.from('SongRequests').select('*').order('id',{ascending:false});
       const list=document.getElementById('requests-list');
