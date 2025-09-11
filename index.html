@@ -27,7 +27,8 @@
     // 🔑 Supabase bilgilerin
     const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { createClient } = supabase;   // ✅ Hata buradaydı
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // 🔑 Admin IP
     const ADMIN_IP = "151.250.4.2";
@@ -62,7 +63,7 @@
         return;
       }
 
-      const { error } = await supabase.from("Songs").insert([{ name, artist, url }]);
+      const { error } = await db.from("Songs").insert([{ name, artist, url }]);
 
       if (error) {
         alert("Hata: " + error.message);
@@ -77,7 +78,7 @@
 
     // Şarkı listesi yükleme
     async function loadSongs() {
-      const { data, error } = await supabase.from("Songs").select("*").order("id", { ascending: false });
+      const { data, error } = await db.from("Songs").select("*").order("id", { ascending: false });
       const list = document.getElementById("songs-list");
       list.innerHTML = "";
 
