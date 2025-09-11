@@ -9,13 +9,69 @@
     h1,h2{ margin:8px 0; }
     input{ padding:8px; margin:6px 0; width:100%; box-sizing:border-box; }
     button{ padding:10px 14px; margin-top:8px; cursor:pointer; }
-    #admin-panel, #user-panel { display:none; background:white; padding:16px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.06); max-width:720px; margin-bottom:20px; }
-    ul#songs-list{ list-style:none; padding:0; }
+    #admin-panel, #user-panel { 
+      display:none; 
+      background:white; 
+      padding:16px; 
+      border-radius:8px; 
+      box-shadow:0 6px 18px rgba(0,0,0,.06); 
+      margin-bottom:20px; 
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+    }
+    .sidebar {
+      width: 200px;
+      flex-shrink: 0;
+    }
+    .main-content {
+      flex-grow: 1;
+    }
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 5px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sidebar button.active {
+      background: #4a6bff;
+      color: white;
+    }
+    ul#songs-list, ul#song-requests-list { list-style:none; padding:0; }
     li.song-item{ padding:10px 0; border-bottom:1px solid #eee; }
     .hint{ color:#666; font-size:13px; margin-top:8px; }
     .error{ color:#c62828; font-weight:700; }
     .ok{ color:#2e7d32; font-weight:700; }
     footer { margin-top:20px; color:#666; font-size:13px; }
+    .request-item {
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .request-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    #upload-status {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .catbox-instructions {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #4a6bff;
+    }
   </style>
 </head>
 <body>
@@ -24,24 +80,90 @@
   <!-- Admin Panel -->
   <div id="admin-panel">
     <h2>🎧 Admin Paneli</h2>
-    <label>Şarkı Adı</label>
-    <input id="song-name" placeholder="Örnek: Faded" />
-    <label>Sanatçı</label>
-    <input id="song-artist" placeholder="Örnek: Alan Walker" />
-    <label>Dosya URL (catbox veya mp3 linki)</label>
-    <input id="song-url" placeholder="https://..." />
-    <div style="display:flex; gap:8px;">
-      <button id="addSongBtn">Şarkıyı Ekle</button>
-      <button id="clearBtn" style="background:#eee">Temizle</button>
+    <div class="container">
+      <div class="sidebar">
+        <button id="btn-library" class="active">Kitaplık</button>
+        <button id="btn-add-song">Şarkı Ekle</button>
+        <button id="btn-song-requests">Şarkı İstekleri</button>
+      </div>
+      <div class="main-content">
+        <!-- Kitaplık Bölümü -->
+        <div id="library-section">
+          <h3>Müzik Kitaplığı</h3>
+          <div id="songs-container">
+            <ul id="songs-list"></ul>
+          </div>
+        </div>
+        
+        <!-- Şarkı Ekleme Bölümü -->
+        <div id="add-song-section" style="display:none">
+          <h3>Şarkı Ekle</h3>
+          <label>Şarkı Adı</label>
+          <input id="song-name" placeholder="Örnek: Faded" />
+          <label>Sanatçı</label>
+          <input id="song-artist" placeholder="Örnek: Alan Walker" />
+          <label>Dosya URL (catbox veya mp3 linki)</label>
+          <input id="song-url" placeholder="https://..." />
+          <div style="display:flex; gap:8px;">
+            <button id="addSongBtn">Şarkıyı Ekle</button>
+            <button id="clearBtn" style="background:#eee">Temizle</button>
+          </div>
+          <p id="admin-msg" class="hint"></p>
+        </div>
+        
+        <!-- Şarkı İstekleri Bölümü -->
+        <div id="song-requests-section" style="display:none">
+          <h3>Şarkı İstekleri</h3>
+          <div id="song-requests-container">
+            <ul id="song-requests-list"></ul>
+          </div>
+        </div>
+      </div>
     </div>
-    <p id="admin-msg" class="hint"></p>
   </div>
 
   <!-- User Panel -->
   <div id="user-panel">
     <h2>📀 Müzik Kitaplığı</h2>
-    <div id="songs-container">
-      <ul id="songs-list"></ul>
+    <div class="container">
+      <div class="sidebar">
+        <button id="user-btn-library" class="active">Kitaplık</button>
+        <button id="user-btn-song-request">Şarkı İsteği</button>
+      </div>
+      <div class="main-content">
+        <!-- Kullanıcı Kitaplık Bölümü -->
+        <div id="user-library-section">
+          <div id="user-songs-container">
+            <ul id="user-songs-list"></ul>
+          </div>
+        </div>
+        
+        <!-- Şarkı İsteği Bölümü -->
+        <div id="user-song-request-section" style="display:none">
+          <h3>Şarkı İsteği Gönder</h3>
+          <label>Şarkı Adı</label>
+          <input id="request-song-name" placeholder="Örnek: Faded" />
+          <label>Sanatçı</label>
+          <input id="request-song-artist" placeholder="Örnek: Alan Walker" />
+          
+          <div class="catbox-instructions">
+            <h4>Dosya Yükleme Talimatları:</h4>
+            <ol>
+              <li><button onclick="window.open('https://catbox.moe/', '_blank')">Catbox.moe'ya Git</button></li>
+              <li>Dosyanızı catbox.moe'ya yükleyin</li>
+              <li>Yükleme tamamlandığında size verilen linki aşağıya yapıştırın</li>
+            </ol>
+          </div>
+          
+          <label>Catbox.moe Dosya Linki</label>
+          <input id="request-song-url" placeholder="https://files.catbox.moe/..." />
+          
+          <div style="display:flex; gap:8px; margin-top:15px">
+            <button id="sendRequestBtn">Şarkı İsteği Gönder</button>
+          </div>
+          <p id="user-request-msg" class="hint"></p>
+        </div>
+      </div>
     </div>
     <p id="user-ip" class="hint"></p>
     <p id="user-msg" class="hint"></p>
@@ -68,11 +190,15 @@
     const userPanel = document.getElementById('user-panel');
     const userIpP = document.getElementById('user-ip');
     const songsList = document.getElementById('songs-list');
+    const userSongsList = document.getElementById('user-songs-list');
+    const songRequestsList = document.getElementById('song-requests-list');
     const adminMsg = document.getElementById('admin-msg');
     const userMsg = document.getElementById('user-msg');
+    const userRequestMsg = document.getElementById('user-request-msg');
     const debug = document.getElementById('debug');
     const addSongBtn = document.getElementById('addSongBtn');
     const clearBtn = document.getElementById('clearBtn');
+    const sendRequestBtn = document.getElementById('sendRequestBtn');
 
     // Sayfa açılınca IP'yi al, admin mi kontrol et, şarkıları yükle
     async function init() {
@@ -88,6 +214,7 @@
           adminPanel.style.display = 'block';
           userPanel.style.display = 'none';
           adminMsg.innerText = `Admin olarak giriş yaptınız (IP: ${ip}).`;
+          await loadSongRequests(); // Şarkı isteklerini yükle
         } else {
           // normal kullanıcı
           adminPanel.style.display = 'none';
@@ -158,9 +285,191 @@
       }
     }
 
+    // Şarkı isteği gönderme
+    async function sendSongRequest() {
+      userRequestMsg.innerText = "";
+      const name = document.getElementById('request-song-name').value.trim();
+      const artist = document.getElementById('request-song-artist').value.trim();
+      const url = document.getElementById('request-song-url').value.trim();
+
+      if (!name || !artist || !url) {
+        userRequestMsg.innerText = "Lütfen tüm alanları doldurun.";
+        userRequestMsg.className = "error";
+        return;
+      }
+
+      // URL'nin geçerli bir catbox URL'si olup olmadığını kontrol et
+      if (!url.includes('catbox.moe')) {
+        userRequestMsg.innerText = "Lütfen geçerli bir catbox.moe URL'si girin.";
+        userRequestMsg.className = "error";
+        return;
+      }
+
+      try {
+        userRequestMsg.innerText = "İstek gönderiliyor...";
+        sendRequestBtn.disabled = true;
+
+        const payload = { 
+          name, 
+          artist, 
+          file_url: url,
+          status: 'pending' // pending, approved, rejected
+        };
+        
+        const { data, error } = await supabase
+          .from('SongRequests')    // Yeni tablo
+          .insert([payload]);
+
+        if (error) {
+          userRequestMsg.innerText = "Hata: " + error.message;
+          userRequestMsg.className = "error";
+          console.error("Supabase insert error:", error);
+        } else {
+          userRequestMsg.innerText = "Şarkı isteği başarıyla gönderildi ✅";
+          userRequestMsg.className = "ok";
+          // form temizle
+          document.getElementById('request-song-name').value = '';
+          document.getElementById('request-song-artist').value = '';
+          document.getElementById('request-song-url').value = '';
+        }
+      } catch (err) {
+        userRequestMsg.innerText = "Beklenmeyen hata: " + (err.message || err);
+        userRequestMsg.className = "error";
+        console.error("Insert exception:", err);
+      } finally {
+        sendRequestBtn.disabled = false;
+      }
+    }
+
+    // Şarkı isteklerini yükle (admin için)
+    async function loadSongRequests() {
+      songRequestsList.innerHTML = 'Yükleniyor...';
+      try {
+        const { data, error } = await supabase
+          .from('SongRequests')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          songRequestsList.innerHTML = `<li class="error">İstekler yüklenemedi: ${error.message}</li>`;
+          console.error("Supabase select error:", error);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          songRequestsList.innerHTML = '<li class="hint">Henüz şarkı isteği yok.</li>';
+          return;
+        }
+
+        songRequestsList.innerHTML = '';
+        data.forEach(request => {
+          const li = document.createElement('li');
+          li.className = 'request-item';
+          li.innerHTML = `
+            <div><strong>${escapeHtml(request.name || '')}</strong> - ${escapeHtml(request.artist || '')}</div>
+            <div class="hint">Durum: ${request.status || 'pending'}</div>
+            <div class="request-actions">
+              <button class="play-btn" data-url="${escapeAttr(request.file_url || '')}">Dinle</button>
+              ${request.status === 'pending' ? `
+                <button class="approve-btn" data-id="${request.id}" data-name="${escapeAttr(request.name)}" data-artist="${escapeAttr(request.artist)}" data-url="${escapeAttr(request.file_url)}">Onayla</button>
+                <button class="reject-btn" data-id="${request.id}">Reddet</button>
+              ` : ''}
+            </div>
+          `;
+          songRequestsList.appendChild(li);
+        });
+
+        // Dinle butonlarına event ekle
+        document.querySelectorAll('.play-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const url = btn.getAttribute('data-url');
+            if (url) {
+              window.open(url, '_blank');
+            }
+          });
+        });
+
+        // Onayla butonlarına event ekle
+        document.querySelectorAll('.approve-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            const artist = btn.getAttribute('data-artist');
+            const fileUrl = btn.getAttribute('data-url');
+            
+            // Şarkı ekleme formunu doldur
+            document.getElementById('song-name').value = name;
+            document.getElementById('song-artist').value = artist;
+            document.getElementById('song-url').value = fileUrl;
+            
+            // Şarkı isteğini onayla
+            approveSongRequest(id);
+            
+            // Şarkı ekleme bölümüne geç
+            document.getElementById('btn-add-song').click();
+          });
+        });
+
+        // Reddet butonlarına event ekle
+        document.querySelectorAll('.reject-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            rejectSongRequest(id);
+          });
+        });
+
+      } catch (err) {
+        songRequestsList.innerHTML = `<li class="error">Beklenmeyen istek yükleme hatası: ${err.message || err}</li>`;
+        console.error(err);
+      }
+    }
+
+    // Şarkı isteğini onayla
+    async function approveSongRequest(id) {
+      try {
+        const { error } = await supabase
+          .from('SongRequests')
+          .update({ status: 'approved' })
+          .eq('id', id);
+
+        if (error) {
+          console.error("İstek onaylama hatası:", error);
+        } else {
+          // Listeyi yenile
+          await loadSongRequests();
+        }
+      } catch (err) {
+        console.error("İstek onaylama hatası:", err);
+      }
+    }
+
+    // Şarkı isteğini reddet
+    async function rejectSongRequest(id) {
+      try {
+        const { error } = await supabase
+          .from('SongRequests')
+          .update({ status: 'rejected' })
+          .eq('id', id);
+
+        if (error) {
+          console.error("İstek reddetme hatası:", error);
+        } else {
+          // Listeyi yenile
+          await loadSongRequests();
+        }
+      } catch (err) {
+        console.error("İstek reddetme hatası:", err);
+      }
+    }
+
     // Şarkıları yükle / listele
     async function loadSongs() {
-      songsList.innerHTML = 'Yükleniyor...';
+      const lists = [songsList, userSongsList];
+      
+      for (const list of lists) {
+        if (list) list.innerHTML = 'Yükleniyor...';
+      }
+      
       try {
         const { data, error } = await supabase
           .from('Songs')
@@ -168,29 +477,42 @@
           .order('id', { ascending: false });
 
         if (error) {
-          songsList.innerHTML = `<li class="error">Liste yüklenemedi: ${error.message}</li>`;
+          const errorMsg = `<li class="error">Liste yüklenemedi: ${error.message}</li>`;
+          for (const list of lists) {
+            if (list) list.innerHTML = errorMsg;
+          }
           console.error("Supabase select error:", error);
           return;
         }
 
         if (!data || data.length === 0) {
-          songsList.innerHTML = '<li class="hint">Henüz şarkı yok.</li>';
+          const emptyMsg = '<li class="hint">Henüz şarkı yok.</li>';
+          for (const list of lists) {
+            if (list) list.innerHTML = emptyMsg;
+          }
           return;
         }
 
-        songsList.innerHTML = '';
-        data.forEach(s => {
-          const li = document.createElement('li');
-          li.className = 'song-item';
-          // Güvenlik: user tarafından gönderilen url'leri direkt koyuyoruz - catbox/cdn linki olduğundan genelde çalışır.
-          li.innerHTML = `<strong>${escapeHtml(s.name || '')}</strong> - ${escapeHtml(s.artist || '')}
-                          <div style="margin-top:6px">
-                            <audio controls preload="none" src="${escapeAttr(s.url || '')}" style="width:100%;max-width:600px"></audio>
-                          </div>`;
-          songsList.appendChild(li);
-        });
+        for (const list of lists) {
+          if (!list) continue;
+          
+          list.innerHTML = '';
+          data.forEach(s => {
+            const li = document.createElement('li');
+            li.className = 'song-item';
+            // Güvenlik: user tarafından gönderilen url'leri direkt koyuyoruz - catbox/cdn linki olduğundan genelde çalışır.
+            li.innerHTML = `<strong>${escapeHtml(s.name || '')}</strong> - ${escapeHtml(s.artist || '')}
+                            <div style="margin-top:6px">
+                              <audio controls preload="none" src="${escapeAttr(s.url || '')}" style="width:100%;max-width:600px"></audio>
+                            </div>`;
+            list.appendChild(li);
+          });
+        }
       } catch (err) {
-        songsList.innerHTML = `<li class="error">Beklenmeyen liste hatası: ${err.message || err}</li>`;
+        const errorMsg = `<li class="error">Beklenmeyen liste hatası: ${err.message || err}</li>`;
+        for (const list of lists) {
+          if (list) list.innerHTML = errorMsg;
+        }
         console.error(err);
       }
     }
@@ -204,6 +526,59 @@
     }
     function escapeAttr(text) { return escapeHtml(text); }
 
+    // Sidebar butonları için event listener'lar
+    function setupSidebarButtons() {
+      // Admin paneli butonları
+      document.getElementById('btn-library').addEventListener('click', () => {
+        document.getElementById('library-section').style.display = 'block';
+        document.getElementById('add-song-section').style.display = 'none';
+        document.getElementById('song-requests-section').style.display = 'none';
+        
+        // Aktif butonu güncelle
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-library').classList.add('active');
+      });
+      
+      document.getElementById('btn-add-song').addEventListener('click', () => {
+        document.getElementById('library-section').style.display = 'none';
+        document.getElementById('add-song-section').style.display = 'block';
+        document.getElementById('song-requests-section').style.display = 'none';
+        
+        // Aktif butonu güncelle
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-add-song').classList.add('active');
+      });
+      
+      document.getElementById('btn-song-requests').addEventListener('click', () => {
+        document.getElementById('library-section').style.display = 'none';
+        document.getElementById('add-song-section').style.display = 'none';
+        document.getElementById('song-requests-section').style.display = 'block';
+        
+        // Aktif butonu güncelle
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-song-requests').classList.add('active');
+      });
+      
+      // Kullanıcı paneli butonları
+      document.getElementById('user-btn-library').addEventListener('click', () => {
+        document.getElementById('user-library-section').style.display = 'block';
+        document.getElementById('user-song-request-section').style.display = 'none';
+        
+        // Aktif butonu güncelle
+        document.querySelectorAll('#user-panel .sidebar button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('user-btn-library').classList.add('active');
+      });
+      
+      document.getElementById('user-btn-song-request').addEventListener('click', () => {
+        document.getElementById('user-library-section').style.display = 'none';
+        document.getElementById('user-song-request-section').style.display = 'block';
+        
+        // Aktif butonu güncelle
+        document.querySelectorAll('#user-panel .sidebar button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('user-btn-song-request').classList.add('active');
+      });
+    }
+
     // eventler
     addSongBtn.addEventListener('click', addSong);
     clearBtn.addEventListener('click', () => {
@@ -212,9 +587,12 @@
       document.getElementById('song-url').value = '';
       adminMsg.innerText = '';
     });
+    
+    sendRequestBtn.addEventListener('click', sendSongRequest);
 
     // başlat
     init();
+    setupSidebarButtons();
   </script>
 </body>
 </html>
