@@ -3,217 +3,173 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kişisel Müzik Kütüphanesi - Admin + Kullanıcı</title>
+  <title>Kişisel Müzik Kütüphanesi</title>
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; padding:20px; background: #f6f7fb; color:#111; }
-    h1,h2{ margin:8px 0; }
-    input{ padding:8px; margin:6px 0; width:100%; box-sizing:border-box; }
-    button{ padding:10px 14px; margin-top:8px; cursor:pointer; }
-    #admin-panel, #user-panel { display:none; background:white; padding:16px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.06); max-width:720px; margin-bottom:20px; }
-    ul#songs-list{ list-style:none; padding:0; }
-    li.song-item{ padding:10px 0; border-bottom:1px solid #eee; }
-    .hint{ color:#666; font-size:13px; margin-top:8px; }
-    .error{ color:#c62828; font-weight:700; }
-    .ok{ color:#2e7d32; font-weight:700; }
-    footer { margin-top:20px; color:#666; font-size:13px; }
+    body { font-family: Arial, sans-serif; margin:0; display:flex; height:100vh; }
+    #sidebar { width:220px; background:#222; color:white; padding:20px; display:flex; flex-direction:column; }
+    #sidebar h2 { font-size:18px; margin-bottom:12px; }
+    #sidebar button { margin:6px 0; padding:10px; border:none; cursor:pointer; background:#444; color:white; border-radius:6px; }
+    #sidebar button:hover { background:#666; }
+    #content { flex:1; padding:20px; overflow:auto; background:#f6f7fb; }
+    .panel { display:none; background:white; padding:16px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    input, file { padding:8px; margin:6px 0; width:100%; box-sizing:border-box; }
+    button.action { padding:10px 14px; margin-top:8px; cursor:pointer; background:#1976d2; color:white; border:none; border-radius:6px; }
+    ul { list-style:none; padding:0; }
+    li { padding:8px 0; border-bottom:1px solid #eee; }
+    audio { width:100%; max-width:600px; margin-top:6px; }
+    .hint { color:#555; font-size:13px; }
+    .ok { color:green; }
+    .error { color:red; }
   </style>
 </head>
 <body>
-  <h1>Kişisel Müzik Kütüphanesi</h1>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel">
-    <h2>🎧 Admin Paneli</h2>
-    <label>Şarkı Adı</label>
-    <input id="song-name" placeholder="Örnek: Faded" />
-    <label>Sanatçı</label>
-    <input id="song-artist" placeholder="Örnek: Alan Walker" />
-    <label>Dosya URL (catbox veya mp3 linki)</label>
-    <input id="song-url" placeholder="https://..." />
-    <div style="display:flex; gap:8px;">
-      <button id="addSongBtn">Şarkıyı Ekle</button>
-      <button id="clearBtn" style="background:#eee">Temizle</button>
-    </div>
-    <p id="admin-msg" class="hint"></p>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <h2>Menü</h2>
+    <button onclick="showPanel('library')">📀 Kitaplık</button>
+    <button id="requestBtn" onclick="showPanel('request')">➕ Şarkı İsteği</button>
+    <button id="adminBtn" style="display:none" onclick="showPanel('admin')">🎧 Admin Paneli</button>
+    <button id="requestsBtn" style="display:none" onclick="showPanel('requests')">📨 İstekler</button>
   </div>
 
-  <!-- User Panel -->
-  <div id="user-panel">
-    <h2>📀 Müzik Kitaplığı</h2>
-    <div id="songs-container">
+  <!-- Content -->
+  <div id="content">
+    <!-- Şarkı Kitaplığı -->
+    <div id="library" class="panel">
+      <h2>📀 Müzik Kitaplığı</h2>
       <ul id="songs-list"></ul>
     </div>
-    <p id="user-ip" class="hint"></p>
-    <p id="user-msg" class="hint"></p>
+
+    <!-- Kullanıcı Şarkı İsteği -->
+    <div id="request" class="panel">
+      <h2>➕ Şarkı İsteği Gönder</h2>
+      <label>Şarkı Adı</label>
+      <input id="req-name" />
+      <label>Sanatçı</label>
+      <input id="req-artist" />
+      <label>Dosya (mp3)</label>
+      <input type="file" id="req-file" accept="audio/*" />
+      <button class="action" onclick="sendRequest()">İstek Gönder</button>
+      <p id="req-msg" class="hint"></p>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin" class="panel">
+      <h2>🎧 Admin Paneli</h2>
+      <label>Şarkı Adı</label>
+      <input id="song-name" />
+      <label>Sanatçı</label>
+      <input id="song-artist" />
+      <label>Dosya URL (catbox/mp3 linki)</label>
+      <input id="song-url" />
+      <button class="action" onclick="addSong()">Şarkıyı Ekle</button>
+      <p id="admin-msg" class="hint"></p>
+    </div>
+
+    <!-- Admin: İstekler -->
+    <div id="requests" class="panel">
+      <h2>📨 Kullanıcı Şarkı İstekleri</h2>
+      <ul id="requests-list"></ul>
+    </div>
   </div>
 
-  <footer>
-    <div id="debug" class="hint"></div>
-  </footer>
-
-  <!-- Supabase ESM import (tarayıcıda çalışır) -->
+  <!-- Supabase -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // --- SENİN SUPABASE BİLGİLERİN (sen verdiğin) ---
     const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- ADMIN IP (senin verdiğin) ---
     const ADMIN_IP = "151.250.4.2";
 
-    // Elemanlar
-    const adminPanel = document.getElementById('admin-panel');
-    const userPanel = document.getElementById('user-panel');
-    const userIpP = document.getElementById('user-ip');
-    const songsList = document.getElementById('songs-list');
-    const adminMsg = document.getElementById('admin-msg');
-    const userMsg = document.getElementById('user-msg');
-    const debug = document.getElementById('debug');
-    const addSongBtn = document.getElementById('addSongBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    let currentIp = null;
 
-    // Sayfa açılınca IP'yi al, admin mi kontrol et, şarkıları yükle
-    async function init() {
-      try {
-        const res = await fetch("https://api64.ipify.org?format=json");
-        const d = await res.json();
-        const ip = d.ip || 'unknown';
-        debug.innerText = ""; // başlangıçta temiz
-        console.log("Görünen IP:", ip);
-
-        if (ip === ADMIN_IP) {
-          // admin
-          adminPanel.style.display = 'block';
-          userPanel.style.display = 'none';
-          adminMsg.innerText = `Admin olarak giriş yaptınız (IP: ${ip}).`;
-        } else {
-          // normal kullanıcı
-          adminPanel.style.display = 'none';
-          userPanel.style.display = 'block';
-          userIpP.innerText = `Senin IP adresin: ${ip}`;
-          userMsg.innerText = `Eğer bu senin gerçek IPnin değilse, IP eşleşmesini kontrol et.`;
-        }
-
-        // Şarkıları her durumda yükle
-        await loadSongs();
-      } catch (err) {
-        debug.innerText = "IP alınırken hata: " + (err.message || err);
-        console.error(err);
-        // Hata olsa bile şarkıları dene
-        await loadSongs();
-        adminPanel.style.display = 'none';
-        userPanel.style.display = 'block';
-      }
+    // Panel göster
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach(p => p.style.display='none');
+      document.getElementById(id).style.display = 'block';
     }
 
-    // Şarkı ekleme
+    // Başlat
+    async function init() {
+      const res = await fetch("https://api64.ipify.org?format=json");
+      const d = await res.json();
+      currentIp = d.ip;
+
+      if (currentIp === ADMIN_IP) {
+        document.getElementById('adminBtn').style.display = 'block';
+        document.getElementById('requestsBtn').style.display = 'block';
+        showPanel('admin');
+      } else {
+        showPanel('library');
+      }
+      await loadSongs();
+      if (currentIp === ADMIN_IP) loadRequests();
+    }
+
+    // Şarkı ekle (admin)
     async function addSong() {
-      adminMsg.innerText = "";
       const name = document.getElementById('song-name').value.trim();
       const artist = document.getElementById('song-artist').value.trim();
       const url = document.getElementById('song-url').value.trim();
+      const msg = document.getElementById('admin-msg');
 
-      if (!name || !artist || !url) {
-        adminMsg.innerText = "Lütfen tüm alanları doldurun (name, artist, url).";
-        adminMsg.className = "error";
-        return;
-      }
+      if (!name || !artist || !url) { msg.innerText="Tüm alanları doldurun"; return; }
 
-      // insert dene
-      try {
-        adminMsg.innerText = "Kaydediliyor...";
-        addSongBtn.disabled = true;
-
-        const payload = { name, artist, url };
-        const { data, error } = await supabase
-          .from('Songs')    // tablo adı: public.Songs
-          .insert([payload]);
-
-        if (error) {
-          // RLS veya benzeri bir problem varsa error.message burada olacak
-          adminMsg.innerText = "Hata: " + error.message;
-          adminMsg.className = "error";
-          console.error("Supabase insert error:", error);
-          // Eğer RLS hatasıysa kullanıcıya SQL düzeltmesi gerektiğini söyle
-          if (error.message && error.message.toLowerCase().includes('row-level')) {
-            adminMsg.innerText += " — RLS policy izinlerini kontrol et (SQL tarafında insert izni ver).";
-          }
-        } else {
-          adminMsg.innerText = "Şarkı başarıyla eklendi ✅";
-          adminMsg.className = "ok";
-          // form temizle
-          document.getElementById('song-name').value = '';
-          document.getElementById('song-artist').value = '';
-          document.getElementById('song-url').value = '';
-          await loadSongs();
-        }
-      } catch (err) {
-        adminMsg.innerText = "Beklenmeyen hata: " + (err.message || err);
-        adminMsg.className = "error";
-        console.error("Insert exception:", err);
-      } finally {
-        addSongBtn.disabled = false;
-      }
+      const { error } = await supabase.from('Songs').insert([{ name, artist, url }]);
+      msg.innerText = error ? "Hata: "+error.message : "Şarkı eklendi ✅";
+      await loadSongs();
     }
 
-    // Şarkıları yükle / listele
+    // Şarkıları listele
     async function loadSongs() {
-      songsList.innerHTML = 'Yükleniyor...';
-      try {
-        const { data, error } = await supabase
-          .from('Songs')
-          .select('*')
-          .order('id', { ascending: false });
-
-        if (error) {
-          songsList.innerHTML = `<li class="error">Liste yüklenemedi: ${error.message}</li>`;
-          console.error("Supabase select error:", error);
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          songsList.innerHTML = '<li class="hint">Henüz şarkı yok.</li>';
-          return;
-        }
-
-        songsList.innerHTML = '';
-        data.forEach(s => {
-          const li = document.createElement('li');
-          li.className = 'song-item';
-          // Güvenlik: user tarafından gönderilen url'leri direkt koyuyoruz - catbox/cdn linki olduğundan genelde çalışır.
-          li.innerHTML = `<strong>${escapeHtml(s.name || '')}</strong> - ${escapeHtml(s.artist || '')}
-                          <div style="margin-top:6px">
-                            <audio controls preload="none" src="${escapeAttr(s.url || '')}" style="width:100%;max-width:600px"></audio>
-                          </div>`;
-          songsList.appendChild(li);
-        });
-      } catch (err) {
-        songsList.innerHTML = `<li class="error">Beklenmeyen liste hatası: ${err.message || err}</li>`;
-        console.error(err);
-      }
-    }
-
-    // Basit escaping yardımcıları
-    function escapeHtml(text) {
-      if (!text) return '';
-      return text.replace(/[&<>"']/g, function (m) {
-        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+      const { data, error } = await supabase.from('Songs').select('*').order('id',{ascending:false});
+      const list = document.getElementById('songs-list');
+      list.innerHTML='';
+      if (error) { list.innerHTML="<li>Hata: "+error.message+"</li>"; return; }
+      if (!data.length) { list.innerHTML="<li>Henüz şarkı yok.</li>"; return; }
+      data.forEach(s=>{
+        const li=document.createElement('li');
+        li.innerHTML=`<b>${s.name}</b> - ${s.artist}<br><audio controls src="${s.url}"></audio>`;
+        list.appendChild(li);
       });
     }
-    function escapeAttr(text) { return escapeHtml(text); }
 
-    // eventler
-    addSongBtn.addEventListener('click', addSong);
-    clearBtn.addEventListener('click', () => {
-      document.getElementById('song-name').value = '';
-      document.getElementById('song-artist').value = '';
-      document.getElementById('song-url').value = '';
-      adminMsg.innerText = '';
-    });
+    // Kullanıcı istek gönder
+    async function sendRequest() {
+      const name=document.getElementById('req-name').value.trim();
+      const artist=document.getElementById('req-artist').value.trim();
+      const file=document.getElementById('req-file').files[0];
+      const msg=document.getElementById('req-msg');
+      if (!name || !artist || !file) { msg.innerText="Tüm alanları doldurun"; return; }
 
-    // başlat
+      // dosya storage yükle
+      const path = Date.now()+"_"+file.name;
+      const { error:upErr } = await supabase.storage.from('song-requests').upload(path, file);
+      if (upErr) { msg.innerText="Yükleme hatası: "+upErr.message; return; }
+
+      const { data:pub } = supabase.storage.from('song-requests').getPublicUrl(path);
+
+      const { error } = await supabase.from('SongRequests').insert([{ name, artist, ip:currentIp, file_url:pub.publicUrl }]);
+      msg.innerText = error ? "Hata: "+error.message : "İstek gönderildi ✅";
+    }
+
+    // Admin istekleri listele
+    async function loadRequests() {
+      const { data, error } = await supabase.from('SongRequests').select('*').order('id',{ascending:false});
+      const list=document.getElementById('requests-list');
+      list.innerHTML='';
+      if (error) { list.innerHTML="<li>Hata: "+error.message+"</li>"; return; }
+      if (!data.length) { list.innerHTML="<li>İstek yok.</li>"; return; }
+      data.forEach(r=>{
+        const li=document.createElement('li');
+        li.innerHTML=`<b>${r.name}</b> - ${r.artist} (${r.ip || "?"})<br>
+                      <a href="${r.file_url}" target="_blank">Dosyayı indir</a>`;
+        list.appendChild(li);
+      });
+    }
+
     init();
   </script>
 </body>
