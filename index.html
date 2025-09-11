@@ -44,7 +44,7 @@
       background: #4a6bff;
       color: white;
     }
-    ul#songs-list, ul#song-requests-list { list-style:none; padding:0; }
+    ul#songs-list, ul#song-requests-list, ul#access-requests-list { list-style:none; padding:0; }
     li.song-item{ padding:10px 0; border-bottom:1px solid #eee; }
     .hint{ color:#666; font-size:13px; margin-top:8px; }
     .error{ color:#c62828; font-weight:700; }
@@ -72,6 +72,18 @@
       margin: 15px 0;
       border-left: 4px solid #4a6bff;
     }
+    .access-request-item {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+    }
+    .approve-all-btn {
+      margin-bottom: 15px;
+      background: #2e7d32;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -85,6 +97,7 @@
         <button id="btn-library" class="active">Kitaplık</button>
         <button id="btn-add-song">Şarkı Ekle</button>
         <button id="btn-song-requests">Şarkı İstekleri</button>
+        <button id="btn-access-requests">Giriş Onayları</button>
       </div>
       <div class="main-content">
         <!-- Kitaplık Bölümü -->
@@ -116,6 +129,15 @@
           <h3>Şarkı İstekleri</h3>
           <div id="song-requests-container">
             <ul id="song-requests-list"></ul>
+          </div>
+        </div>
+        
+        <!-- Giriş Onayları Bölümü -->
+        <div id="access-requests-section" style="display:none">
+          <h3>Giriş Onayları</h3>
+          <button id="approveAllBtn" class="approve-all-btn">Tümünü Onayla</button>
+          <div id="access-requests-container">
+            <ul id="access-requests-list"></ul>
           </div>
         </div>
       </div>
@@ -192,6 +214,7 @@
     const songsList = document.getElementById('songs-list');
     const userSongsList = document.getElementById('user-songs-list');
     const songRequestsList = document.getElementById('song-requests-list');
+    const accessRequestsList = document.getElementById('access-requests-list');
     const adminMsg = document.getElementById('admin-msg');
     const userMsg = document.getElementById('user-msg');
     const userRequestMsg = document.getElementById('user-request-msg');
@@ -199,6 +222,10 @@
     const addSongBtn = document.getElementById('addSongBtn');
     const clearBtn = document.getElementById('clearBtn');
     const sendRequestBtn = document.getElementById('sendRequestBtn');
+    const approveAllBtn = document.getElementById('approveAllBtn');
+
+    // Onaylanmış IP'ler (localStorage'da saklanacak)
+    let approvedIPs = JSON.parse(localStorage.getItem('approvedIPs')) || [];
 
     // Sayfa açılınca IP'yi al, admin mi kontrol et, şarkıları yükle
     async function init() {
@@ -209,18 +236,26 @@
         debug.innerText = ""; // başlangıçta temiz
         console.log("Görünen IP:", ip);
 
+        // IP'yi kaydet
+        localStorage.setItem('currentIP', ip);
+        
+        // Eğer admin IP'si ise
         if (ip === ADMIN_IP) {
           // admin
           adminPanel.style.display = 'block';
           userPanel.style.display = 'none';
           adminMsg.innerText = `Admin olarak giriş yaptınız (IP: ${ip}).`;
           await loadSongRequests(); // Şarkı isteklerini yükle
+          await loadAccessRequests(); // Giriş isteklerini yükle
         } else {
-          // normal kullanıcı
+          // normal kullanıcı - artık direkt girebiliyor
           adminPanel.style.display = 'none';
           userPanel.style.display = 'block';
           userIpP.innerText = `Senin IP adresin: ${ip}`;
-          userMsg.innerText = `Eğer bu senin gerçek IPnin değilse, IP eşleşmesini kontrol et.`;
+          userMsg.innerText = ``;
+          
+          // IP'yi access requests tablosuna kaydet
+          await saveAccessRequest(ip);
         }
 
         // Şarkıları her durumda yükle
@@ -232,6 +267,39 @@
         await loadSongs();
         adminPanel.style.display = 'none';
         userPanel.style.display = 'block';
+      }
+    }
+
+    // Erişim isteğini kaydet
+    async function saveAccessRequest(ip) {
+      try {
+        // Öncelikle bu IP zaten kayıtlı mı kontrol et
+        const { data: existingRequests, error: checkError } = await supabase
+          .from('AccessRequests')
+          .select('*')
+          .eq('ip', ip);
+
+        if (checkError) {
+          console.error("IP kontrol hatası:", checkError);
+          return;
+        }
+
+        // Eğer bu IP zaten kayıtlı değilse ekle
+        if (!existingRequests || existingRequests.length === 0) {
+          const { error } = await supabase
+            .from('AccessRequests')
+            .insert([{ 
+              ip: ip, 
+              status: 'pending',
+              created_at: new Date().toISOString()
+            }]);
+
+          if (error) {
+            console.error("Erişim isteği kaydetme hatası:", error);
+          }
+        }
+      } catch (err) {
+        console.error("Erişim isteği kaydetme hatası:", err);
       }
     }
 
@@ -338,6 +406,129 @@
         console.error("Insert exception:", err);
       } finally {
         sendRequestBtn.disabled = false;
+      }
+    }
+
+    // Giriş isteklerini yükle (admin için)
+    async function loadAccessRequests() {
+      accessRequestsList.innerHTML = 'Yükleniyor...';
+      try {
+        const { data, error } = await supabase
+          .from('AccessRequests')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          accessRequestsList.innerHTML = `<li class="error">İstekler yüklenemedi: ${error.message}</li>`;
+          console.error("Supabase select error:", error);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          accessRequestsList.innerHTML = '<li class="hint">Henüz giriş isteği yok.</li>';
+          return;
+        }
+
+        accessRequestsList.innerHTML = '';
+        data.forEach(request => {
+          const li = document.createElement('li');
+          li.className = 'access-request-item';
+          li.innerHTML = `
+            <div><strong>IP Adresi:</strong> ${escapeHtml(request.ip || '')}</div>
+            <div><strong>Durum:</strong> ${request.status || 'pending'}</div>
+            <div><strong>İstek Zamanı:</strong> ${new Date(request.created_at).toLocaleString('tr-TR')}</div>
+            ${request.status === 'pending' ? `
+              <div class="request-actions">
+                <button class="approve-access-btn" data-ip="${escapeAttr(request.ip)}">Onayla</button>
+              </div>
+            ` : ''}
+          `;
+          accessRequestsList.appendChild(li);
+        });
+
+        // Onayla butonlarına event ekle
+        document.querySelectorAll('.approve-access-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const ip = btn.getAttribute('data-ip');
+            approveAccessRequest(ip);
+          });
+        });
+
+      } catch (err) {
+        accessRequestsList.innerHTML = `<li class="error">Beklenmeyen istek yükleme hatası: ${err.message || err}</li>`;
+        console.error(err);
+      }
+    }
+
+    // Tüm giriş isteklerini onayla
+    async function approveAllAccessRequests() {
+      try {
+        const { data: requests, error: fetchError } = await supabase
+          .from('AccessRequests')
+          .select('*')
+          .eq('status', 'pending');
+
+        if (fetchError) {
+          console.error("İstekleri getirme hatası:", fetchError);
+          return;
+        }
+
+        if (!requests || requests.length === 0) {
+          alert("Onay bekleyen istek bulunamadı.");
+          return;
+        }
+
+        // Tüm bekleyen istekleri onayla
+        for (const request of requests) {
+          const { error } = await supabase
+            .from('AccessRequests')
+            .update({ status: 'approved' })
+            .eq('id', request.id);
+
+          if (error) {
+            console.error(`IP ${request.ip} onaylama hatası:`, error);
+          } else {
+            // Onaylanan IP'yi localStorage'a ekle
+            if (!approvedIPs.includes(request.ip)) {
+              approvedIPs.push(request.ip);
+            }
+          }
+        }
+
+        // localStorage'ı güncelle
+        localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+        
+        // Listeyi yenile
+        await loadAccessRequests();
+        
+        alert("Tüm istekler onaylandı!");
+      } catch (err) {
+        console.error("Toplu onaylama hatası:", err);
+      }
+    }
+
+    // Giriş isteğini onayla
+    async function approveAccessRequest(ip) {
+      try {
+        const { error } = await supabase
+          .from('AccessRequests')
+          .update({ status: 'approved' })
+          .eq('ip', ip);
+
+        if (error) {
+          console.error("İstek onaylama hatası:", error);
+        } else {
+          // Onaylanan IP'yi localStorage'a ekle
+          if (!approvedIPs.includes(ip)) {
+            approvedIPs.push(ip);
+            localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+          }
+          
+          // Listeyi yenile
+          await loadAccessRequests();
+        }
+      } catch (err) {
+        console.error("İstek onaylama hatası:", err);
       }
     }
 
@@ -533,6 +724,7 @@
         document.getElementById('library-section').style.display = 'block';
         document.getElementById('add-song-section').style.display = 'none';
         document.getElementById('song-requests-section').style.display = 'none';
+        document.getElementById('access-requests-section').style.display = 'none';
         
         // Aktif butonu güncelle
         document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
@@ -543,6 +735,7 @@
         document.getElementById('library-section').style.display = 'none';
         document.getElementById('add-song-section').style.display = 'block';
         document.getElementById('song-requests-section').style.display = 'none';
+        document.getElementById('access-requests-section').style.display = 'none';
         
         // Aktif butonu güncelle
         document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
@@ -553,10 +746,22 @@
         document.getElementById('library-section').style.display = 'none';
         document.getElementById('add-song-section').style.display = 'none';
         document.getElementById('song-requests-section').style.display = 'block';
+        document.getElementById('access-requests-section').style.display = 'none';
         
         // Aktif butonu güncelle
         document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
         document.getElementById('btn-song-requests').classList.add('active');
+      });
+      
+      document.getElementById('btn-access-requests').addEventListener('click', () => {
+        document.getElementById('library-section').style.display = 'none';
+        document.getElementById('add-song-section').style.display = 'none';
+        document.getElementById('song-requests-section').style.display = 'none';
+        document.getElementById('access-requests-section').style.display = 'block';
+        
+        // Aktif butonu güncelle
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-access-requests').classList.add('active');
       });
       
       // Kullanıcı paneli butonları
@@ -589,6 +794,7 @@
     });
     
     sendRequestBtn.addEventListener('click', sendSongRequest);
+    approveAllBtn.addEventListener('click', approveAllAccessRequests);
 
     // başlat
     init();
