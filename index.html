@@ -13,7 +13,7 @@
     #sidebar button.active { background:#1976d2; }
     #content { flex:1; padding:20px; overflow:auto; background:#f6f7fb; }
     .panel { display:none; background:white; padding:16px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
-    .panel.active { display:block; }
+    .panel.active { display:block; animation: fadeIn 0.3s ease; }
     input, file { padding:8px; margin:6px 0; width:100%; box-sizing:border-box; }
     button.action { padding:10px 14px; margin-top:8px; cursor:pointer; background:#1976d2; color:white; border:none; border-radius:6px; }
     ul { list-style:none; padding:0; }
@@ -22,13 +22,18 @@
     .hint { color:#555; font-size:13px; }
     .ok { color:green; }
     .error { color:red; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <!-- Sidebar -->
   <div id="sidebar">
     <h2>Menü</h2>
-    <button type="button" id="libraryBtn" onclick="showPanel('library')">📀 Kitaplık</button>
+    <button type="button" id="libraryBtn" class="active" onclick="showPanel('library')">📀 Kitaplık</button>
     <button type="button" id="requestBtn" onclick="showPanel('request')">➕ Şarkı İsteği</button>
     <button type="button" id="adminBtn" style="display:none" onclick="showPanel('admin')">🎧 Admin Paneli</button>
     <button type="button" id="requestsBtn" style="display:none" onclick="showPanel('requests')">📨 İstekler</button>
@@ -36,7 +41,7 @@
 
   <!-- Content -->
   <div id="content">
-    <div id="library" class="panel">
+    <div id="library" class="panel active">
       <h2>📀 Müzik Kitaplığı</h2>
       <ul id="songs-list"></ul>
       <p id="library-msg" class="hint"></p>
@@ -84,23 +89,23 @@
     // --- ADMIN IP (senin verdiğin) ---
     const ADMIN_IP = "151.250.4.2";
     let currentIp = null;
-    let currentPanel = 'library'; // Varsayılan panel
 
     function showPanel(id) {
       // Tüm panelleri gizle
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => {
+        p.classList.remove('active');
+      });
       
       // Tüm butonlardan aktif sınıfını kaldır
-      document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('#sidebar button').forEach(btn => {
+        btn.classList.remove('active');
+      });
       
       // İlgili paneli göster
       document.getElementById(id).classList.add('active');
       
       // İlgili butona aktif sınıfı ekle
       document.getElementById(id + 'Btn').classList.add('active');
-      
-      // Mevcut paneli güncelle
-      currentPanel = id;
       
       // Eğer kitaplık paneli gösteriliyorsa şarkıları yeniden yükle
       if (id === 'library') {
@@ -128,11 +133,8 @@
       if (currentIp === ADMIN_IP) {
         document.getElementById('adminBtn').style.display = 'block';
         document.getElementById('requestsBtn').style.display = 'block';
-        showPanel('admin');
-      } else {
-        showPanel('library');
       }
-
+      
       await loadSongs();
       if (currentIp === ADMIN_IP) await loadRequests();
     }
