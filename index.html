@@ -20,6 +20,7 @@
   <div id="user-panel" style="display:none;">
     <h2>📀 Şarkı Listesi</h2>
     <ul id="songs-list"></ul>
+    <p id="user-ip" style="margin-top:20px; color:gray; font-size:14px;"></p>
   </div>
 
   <script>
@@ -42,6 +43,7 @@
           document.getElementById("admin-panel").style.display = "block";
         } else {
           document.getElementById("user-panel").style.display = "block";
+          document.getElementById("user-ip").innerText = "Senin IP adresin: " + data.ip;
         }
         loadSongs();
       } catch (err) {
