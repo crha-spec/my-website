@@ -89,17 +89,14 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .songs-grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px,1fr));
-      gap:20px;
-    }
+    ul { list-style:none; padding:0; }
 
     .song-item {
       background: rgba(255,255,255,0.1);
       border-radius: 12px;
       padding: 15px;
       color:white;
+      margin-bottom: 10px;
     }
 
     .status-message { margin-top:10px; font-weight:500; }
@@ -135,32 +132,18 @@
           <button id="btn-access-requests"><i class="fas fa-user-check"></i> Giriş Onayları</button>
         </div>
         <div class="main-content">
-          <div id="library-section">
-            <div class="card">
-              <h3>Müzik Kitaplığı</h3>
-              <ul id="songs-list"></ul>
-            </div>
-          </div>
-          <div id="add-song-section" style="display:none;" class="card">
+          <div id="library-section" class="card"> <h3>Müzik Kitaplığı</h3><ul id="songs-list"></ul></div>
+          <div id="add-song-section" class="card" style="display:none;">
             <h3>Şarkı Ekle</h3>
             <input id="song-name" placeholder="Şarkı adı" />
             <input id="song-artist" placeholder="Sanatçı" />
             <input id="song-url" placeholder="Dosya URL" />
-            <div>
-              <button id="addSongBtn" class="btn">Ekle</button>
-              <button id="clearBtn" class="btn">Temizle</button>
-            </div>
+            <button id="addSongBtn">Ekle</button>
+            <button id="clearBtn">Temizle</button>
             <div id="admin-msg" class="status-message"></div>
           </div>
-          <div id="song-requests-section" style="display:none;" class="card">
-            <h3>Şarkı İstekleri</h3>
-            <ul id="song-requests-list"></ul>
-          </div>
-          <div id="access-requests-section" style="display:none;" class="card">
-            <h3>Giriş Onayları</h3>
-            <button id="approveAllBtn" class="btn">Tümünü Onayla</button>
-            <ul id="access-requests-list"></ul>
-          </div>
+          <div id="song-requests-section" class="card" style="display:none;"><h3>Şarkı İstekleri</h3><ul id="song-requests-list"></ul></div>
+          <div id="access-requests-section" class="card" style="display:none;"><h3>Giriş Onayları</h3><button id="approveAllBtn">Tümünü Onayla</button><ul id="access-requests-list"></ul></div>
         </div>
       </div>
     </div>
@@ -174,18 +157,13 @@
           <button id="user-btn-song-request"><i class="fas fa-plus-circle"></i> Şarkı İsteği</button>
         </div>
         <div class="main-content">
-          <div id="user-library-section">
-            <div class="card">
-              <h3>Popüler Şarkılar</h3>
-              <ul id="user-songs-list"></ul>
-            </div>
-          </div>
-          <div id="user-song-request-section" style="display:none;" class="card">
+          <div id="user-library-section" class="card"><h3>Popüler Şarkılar</h3><ul id="user-songs-list"></ul></div>
+          <div id="user-song-request-section" class="card" style="display:none;">
             <h3>Şarkı İsteği Gönder</h3>
             <input id="request-song-name" placeholder="Şarkı adı" />
             <input id="request-song-artist" placeholder="Sanatçı" />
             <input id="request-song-url" placeholder="Catbox.moe linki" />
-            <button id="sendRequestBtn" class="btn">Gönder</button>
+            <button id="sendRequestBtn">Gönder</button>
             <div id="user-request-msg" class="status-message"></div>
           </div>
         </div>
@@ -200,43 +178,55 @@
     </footer>
   </div>
 
-  <!-- Supabase -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
+    const SUPABASE_KEY = "senin keyin"; // kendi keyini koy
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMIN_IP = "151.250.4.2";
-
     const adminPanel = document.getElementById('admin-panel');
     const userPanel = document.getElementById('user-panel');
     const userIpP = document.getElementById('user-ip');
     const userType = document.getElementById('user-type');
-    const debug = document.getElementById('debug');
 
     async function init() {
-      try {
-        const res = await fetch("https://api64.ipify.org?format=json");
-        const d = await res.json();
-        const ip = d.ip || 'unknown';
-
-        if (ip === ADMIN_IP) {
-          adminPanel.style.display = 'block';
-          userPanel.style.display = 'none';
-          userType.textContent = 'Yönetici';
-        } else {
-          adminPanel.style.display = 'none';
-          userPanel.style.display = 'block';
-          userType.textContent = 'Kullanıcı';
-          userIpP.innerText = "IP: " + ip;
-        }
-      } catch (e) {
-        debug.innerText = "IP alınamadı: " + e.message;
+      const res = await fetch("https://api64.ipify.org?format=json");
+      const d = await res.json();
+      const ip = d.ip || 'unknown';
+      if (ip === ADMIN_IP) {
+        adminPanel.style.display = 'block';
+        userPanel.style.display = 'none';
+        userType.textContent = 'Yönetici';
+      } else {
+        adminPanel.style.display = 'none';
+        userPanel.style.display = 'block';
+        userType.textContent = 'Kullanıcı';
+        userIpP.innerText = "IP: " + ip;
       }
     }
+
+    function setupSidebarButtons() {
+      document.getElementById('btn-library').addEventListener('click', () => showSection('library-section','btn-library'));
+      document.getElementById('btn-add-song').addEventListener('click', () => showSection('add-song-section','btn-add-song'));
+      document.getElementById('btn-song-requests').addEventListener('click', () => showSection('song-requests-section','btn-song-requests'));
+      document.getElementById('btn-access-requests').addEventListener('click', () => showSection('access-requests-section','btn-access-requests'));
+      document.getElementById('user-btn-library').addEventListener('click', () => showSection('user-library-section','user-btn-library',true));
+      document.getElementById('user-btn-song-request').addEventListener('click', () => showSection('user-song-request-section','user-btn-song-request',true));
+    }
+
+    function showSection(sectionId,btnId,isUser=false){
+      const panelSelector = isUser ? '#user-panel .main-content > div' : '#admin-panel .main-content > div';
+      const btnSelector = isUser ? '#user-panel .sidebar button' : '#admin-panel .sidebar button';
+      document.querySelectorAll(panelSelector).forEach(sec=>sec.style.display='none');
+      document.getElementById(sectionId).style.display='block';
+      document.querySelectorAll(btnSelector).forEach(btn=>btn.classList.remove('active'));
+      document.getElementById(btnId).classList.add('active');
+    }
+
     init();
+    setupSidebarButtons();
   </script>
 </body>
 </html>
