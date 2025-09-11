@@ -84,6 +84,13 @@
       background: #2e7d32;
       color: white;
     }
+    .tablo-hata {
+      background: #ffebee;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #c62828;
+    }
   </style>
 </head>
 <body>
@@ -135,6 +142,9 @@
         <!-- Giriş Onayları Bölümü -->
         <div id="access-requests-section" style="display:none">
           <h3>Giriş Onayları</h3>
+          <div id="tablo-hata-mesaji" class="tablo-hata" style="display:none;">
+            AccessRequests tablosu bulunamadı. Lütfen Supabase'de tabloyu oluşturun.
+          </div>
           <button id="approveAllBtn" class="approve-all-btn">Tümünü Onayla</button>
           <div id="access-requests-container">
             <ul id="access-requests-list"></ul>
@@ -223,6 +233,7 @@
     const clearBtn = document.getElementById('clearBtn');
     const sendRequestBtn = document.getElementById('sendRequestBtn');
     const approveAllBtn = document.getElementById('approveAllBtn');
+    const tabloHataMesaji = document.getElementById('tablo-hata-mesaji');
 
     // Onaylanmış IP'ler (localStorage'da saklanacak)
     let approvedIPs = JSON.parse(localStorage.getItem('approvedIPs')) || [];
@@ -279,8 +290,18 @@
           .select('*')
           .eq('ip', ip);
 
-        if (checkError) {
-          console.error("IP kontrol hatası:", checkError);
+        if (checkError && checkError.message.includes('schema cache')) {
+          console.error("AccessRequests tablosu bulunamadı:", checkError);
+          // Tablo yoksa localStorage'a kaydet
+          const requests = JSON.parse(localStorage.getItem('accessRequests')) || [];
+          if (!requests.some(req => req.ip === ip)) {
+            requests.push({ 
+              ip: ip, 
+              status: 'pending',
+              created_at: new Date().toISOString()
+            });
+            localStorage.setItem('accessRequests', JSON.stringify(requests));
+          }
           return;
         }
 
@@ -418,6 +439,46 @@
           .select('*')
           .order('created_at', { ascending: false });
 
+        if (error && error.message.includes('schema cache')) {
+          // Tablo yoksa localStorage'dan yükle
+          tabloHataMesaji.style.display = 'block';
+          approveAllBtn.style.display = 'none';
+          
+          const requests = JSON.parse(localStorage.getItem('accessRequests')) || [];
+          
+          if (requests.length === 0) {
+            accessRequestsList.innerHTML = '<li class="hint">Henüz giriş isteği yok.</li>';
+            return;
+          }
+
+          accessRequestsList.innerHTML = '';
+          requests.forEach(request => {
+            const li = document.createElement('li');
+            li.className = 'access-request-item';
+            li.innerHTML = `
+              <div><strong>IP Adresi:</strong> ${escapeHtml(request.ip || '')}</div>
+              <div><strong>Durum:</strong> ${request.status || 'pending'}</div>
+              <div><strong>İstek Zamanı:</strong> ${new Date(request.created_at).toLocaleString('tr-TR')}</div>
+              ${request.status === 'pending' ? `
+                <div class="request-actions">
+                  <button class="approve-access-btn" data-ip="${escapeAttr(request.ip)}">Onayla</button>
+                </div>
+              ` : ''}
+            `;
+            accessRequestsList.appendChild(li);
+          });
+
+          // Onayla butonlarına event ekle
+          document.querySelectorAll('.approve-access-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const ip = btn.getAttribute('data-ip');
+              approveAccessRequest(ip);
+            });
+          });
+          
+          return;
+        }
+
         if (error) {
           accessRequestsList.innerHTML = `<li class="error">İstekler yüklenemedi: ${error.message}</li>`;
           console.error("Supabase select error:", error);
@@ -429,6 +490,9 @@
           return;
         }
 
+        tabloHataMesaji.style.display = 'none';
+        approveAllBtn.style.display = 'block';
+        
         accessRequestsList.innerHTML = '';
         data.forEach(request => {
           const li = document.createElement('li');
@@ -463,10 +527,41 @@
     // Tüm giriş isteklerini onayla
     async function approveAllAccessRequests() {
       try {
+        // Önce Supabase'den verileri çekmeyi dene
         const { data: requests, error: fetchError } = await supabase
           .from('AccessRequests')
           .select('*')
           .eq('status', 'pending');
+
+        if (fetchError && fetchError.message.includes('schema cache')) {
+          // Tablo yoksa localStorage'daki verileri işle
+          const localRequests = JSON.parse(localStorage.getItem('accessRequests')) || [];
+          const pendingRequests = localRequests.filter(req => req.status === 'pending');
+          
+          if (pendingRequests.length === 0) {
+            alert("Onay bekleyen istek bulunamadı.");
+            return;
+          }
+
+          // Tüm bekleyen istekleri onayla
+          for (const request of pendingRequests) {
+            request.status = 'approved';
+            // Onaylanan IP'yi localStorage'a ekle
+            if (!approvedIPs.includes(request.ip)) {
+              approvedIPs.push(request.ip);
+            }
+          }
+
+          // localStorage'ı güncelle
+          localStorage.setItem('accessRequests', JSON.stringify(localRequests));
+          localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+          
+          // Listeyi yenile
+          await loadAccessRequests();
+          
+          alert("Tüm istekler onaylandı!");
+          return;
+        }
 
         if (fetchError) {
           console.error("İstekleri getirme hatası:", fetchError);
@@ -510,23 +605,34 @@
     // Giriş isteğini onayla
     async function approveAccessRequest(ip) {
       try {
+        // Önce Supabase'de güncellemeyi dene
         const { error } = await supabase
           .from('AccessRequests')
           .update({ status: 'approved' })
           .eq('ip', ip);
 
-        if (error) {
-          console.error("İstek onaylama hatası:", error);
-        } else {
-          // Onaylanan IP'yi localStorage'a ekle
-          if (!approvedIPs.includes(ip)) {
-            approvedIPs.push(ip);
-            localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
-          }
+        if (error && error.message.includes('schema cache')) {
+          // Tablo yoksa localStorage'daki veriyi güncelle
+          const requests = JSON.parse(localStorage.getItem('accessRequests')) || [];
+          const requestIndex = requests.findIndex(req => req.ip === ip);
           
-          // Listeyi yenile
-          await loadAccessRequests();
+          if (requestIndex !== -1) {
+            requests[requestIndex].status = 'approved';
+            localStorage.setItem('accessRequests', JSON.stringify(requests));
+          }
+        } else if (error) {
+          console.error("İstek onaylama hatası:", error);
+          return;
         }
+
+        // Onaylanan IP'yi localStorage'a ekle
+        if (!approvedIPs.includes(ip)) {
+          approvedIPs.push(ip);
+          localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+        }
+        
+        // Listeyi yenile
+        await loadAccessRequests();
       } catch (err) {
         console.error("İstek onaylama hatası:", err);
       }
