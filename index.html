@@ -22,6 +22,7 @@
     .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.2); }
     #player-bar { position:fixed; left:0; right:0; bottom:0; background:#000; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
     #now-playing-lyrics, #user-now-playing-lyrics { white-space:pre-wrap; margin-top:10px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; }
+    .edit-form { display:none; margin-top:10px; padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; }
   </style>
 </head>
 <body>
@@ -145,17 +146,73 @@ function renderList(list,data,isAdmin){
   list.innerHTML="";
   data.forEach((s,i)=>{
     const li=document.createElement("li"); li.className="song"; li.dataset.id=s.id;
+    
+    // Düzenleme formu
+    const editForm = document.createElement("div");
+    editForm.className = "edit-form";
+    editForm.id = `edit-form-${s.id}`;
+    editForm.innerHTML = `
+      <input value="${s.name}" id="edit-name-${s.id}" placeholder="Şarkı adı">
+      <input value="${s.artist}" id="edit-artist-${s.id}" placeholder="Sanatçı">
+      <input value="${s.url}" id="edit-url-${s.id}" placeholder="URL">
+      <textarea id="edit-lyrics-${s.id}" placeholder="Şarkı sözleri">${s.lyrics || ''}</textarea>
+      <button class="btn save-edit" data-id="${s.id}">Kaydet</button>
+      <button class="btn cancel-edit" data-id="${s.id}">İptal</button>
+    `;
+    
     li.innerHTML=`<div><strong>${s.name}</strong> - ${s.artist}</div>
       <div>
         <button class="btn play" data-index="${i}">Çal</button>
         ${isAdmin?`<button class="btn edit" data-id="${s.id}">Düzenle</button><button class="btn danger" data-id="${s.id}">Sil</button>`:""}
       </div>`;
+    
+    if (isAdmin) {
+      li.appendChild(editForm);
+    }
+    
     list.appendChild(li);
   });
+  
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>playSong(parseInt(b.dataset.index)));
   if(isAdmin){
-    list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id,b.closest("li")));
-    list.querySelectorAll(".edit").forEach(b=>b.onclick=()=>editSong(b.dataset.id));
+    list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));
+    list.querySelectorAll(".edit").forEach(b=>b.onclick=()=>toggleEditForm(b.dataset.id, true));
+    list.querySelectorAll(".save-edit").forEach(b=>b.onclick=()=>saveSongEdit(b.dataset.id));
+    list.querySelectorAll(".cancel-edit").forEach(b=>b.onclick=()=>toggleEditForm(b.dataset.id, false));
+  }
+}
+
+// Düzenleme formunu göster/gizle
+function toggleEditForm(id, show) {
+  const form = document.getElementById(`edit-form-${id}`);
+  if (form) {
+    form.style.display = show ? 'block' : 'none';
+  }
+}
+
+// Şarkı düzenlemeyi kaydet
+async function saveSongEdit(id) {
+  const name = document.getElementById(`edit-name-${id}`).value.trim();
+  const artist = document.getElementById(`edit-artist-${id}`).value.trim();
+  const url = document.getElementById(`edit-url-${id}`).value.trim();
+  const lyrics = document.getElementById(`edit-lyrics-${id}`).value.trim();
+
+  if (!name || !artist || !url) {
+    alert("Lütfen tüm alanları doldurun.");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("Songs")
+    .update({ name, artist, url, lyrics })
+    .eq("id", id);
+
+  if (error) {
+    alert("Güncelleme hatası: " + error.message);
+  } else {
+    alert("✅ Şarkı başarıyla güncellendi");
+    toggleEditForm(id, false);
+    loadSongs(); // Listeyi yeniden yükle
   }
 }
 
@@ -168,7 +225,7 @@ function playSong(i){
   document.getElementById("now-playing-info").textContent=`${s.name} - ${s.artist}`;
   document.getElementById("user-now-playing-info").textContent=`${s.name} - ${s.artist}`;
 
-  // ✅ Şarkı sözleri
+  // Şarkı sözleri
   const lyricsText = s.lyrics && s.lyrics.trim() ? s.lyrics : "Bu şarkıya söz eklenmemiş.";
   document.getElementById("now-playing-lyrics").textContent=lyricsText;
   document.getElementById("user-now-playing-lyrics").textContent=lyricsText;
@@ -179,19 +236,39 @@ function prevSong(){ if(currentIndex>0) playSong(currentIndex-1); }
 function nextSong(){ if(currentIndex<allSongs.length-1) playSong(currentIndex+1); }
 function togglePlay(){ if(mainPlayer.paused) mainPlayer.play(); else mainPlayer.pause(); }
 
-// Şarkı silme ✅
-async function deleteSong(id,element){
-  if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
+// Şarkı silme - DÜZELTİLMİŞ VERSİYON
+async function deleteSong(id){
+  if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
 
-  const { error } = await supabase.from("Songs").delete().eq("id", id);
-
-  if(error){ 
-    alert("Silme hatası: "+error.message);
-    console.error(error);
-  } else {
-    if(element) element.remove();
-    await loadSongs();
-    alert("✅ Şarkı tamamen silindi");
+  try {
+    const { error } = await supabase.from("Songs").delete().eq("id", id);
+    
+    if(error){ 
+      alert("Silme hatası: " + error.message);
+      console.error(error);
+    } else {
+      // Şarkıyı yerel listeden de kaldır
+      allSongs = allSongs.filter(song => song.id !== id);
+      
+      // Listeleri yeniden yükle
+      await loadSongs();
+      alert("✅ Şarkı tamamen silindi");
+      
+      // Eğer silinen şarkı çalınıyorsa, çalmayı durdur
+      if (currentIndex !== -1 && allSongs[currentIndex] && allSongs[currentIndex].id === id) {
+        mainPlayer.pause();
+        mainPlayer.src = "";
+        playerInfo.textContent = "Henüz şarkı seçilmedi";
+        document.getElementById("now-playing-info").textContent = "Henüz şarkı seçilmedi";
+        document.getElementById("user-now-playing-info").textContent = "Henüz şarkı seçilmedi";
+        document.getElementById("now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
+        document.getElementById("user-now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
+        currentIndex = -1;
+      }
+    }
+  } catch (err) {
+    alert("Bir hata oluştu: " + err.message);
+    console.error(err);
   }
 }
 
@@ -205,23 +282,16 @@ async function addSong(){
   if(!name||!artist||!url){msg.textContent="Lütfen tüm alanları doldurun.";return;}
   const {error}=await supabase.from("Songs").insert([{name,artist,url,lyrics}]);
   if(error){ msg.textContent="Hata: "+error.message;}
-  else{ msg.textContent="✅ Eklendi"; loadSongs(); }
+  else{ 
+    msg.textContent="✅ Eklendi"; 
+    document.getElementById("song-name").value = "";
+    document.getElementById("song-artist").value = "";
+    document.getElementById("song-url").value = "";
+    document.getElementById("song-lyrics").value = "";
+    loadSongs(); 
+  }
 }
 document.getElementById("addSongBtn").onclick=addSong;
-
-// Düzenle
-async function editSong(id){
-  const song=allSongs.find(s=>s.id==id); if(!song) return;
-  const newName=prompt("Şarkı adı:",song.name);
-  if(!newName) return;
-  const newArtist=prompt("Sanatçı:",song.artist);
-  if(!newArtist) return;
-  const newUrl=prompt("URL:",song.url);
-  if(!newUrl) return;
-  const newLyrics=prompt("Şarkı sözleri:",song.lyrics||"");
-  const {error}=await supabase.from("Songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics}).eq("id",id);
-  if(error) alert("Güncelleme hatası: "+error.message); else loadSongs();
-}
 
 // Admin menü
 function setupAdminButtons(){
