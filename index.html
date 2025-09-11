@@ -142,7 +142,19 @@ function renderList(list,data,isAdmin){
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>{mainPlayer.src=b.dataset.url; playerInfo.textContent=`${b.dataset.name} - ${b.dataset.artist}`; mainPlayer.play();});
   if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
 }
-async function deleteSong(id){await supabase.from("Songs").delete().eq("id",id); loadSongs();}
+// Şarkı silme (Admin)
+async function deleteSong(id){
+  if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
+
+  const { error } = await supabase.from("Songs").delete().eq("id", id);
+  if(error){
+    alert("Silme hatası: " + error.message);
+    console.error(error);
+  } else {
+    alert("Şarkı başarıyla silindi ✅");
+    loadSongs();
+  }
+}
 // Şarkı ekleme (Admin)
 async function addSong(){
   const name=document.getElementById("song-name").value.trim();
