@@ -38,35 +38,13 @@
     <h2>Admin Paneli</h2>
     <div class="sidebar">
       <button id="btn-library" class="active">Kitaplık</button>
-      <button id="btn-add-song">Şarkı Ekle</button>
       <button id="btn-requests">Şarkı İstekleri</button>
       <button id="btn-now-playing">Şu An Çalan</button>
     </div>
 
     <div id="library-section" class="card">
       <h3>Kitaplık</h3>
-      <!-- ✅ Tüm şarkıları sil butonu -->
-      <button id="deleteAllBtn" class="btn danger">🚨 Tüm Şarkıları Sil</button>
-      <div class="controls">
-        <input type="text" id="admin-search" placeholder="Ara...">
-        <select id="admin-sort">
-          <option value="id">En Yeni</option>
-          <option value="name">Ada Göre</option>
-          <option value="artist">Sanatçıya Göre</option>
-        </select>
-      </div>
       <ul id="songs-list"></ul>
-    </div>
-
-    <div id="add-song-section" class="card" style="display:none;">
-      <h3>Şarkı Ekle</h3>
-      <input id="song-name" placeholder="Şarkı adı">
-      <input id="song-artist" placeholder="Sanatçı">
-      <input id="song-url" placeholder="URL">
-      <textarea id="song-lyrics" placeholder="Şarkı sözleri (opsiyonel)"></textarea>
-      <input id="song-cover" placeholder="Kapak fotoğrafı URL (opsiyonel)">
-      <button id="addSongBtn" class="btn">Ekle</button>
-      <div id="admin-msg"></div>
     </div>
 
     <div id="requests-section" class="card" style="display:none;">
@@ -97,14 +75,6 @@
 
     <div id="user-library-section" class="card">
       <h3>Kitaplık</h3>
-      <div class="controls">
-        <input type="text" id="user-search" placeholder="Ara...">
-        <select id="user-sort">
-          <option value="id">En Yeni</option>
-          <option value="name">Ada Göre</option>
-          <option value="artist">Sanatçıya Göre</option>
-        </select>
-      </div>
       <ul id="user-songs-list"></ul>
     </div>
 
@@ -113,6 +83,7 @@
       <input id="req-name" placeholder="Şarkı adı">
       <input id="req-artist" placeholder="Sanatçı">
       <input type="file" id="req-file" accept="audio/*">
+      <input id="req-url" placeholder="Şarkı URL (catbox link)">
       <button id="sendRequestBtn" class="btn">İstek Gönder</button>
       <div id="req-msg"></div>
     </div>
@@ -138,8 +109,7 @@
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co",
-  "YOUR_SUPABASE_ANON_KEY");
+const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co","YOUR_SUPABASE_KEY");
 const ADMIN_IP="151.250.4.2";
 let allSongs=[]; let currentIndex=-1;
 
@@ -149,28 +119,17 @@ const userSongsList=document.getElementById("user-songs-list");
 const mainPlayer=document.getElementById("main-player");
 const playerInfo=document.getElementById("player-info");
 
-// Admin / User ayrımı
+// IP kontrol + giriş
 (async()=>{
   const ip=(await (await fetch("https://api64.ipify.org?format=json")).json()).ip;
   if(ip===ADMIN_IP){
     let pass=prompt("Admin şifresini gir:");
-    if(pass==="efkaza7634"){
-      document.getElementById("admin-panel").style.display="block";
-      document.getElementById("user-type").textContent="Admin";
-      setupAdminButtons();
-    } else {
-      alert("❌ Yanlış şifre!");
-      document.getElementById("user-panel").style.display="block";
-      document.getElementById("user-type").textContent="Kullanıcı";
-      setupUserButtons();
-    }
+    if(pass==="efkaza7634"){document.getElementById("admin-panel").style.display="block"; setupAdminButtons();}
+    else{document.getElementById("user-panel").style.display="block"; setupUserButtons();}
   } else {
-    document.getElementById("user-panel").style.display="block";
-    document.getElementById("user-type").textContent="Kullanıcı";
-    setupUserButtons();
+    document.getElementById("user-panel").style.display="block"; setupUserButtons();
   }
-  loadSongs();
-  loadRequests();
+  loadSongs(); loadRequests();
 })();
 
 // Şarkı listeleme
@@ -188,24 +147,13 @@ function renderList(list,data,isAdmin){
     li.innerHTML=`<div><strong>${s.name}</strong> - ${s.artist}</div>
       <div>
         <button class="btn play" data-index="${i}">Çal</button>
-        ${isAdmin?`<button class="btn edit" data-id="${s.id}">Düzenle</button><button class="btn danger" data-id="${s.id}">Sil</button>`:""}
+        ${isAdmin?`<button class="btn danger" data-id="${s.id}">Sil</button>`:""}
       </div>`;
     list.appendChild(li);
   });
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>playSong(parseInt(b.dataset.index)));
-  if(isAdmin){
-    list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));
-    list.querySelectorAll(".edit").forEach(b=>b.onclick=()=>editSong(b.dataset.id));
-  }
+  if(isAdmin){list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));}
 }
-
-// ✅ Tüm şarkıları silme
-document.getElementById("deleteAllBtn").onclick=async()=>{
-  if(!confirm("🚨 Tüm şarkılar silinecek. Emin misiniz?")) return;
-  await supabase.from("Songs").delete().neq("id",0);
-  loadSongs();
-  alert("✅ Tüm şarkılar silindi!");
-};
 
 // Çalma
 function playSong(i){
@@ -218,51 +166,43 @@ function playSong(i){
   document.getElementById("user-now-playing-lyrics").textContent=s.lyrics||"Bu şarkıya söz eklenmemiş.";
 }
 
-// Tek şarkı silme
+// Silme
 async function deleteSong(id){
   if(!confirm("Silinsin mi?")) return;
   await supabase.from("Songs").delete().eq("id",id);
   loadSongs();
 }
 
-// Düzenleme
-async function editSong(id){
-  const song=allSongs.find(s=>s.id==id); if(!song) return;
-  const newName=prompt("Şarkı adı:",song.name); if(!newName) return;
-  const newArtist=prompt("Sanatçı:",song.artist); if(!newArtist) return;
-  const newUrl=prompt("URL:",song.url); if(!newUrl) return;
-  const newLyrics=prompt("Sözler:",song.lyrics||"");
-  const newCover=prompt("Kapak URL:",song.cover_url||"");
-  await supabase.from("Songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics,cover_url:newCover}).eq("id",id);
-  loadSongs();
-}
+// Kullanıcı şarkı isteği (Catbox upload)
+document.getElementById("req-file").addEventListener("change", async function(){
+  const file=this.files[0]; if(!file) return;
+  const formData=new FormData();
+  formData.append("reqtype","fileupload");
+  formData.append("fileToUpload",file);
+  const msg=document.getElementById("req-msg");
+  try{
+    const res=await fetch("https://catbox.moe/user/api.php",{method:"POST",body:formData});
+    const url=await res.text();
+    if(url.startsWith("http")){
+      document.getElementById("req-url").value=url;
+      msg.textContent="✅ Dosya Catbox'a yüklendi!";
+    }else{ msg.textContent="❌ Yükleme başarısız: "+url; }
+  }catch(err){ msg.textContent="❌ Hata: "+err.message; }
+});
 
-// Şarkı ekleme
-document.getElementById("addSongBtn").onclick=async()=>{
-  const name=document.getElementById("song-name").value.trim();
-  const artist=document.getElementById("song-artist").value.trim();
-  const url=document.getElementById("song-url").value.trim();
-  const lyrics=document.getElementById("song-lyrics").value.trim();
-  const cover_url=document.getElementById("song-cover").value.trim();
-  await supabase.from("Songs").insert([{name,artist,url,lyrics,cover_url}]);
-  loadSongs();
-};
-
-// Kullanıcı şarkı isteği
+// Kullanıcı istek gönderme
 document.getElementById("sendRequestBtn").onclick=async()=>{
   const name=document.getElementById("req-name").value.trim();
   const artist=document.getElementById("req-artist").value.trim();
-  const file=document.getElementById("req-file").files[0];
+  const url=document.getElementById("req-url").value.trim();
   const msg=document.getElementById("req-msg");
-  if(!name||!artist||!file){msg.textContent="❌ Tüm alanları doldurun";return;}
-  const { data:up, error:err }=await supabase.storage.from("requests").upload(`songs/${Date.now()}_${file.name}`,file);
-  if(err){ msg.textContent="❌ Yükleme hatası"; return;}
-  const file_url=supabase.storage.from("requests").getPublicUrl(up.path).data.publicUrl;
-  await supabase.from("SongRequests").insert([{name,artist,file_url}]);
+  if(!name||!artist||!url){msg.textContent="❌ Tüm alanları doldurun";return;}
+  await supabase.from("SongRequests").insert([{name,artist,file_url:url}]);
   msg.textContent="✅ İstek gönderildi!";
+  loadRequests();
 };
 
-// Admin istekler
+// Admin istekleri
 async function loadRequests(){
   const {data,error}=await supabase.from("SongRequests").select("*").order("id",{ascending:false});
   if(error) return;
@@ -278,7 +218,7 @@ async function loadRequests(){
       </div>`;
     list.appendChild(li);
     li.querySelector(".approve").onclick=async()=>{
-      await supabase.from("Songs").insert([{name:r.name,artist:r.artist,url:r.file_url,cover_url:r.cover_url}]);
+      await supabase.from("Songs").insert([{name:r.name,artist:r.artist,url:r.file_url}]);
       await supabase.from("SongRequests").update({status:"approved"}).eq("id",r.id);
       loadSongs(); loadRequests();
     };
@@ -291,14 +231,17 @@ async function loadRequests(){
 
 // Menü setup
 function setupAdminButtons(){
-  const sections=["library-section","add-song-section","requests-section","now-playing-section"];
-  ["btn-library","btn-add-song","btn-requests","btn-now-playing"].forEach((id,i)=>{
+  const sections=["library-section","requests-section","now-playing-section"];
+  ["btn-library","btn-requests","btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
       sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
       document.querySelectorAll("#admin-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
   });
+  document.getElementById("prevBtn").onclick=()=>{if(currentIndex>0) playSong(currentIndex-1);};
+  document.getElementById("nextBtn").onclick=()=>{if(currentIndex<allSongs.length-1) playSong(currentIndex+1);};
+  document.getElementById("toggleBtn").onclick=()=>{if(mainPlayer.paused) mainPlayer.play(); else mainPlayer.pause();};
 }
 function setupUserButtons(){
   const sections=["user-library-section","user-request-section","user-now-playing-section"];
@@ -309,6 +252,9 @@ function setupUserButtons(){
       document.getElementById(id).classList.add("active");
     };
   });
+  document.getElementById("uPrevBtn").onclick=()=>{if(currentIndex>0) playSong(currentIndex-1);};
+  document.getElementById("uNextBtn").onclick=()=>{if(currentIndex<allSongs.length-1) playSong(currentIndex+1);};
+  document.getElementById("uToggleBtn").onclick=()=>{if(mainPlayer.paused) mainPlayer.play(); else mainPlayer.pause();};
 }
 </script>
 </body>
