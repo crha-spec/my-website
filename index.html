@@ -23,6 +23,11 @@
     .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid rgba(255,255,255,0.03)}
     .cover{width:220px;height:220px;object-fit:cover;border-radius:10px;display:block;margin:12px auto}
     /* sağdan açılan menü */
+    #coverArt {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
     .sidebar-panel {
       position: fixed;
       top: 0; right: -280px;
@@ -167,6 +172,8 @@
           <img id="main-cover" src="" alt="Kapak" 
      style="display:none;width:100px;height:100px;object-fit:cover;
             border-radius:12px;margin-bottom:8px;" />
+            <img id="coverArt" class="cover-art" src="" alt="Kapak Fotoğrafı"
+     style="display:block; width:120px; height:120px; object-fit:cover; border-radius:12px; margin:8px auto;">
           <div id="player-info">Henüz şarkı seçilmedi</div>
           <audio id="main-player" controls></audio>
           <div class="small" style="margin-top:8px">Admin paneli sadece ADMIN_IP ile açılır. (IP kontrolü mevcut)</div>
@@ -346,12 +353,12 @@ function playSong(index){
   mainPlayer.src = s.url || s.file_url || "";
   mainPlayer.play().catch(()=>{/* autoplay engellerse kullanıcı başlatır */});
   playerInfo.textContent = `${s.name} - ${s.artist}`;
-  const mainCover = document.getElementById("main-cover");
+  const coverArt = document.getElementById("coverArt");
 if (s.cover_url && s.cover_url.trim() !== "") {
-  mainCover.src = s.cover_url;
-  mainCover.style.display = "block";
+  coverArt.src = s.cover_url;
+  coverArt.style.display = "block";
 } else {
-  mainCover.style.display = "none";
+  coverArt.style.display = "none";
 }
   const coverEl = document.getElementById("now-playing-cover");
 if (s.cover_url && s.cover_url.trim() !== "") {
