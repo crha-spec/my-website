@@ -21,7 +21,7 @@
     .btn.edit { background:#f8961e; color:#fff; }
     .btn.approve { background:#2a9d8f; color:#fff; }
     .btn.reject { background:#e76f51; color:#fff; }
-    .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.2); }
+    .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.2); flex-wrap:wrap; }
     #player-bar { position:fixed; left:0; right:0; bottom:0; background:#000; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
     #now-playing-lyrics, #user-now-playing-lyrics { white-space:pre-wrap; margin-top:10px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; }
   </style>
@@ -110,9 +110,9 @@
       <h3>Şarkı İsteği Gönder</h3>
       <input id="req-name" placeholder="Şarkı adı">
       <input id="req-artist" placeholder="Sanatçı">
-      <input id="req-url" placeholder="Şarkı URL (ör: Catbox link)">
+      <input id="req-url" placeholder="Şarkı URL (catbox.moe)">
       <textarea id="req-lyrics" placeholder="Şarkı sözleri (opsiyonel)"></textarea>
-      <input id="req-cover" placeholder="Kapak fotoğrafı URL (opsiyonel)">
+      <input id="req-cover" placeholder="Kapak URL (opsiyonel)">
       <button id="sendRequestBtn" class="btn">İstek Gönder</button>
       <div id="req-msg"></div>
     </div>
@@ -138,11 +138,11 @@
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co",
-  "YOUR_SUPABASE_ANON_KEY");
+const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co", "YOUR_SUPABASE_ANON_KEY");
 const ADMIN_IP="151.250.4.2";
 let allSongs=[]; let currentIndex=-1;
 
+// Elementler
 const songsList=document.getElementById("songs-list");
 const userSongsList=document.getElementById("user-songs-list");
 const mainPlayer=document.getElementById("main-player");
@@ -174,7 +174,7 @@ const playerInfo=document.getElementById("player-info");
 
 // Şarkı listeleme
 async function loadSongs(){
-  const {data,error}=await supabase.from("Songs").select("*").order("id",{ascending:false});
+  const {data,error}=await supabase.from("songs").select("*").order("id",{ascending:false});
   if(error) return console.error(error);
   allSongs=data;
   renderList(songsList,data,true);
@@ -212,7 +212,7 @@ function playSong(i){
 // Silme
 async function deleteSong(id){
   if(!confirm("Silinsin mi?")) return;
-  await supabase.from("Songs").delete().eq("id",id);
+  await supabase.from("songs").delete().eq("id",id);
   loadSongs();
 }
 
@@ -224,7 +224,7 @@ async function editSong(id){
   const newUrl=prompt("URL:",song.url); if(!newUrl) return;
   const newLyrics=prompt("Sözler:",song.lyrics||"");
   const newCover=prompt("Kapak URL:",song.cover_url||"");
-  await supabase.from("Songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics,cover_url:newCover}).eq("id",id);
+  await supabase.from("songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics,cover_url:newCover}).eq("id",id);
   loadSongs();
 }
 
@@ -235,7 +235,7 @@ document.getElementById("addSongBtn").onclick=async()=>{
   const url=document.getElementById("song-url").value.trim();
   const lyrics=document.getElementById("song-lyrics").value.trim();
   const cover_url=document.getElementById("song-cover").value.trim();
-  await supabase.from("Songs").insert([{name,artist,url,lyrics,cover_url}]);
+  await supabase.from("songs").insert([{name,artist,url,lyrics,cover_url}]);
   loadSongs();
 };
 
@@ -248,14 +248,15 @@ document.getElementById("sendRequestBtn").onclick=async()=>{
   const cover_url=document.getElementById("req-cover").value.trim();
   const msg=document.getElementById("req-msg");
   if(!name||!artist||!file_url){msg.textContent="❌ Tüm alanları doldurun";return;}
-  await supabase.from("songrequests").insert([{name,artist,file_url,lyrics,cover_url}]);
-  msg.textContent="✅ İstek gönderildi!";
+  const {error}=await supabase.from("songrequests").insert([{name,artist,file_url,lyrics,cover_url}]);
+  if(error){ msg.textContent="❌ Hata: "+error.message; }
+  else{ msg.textContent="✅ İstek gönderildi!"; loadRequests(); }
 };
 
 // Admin istekler
-async function loadRequests() {
-  const { data, error } = await supabase.from("songrequests").select("*").order("id",{ascending:false});
-  if(error){console.error(error);return;}
+async function loadRequests(){
+  const {data,error}=await supabase.from("songrequests").select("*").order("id",{ascending:false});
+  if(error) return;
   const list=document.getElementById("requests-list"); list.innerHTML="";
   data.forEach(r=>{
     const li=document.createElement("li"); li.className="song";
@@ -268,14 +269,16 @@ async function loadRequests() {
       </div>`;
     list.appendChild(li);
     li.querySelector(".approve").onclick=async()=>{
-      await supabase.from("Songs").insert([{name:r.name,artist:r.artist,url:r.file_url,lyrics:r.lyrics||"",cover_url:r.cover_url||""}]);
-      await supabase.from("songrequests").update({status:"approved"}).eq("id",r.id);
-      loadSongs(); loadRequests();
-      playSong(allSongs.length-1);
+      const {error}=await supabase.rpc("approve_request",{req_id:r.id});
+      if(error){alert("Onay hatası: "+error.message);return;}
+      await loadSongs(); await loadRequests();
+      const idx = allSongs.findIndex(s=>s.url===r.file_url && s.name===r.name);
+      if(idx>=0) playSong(idx); else if(allSongs.length>0) playSong(0);
     };
     li.querySelector(".reject").onclick=async()=>{
-      await supabase.from("songrequests").update({status:"rejected"}).eq("id",r.id);
-      loadRequests();
+      const {error}=await supabase.rpc("reject_request",{req_id:r.id});
+      if(error){alert("Reddetme hatası: "+error.message);return;}
+      await loadRequests();
     };
   });
 }
@@ -283,24 +286,37 @@ async function loadRequests() {
 // Menü setup
 function setupAdminButtons(){
   const sections=["library-section","add-song-section","requests-section","now-playing-section"];
-  ["btn-library","btn-add-song","btn-requests","btn-now-playing"].forEach((id,i)=>{
+["btn-library","btn-add-song","btn-requests","btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
-      sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
+      sections.forEach((s,j)=>{
+        document.getElementById(s).style.display=(i===j?"block":"none");
+      });
       document.querySelectorAll("#admin-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
   });
 }
+
 function setupUserButtons(){
   const sections=["user-library-section","user-request-section","user-now-playing-section"];
   ["user-btn-library","user-btn-request","user-btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
-      sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
+      sections.forEach((s,j)=>{
+        document.getElementById(s).style.display=(i===j?"block":"none");
+      });
       document.querySelectorAll("#user-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
   });
 }
+
+// Çalar kontrolleri
+document.getElementById("prevBtn").onclick=()=>{ if(currentIndex>0) playSong(currentIndex-1); };
+document.getElementById("nextBtn").onclick=()=>{ if(currentIndex<allSongs.length-1) playSong(currentIndex+1); };
+document.getElementById("toggleBtn").onclick=()=>{ if(mainPlayer.paused) mainPlayer.play(); else mainPlayer.pause(); };
+document.getElementById("uPrevBtn").onclick=()=>{ if(currentIndex>0) playSong(currentIndex-1); };
+document.getElementById("uNextBtn").onclick=()=>{ if(currentIndex<allSongs.length-1) playSong(currentIndex+1); };
+document.getElementById("uToggleBtn").onclick=()=>{ if(mainPlayer.paused) mainPlayer.play(); else mainPlayer.pause(); };
 </script>
 </body>
 </html>
