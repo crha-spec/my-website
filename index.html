@@ -143,7 +143,7 @@ const userBadge = document.getElementById('user-badge');
 const debug = document.getElementById('debug');
 
 const songsListEl = document.getElementById('songs-list');
-const userSongsListEl = document.getElementById('user-songs-list');
+const usersongsListEl = document.getElementById('user-songs-list');
 const requestsListEl = document.getElementById('requests-list');
 
 const addSongView = document.getElementById('add-song-view');
@@ -192,7 +192,7 @@ const audio = document.getElementById('audio');
     setupUserUI();
   }
 
-  await loadSongs();
+  await loadsongs();
   await loadRequests();
 })();
 
@@ -244,16 +244,16 @@ function showView(key){
 }
 
 /* ========== Veri yükleme / render ========= */
-async function loadSongs(){
+async function loadsongs(){
   const res = await supabase.from('songs').select('*').order('id',{ascending:true});
-  if(res.error){ console.error('loadSongs',res.error); debug.textContent = 'Songs yüklenemedi: '+res.error.message; return; }
+  if(res.error){ console.error('loadsongs',res.error); debug.textContent = 'songs yüklenemedi: '+res.error.message; return; }
   songs = res.data || [];
-  renderSongs();
+  rendersongs();
 }
 
-function renderSongs(){
+function rendersongs(){
   songsListEl.innerHTML = '';
-  userSongsListEl.innerHTML = '';
+  usersongsListEl.innerHTML = '';
   songs.forEach((s, idx)=>{
     const li = document.createElement('li');
     li.className = 'song';
@@ -266,7 +266,7 @@ function renderSongs(){
                       <button class="btn warn" data-id="${s.id}">Sil</button>
                     </div>`;
     songsListEl.appendChild(li);
-    userSongsListEl.appendChild(li.cloneNode(true));
+    usersongsListEl.appendChild(li.cloneNode(true));
   });
 
   // bağla eventler
@@ -276,7 +276,7 @@ function renderSongs(){
     if(!confirm('Bu şarkıyı silmek istediğine emin misin?')) return;
     const { error } = await supabase.from('songs').delete().eq('id', id);
     if(error){ alert('Silme hatası: '+error.message); console.error(error); return; }
-    await loadSongs();
+    await loadsongs();
   });
   // düzenle (prompt ile hızlı)
   songsListEl.querySelectorAll('button[data-id]:not(.warn)').forEach(b=>b.onclick = async ()=>{
@@ -290,7 +290,7 @@ function renderSongs(){
     const lyrics = prompt('Sözler (.lrc zamanlı tercih):', song.lyrics||'');
     const { error } = await supabase.from('songs').update({name,artist,url,cover_url:cover,lyrics}).eq('id', id);
     if(error) alert('Güncelleme hatası: '+error.message);
-    else await loadSongs();
+    else await loadsongs();
   });
 }
 
@@ -331,7 +331,7 @@ function renderRequests(){
       if(ins.error){ alert('Kitaplığa ekleme hatası: '+ins.error.message); console.error(ins.error); return; }
       // request status update
       await supabase.from('songrequests').update({ status:'approved' }).eq('id', id);
-      await loadSongs(); await loadRequests();
+      await loadsongs(); await loadRequests();
       // hemen eklenen parçayı çal
       // yüklenmiş songs ile eşleşen indexi bul
       await sleep(300); // kısa bekle, DB'nin güncellenmesi için
@@ -390,7 +390,7 @@ async function handleAddSong(){
   if(res.error){ addMsg.textContent = 'Hata: '+res.error.message; console.error(res.error); return; }
   addMsg.textContent = '✅ Eklendi';
   clearAddForm();
-  await loadSongs();
+  await loadsongs();
 }
 
 function clearAddForm(){
