@@ -94,9 +94,9 @@
       <h3>Şarkı İsteği Gönder</h3>
       <input id="req-name" placeholder="Şarkı adı">
       <input id="req-artist" placeholder="Sanatçı">
-      <input id="req-url" placeholder="Şarkı dosyası URL (ör: catbox.moe)">
-      <textarea id="req-lyrics" placeholder="Şarkı sözleri (opsiyonel)"></textarea>
+      <input id="req-url" placeholder="Şarkı linki (ör. catbox.moe)">
       <input id="req-cover" placeholder="Kapak fotoğrafı URL (opsiyonel)">
+      <textarea id="req-lyrics" placeholder="Şarkı sözleri (opsiyonel)"></textarea>
       <button id="sendRequestBtn" class="btn">İstek Gönder</button>
       <div id="req-msg"></div>
     </div>
@@ -123,20 +123,18 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+// ✅ Senin gerçek API bilgilerin:
 const supabase = createClient(
   "https://zzlrltqrzxjwmtpuvhsi.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g"
 );
 
 const ADMIN_IP="151.250.4.2";
 let allSongs=[]; let currentIndex=-1;
-
-const songsList=document.getElementById("songs-list");
-const userSongsList=document.getElementById("user-songs-list");
 const mainPlayer=document.getElementById("main-player");
 const playerInfo=document.getElementById("player-info");
 
-// Admin / User ayrımı
+// IP kontrol + şifre
 (async()=>{
   const ip=(await (await fetch("https://api64.ipify.org?format=json")).json()).ip;
   if(ip===ADMIN_IP){
@@ -162,11 +160,11 @@ const playerInfo=document.getElementById("player-info");
 
 // Şarkı listeleme
 async function loadSongs(){
-  const {data,error}=await supabase.from("Songs").select("*").order("id",{ascending:false});
-  if(error) return console.error(error);
+  const {data,error}=await supabase.from("songs").select("*").order("id",{ascending:false});
+  if(error){console.error(error);return;}
   allSongs=data;
-  renderList(songsList,data,true);
-  renderList(userSongsList,data,false);
+  renderList(document.getElementById("songs-list"),data,true);
+  renderList(document.getElementById("user-songs-list"),data,false);
 }
 function renderList(list,data,isAdmin){
   list.innerHTML="";
@@ -175,14 +173,13 @@ function renderList(list,data,isAdmin){
     li.innerHTML=`<div><strong>${s.name}</strong> - ${s.artist}</div>
       <div>
         <button class="btn play" data-index="${i}">Çal</button>
-        ${isAdmin?`<button class="btn edit" data-id="${s.id}">Düzenle</button><button class="btn danger" data-id="${s.id}">Sil</button>`:""}
+        ${isAdmin?`<button class="btn danger" data-id="${s.id}">Sil</button>`:""}
       </div>`;
     list.appendChild(li);
   });
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>playSong(parseInt(b.dataset.index)));
   if(isAdmin){
     list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));
-    list.querySelectorAll(".edit").forEach(b=>b.onclick=()=>editSong(b.dataset.id));
   }
 }
 
@@ -200,30 +197,18 @@ function playSong(i){
 // Silme
 async function deleteSong(id){
   if(!confirm("Silinsin mi?")) return;
-  await supabase.from("Songs").delete().eq("id",id);
+  await supabase.from("songs").delete().eq("id",id);
   loadSongs();
 }
 
-// Düzenleme
-async function editSong(id){
-  const song=allSongs.find(s=>s.id==id); if(!song) return;
-  const newName=prompt("Şarkı adı:",song.name); if(!newName) return;
-  const newArtist=prompt("Sanatçı:",song.artist); if(!newArtist) return;
-  const newUrl=prompt("URL:",song.url); if(!newUrl) return;
-  const newLyrics=prompt("Sözler:",song.lyrics||"");
-  const newCover=prompt("Kapak URL:",song.cover_url||"");
-  await supabase.from("Songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics,cover_url:newCover}).eq("id",id);
-  loadSongs();
-}
-
-// Şarkı ekleme
+// Şarkı ekleme (Admin)
 document.getElementById("addSongBtn").onclick=async()=>{
   const name=document.getElementById("song-name").value.trim();
   const artist=document.getElementById("song-artist").value.trim();
   const url=document.getElementById("song-url").value.trim();
   const lyrics=document.getElementById("song-lyrics").value.trim();
   const cover_url=document.getElementById("song-cover").value.trim();
-  await supabase.from("Songs").insert([{name,artist,url,lyrics,cover_url}]);
+  await supabase.from("songs").insert([{name,artist,url,lyrics,cover_url}]);
   loadSongs();
 };
 
@@ -232,21 +217,19 @@ document.getElementById("sendRequestBtn").onclick=async()=>{
   const name=document.getElementById("req-name").value.trim();
   const artist=document.getElementById("req-artist").value.trim();
   const file_url=document.getElementById("req-url").value.trim();
-  const lyrics=document.getElementById("req-lyrics").value.trim();
   const cover_url=document.getElementById("req-cover").value.trim();
+  const lyrics=document.getElementById("req-lyrics").value.trim();
   const msg=document.getElementById("req-msg");
-
-  if(!name||!artist||!file_url){ msg.textContent="❌ Tüm alanlar doldurulmalı"; return; }
-
-  const { error } = await supabase.from("songrequests").insert([{name,artist,file_url,lyrics,cover_url}]);
+  if(!name||!artist||!file_url){msg.textContent="❌ Tüm alanları doldurun";return;}
+  const { error }=await supabase.from("songrequests").insert([{name,artist,file_url,lyrics,cover_url}]);
   if(error){ msg.textContent="❌ Hata: "+error.message; console.error(error); }
-  else { msg.textContent="✅ İstek gönderildi!"; }
+  else{ msg.textContent="✅ İstek gönderildi!"; }
 };
 
 // Admin istekler
 async function loadRequests(){
-  const {data,error}=await supabase.from("songrequests").select("*").eq("status","pending").order("id",{ascending:false});
-  if(error) return console.error(error);
+  const {data,error}=await supabase.from("songrequests").select("*").order("id",{ascending:false});
+  if(error){console.error(error);return;}
   const list=document.getElementById("requests-list"); list.innerHTML="";
   data.forEach(r=>{
     const li=document.createElement("li"); li.className="song";
@@ -259,10 +242,11 @@ async function loadRequests(){
       </div>`;
     list.appendChild(li);
     li.querySelector(".approve").onclick=async()=>{
-      await supabase.from("Songs").insert([{name:r.name,artist:r.artist,url:r.file_url,lyrics:r.lyrics,cover_url:r.cover_url}]);
+      await supabase.from("songs").insert([{name:r.name,artist:r.artist,url:r.file_url,lyrics:r.lyrics,cover_url:r.cover_url}]);
       await supabase.from("songrequests").update({status:"approved"}).eq("id",r.id);
       loadSongs(); loadRequests();
-      playSong(0);
+      const idx = allSongs.findIndex(s => s.url === r.file_url);
+      if(idx >= 0) playSong(idx);
     };
     li.querySelector(".reject").onclick=async()=>{
       await supabase.from("songrequests").update({status:"rejected"}).eq("id",r.id);
@@ -276,7 +260,9 @@ function setupAdminButtons(){
   const sections=["library-section","add-song-section","requests-section","now-playing-section"];
   ["btn-library","btn-add-song","btn-requests","btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
-      sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
+      sections.forEach((s,j)=>{
+        document.getElementById(s).style.display=(i===j?"block":"none");
+      });
       document.querySelectorAll("#admin-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
@@ -286,7 +272,8 @@ function setupUserButtons(){
   const sections=["user-library-section","user-request-section","user-now-playing-section"];
   ["user-btn-library","user-btn-request","user-btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
-      sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
+      sections.forEach((s,j)=>{
+        document.getElementById(s).style.display=(i===j?"block":"none");});
       document.querySelectorAll("#user-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
