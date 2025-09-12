@@ -311,44 +311,52 @@ async function loadSongs(){
   allSongs = data || [];
   renderSongs();
 }
-function renderSongs(){
-  songsList.innerHTML = ""; userSongsList.innerHTML = "";
-  allSongs.forEach((s, idx) => {
-    const li = document.createElement("li"); li.className = "item";
-    li.innerHTML = `<div style="max-width:68%"><strong>${escapeHtml(s.name)}</strong> - ${escapeHtml(s.artist)}<div class="timestamp">${new Date(s.created_at||'').toLocaleString()}</div></div>
-                    <div>
-                      <button class="btn" data-idx="${idx}" data-act="play">Çal</button>
-                      <a class="link" href="${escapeAttr(s.url||'')}" target="_blank">Aç</a>
-                      <button class="btn" data-id="${s.id}" data-act="edit">Düzenle</button>
-                      <button class="btn danger" data-id="${s.id}" data-act="delete">Sil</button>
-                    </div>`;
-    songsList.appendChild(li);
-    // kullanıcı listesi kopyası (sil & düzenleme adminde çalışsın — kullanıcıda sadece çal ve aç)
-    const uli = li.cloneNode(true);
-    // kullanıcı listesindeki düğmelerden edit ve delete'leri gizle
-    [...uli.querySelectorAll('button')].forEach(b=>{
-      if (b.dataset.act === 'edit' || b.dataset.act === 'delete') b.remove();
+async function renderSongs() {
+  const { data: songs } = await supabase
+    .from("songs")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const list = document.getElementById("song-list");
+  list.innerHTML = "";
+  if (!songs || songs.length === 0) {
+    list.innerHTML = "<p>Henüz şarkı eklenmemiş.</p>";
+    return;
+  }
+
+  songs.forEach((s, idx) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div style="max-width:68%">
+        <strong>${escapeHtml(s.name)}</strong> - ${escapeHtml(s.artist)}
+        <div class="timestamp">${new Date(s.created_at || "").toLocaleString()}</div>
+      </div>
+      <div>
+        <button class="btn" data-idx="${idx}" data-act="play">Çal</button>
+        <button class="btn" data-id="${s.id}" data-act="edit">Düzenle</button>
+        <button class="btn danger" data-id="${s.id}" data-act="delete">Sil</button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+
+  // event delegation
+  list.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const act = e.target.dataset.act;
+      const id = e.target.dataset.id;
+      const idx = e.target.dataset.idx;
+      if (act === "play") {
+        playSong(songs[idx]);
+      } else if (act === "delete") {
+        if (confirm("Bu şarkıyı silmek istediğine emin misin?")) {
+          await supabase.from("songs").delete().eq("id", id);
+          renderSongs();
+        }
+      } else if (act === "edit") {
+        editSong(id, songs[idx]);
+      }
     });
-    userSongsList.appendChild(uli);
-  });
-  // event binding
-  document.querySelectorAll('[data-act="play"]').forEach(b => {
-    b.onclick = (e)=> playSong(parseInt(e.currentTarget.dataset.idx));
-  });
-  document.querySelectorAll('[data-act="delete"]').forEach(b => {
-    b.onclick = async (e) => {
-      const id = e.currentTarget.dataset.id;
-      if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
-      const { error } = await supabase.from("songs").delete().eq("id", id);
-      if (error) { alert("Silme hatası: "+error.message); console.error(error); }
-      else { await loadSongs(); if (currentIndex !== -1) { if(!allSongs[currentIndex] || allSongs[currentIndex].id == id) stopAndReset(); } }
-    };
-  });
-  document.querySelectorAll('[data-act="edit"]').forEach(b=>{
-    b.onclick = async (e)=>{
-      const id = e.currentTarget.dataset.id;
-      await editSong(id);
-    };
   });
 }
 
