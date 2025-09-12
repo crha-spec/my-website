@@ -379,13 +379,13 @@ if (s.cover_url && s.cover_url.trim() !== "") {
   // now info
   const ni = document.getElementById("now-playing-info"); if(ni) ni.textContent = playerInfo.textContent;
   const ui = document.getElementById("user-now-playing-info"); if(ui) ui.textContent = playerInfo.textContent;
-  // lyrics: prepare words (split by whitespace)
-  const raw = (s.lyrics && s.lyrics.trim()) ? s.lyrics : "Bu şarkıya söz eklenmemiş.";
-  lyricsWords = raw.replace(/\r/g,'').split(/\s+/).filter(Boolean);
-  wordIdx = 0;
-  stopLyrics();
-  showWord(); // ilk gösterim
-  if(!mainPlayer.paused) startLyrics();
+// lyrics: prepare words (split by whitespace)
+const raw = (s.lyrics && s.lyrics.trim()) ? s.lyrics : "Bu şarkıya söz eklenmemiş.";
+lyricsWords = raw.replace(/\r/g,'').split(/\s+/).filter(Boolean);
+wordIdx = 0;
+stopLyrics();
+showWord(); // ilk kelimeyi göster
+if(!mainPlayer.paused) startLyrics();
 }
 
 /* edit (prompt-based minimal) */
@@ -438,21 +438,32 @@ function showWord(){
   const adminBox = document.getElementById("now-lyric");
   const userBox = document.getElementById("user-lyric");
   const word = lyricsWords.length ? lyricsWords[wordIdx] : "—";
-  // reset opacity quickly
-  if(adminBox){ adminBox.style.opacity = "0"; adminBox.textContent = word; setTimeout(()=> adminBox.style.opacity = "1", 20); setTimeout(()=> adminBox.style.opacity = "0", 1000); }
-  if(userBox){ userBox.style.opacity = "0"; userBox.textContent = word; setTimeout(()=> userBox.style.opacity = "1", 20); setTimeout(()=> userBox.style.opacity = "0", 1000); }
+  if(adminBox){
+    adminBox.style.opacity = "0";
+    adminBox.textContent = word;
+    setTimeout(()=> adminBox.style.opacity = "1", 20);
+    setTimeout(()=> adminBox.style.opacity = "0", 1000);
+  }
+  if(userBox){
+    userBox.style.opacity = "0";
+    userBox.textContent = word;
+    setTimeout(()=> userBox.style.opacity = "1", 20);
+    setTimeout(()=> userBox.style.opacity = "0", 1000);
+  }
   wordIdx = (wordIdx + 1) % Math.max(1, lyricsWords.length);
 }
+
 function startLyrics(){
   stopLyrics();
-  // interval 1500ms: 1s visible + 0.5s fade
   lyricsInterval = setInterval(()=>{
-    // if paused, do nothing (but we stop interval on pause)
     if(mainPlayer.paused) return;
     showWord();
-  }, 1500);
+  }, 1500); // 1s görünür + 0.5s fade
 }
-function stopLyrics(){ if(lyricsInterval) { clearInterval(lyricsInterval); lyricsInterval = null; } }
+
+function stopLyrics(){
+  if(lyricsInterval){ clearInterval(lyricsInterval); lyricsInterval = null; }
+}
 function stopAndReset(){
   mainPlayer.pause(); mainPlayer.src = ""; playerInfo.textContent = "Henüz şarkı seçilmedi";
   const a = document.getElementById("now-lyric"), b = document.getElementById("user-lyric");
