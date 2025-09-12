@@ -108,7 +108,8 @@
 
           <div id="now-playing-admin" class="hidden" style="margin-top:12px;">
             <h3>Şu An Çalan</h3>
-            <img id="now-playing-cover" class="cover" src="" alt="Kapak">
+            <img id="now-playing-cover" src="" alt="Kapak Fotoğrafı" 
+     style="display:none; width:120px; height:120px; object-fit:cover; border-radius:12px; margin-bottom:10px;" />
             <div id="now-playing-info">Henüz şarkı seçilmedi</div>
             <div style="margin-top:8px;" class="row">
               <button id="prevBtn" class="btn">⏮ Önceki</button>
@@ -342,8 +343,14 @@ function playSong(index){
   mainPlayer.src = s.url || s.file_url || "";
   mainPlayer.play().catch(()=>{/* autoplay engellerse kullanıcı başlatır */});
   playerInfo.textContent = `${s.name} - ${s.artist}`;
+  const coverEl = document.getElementById("now-playing-cover");
+if (s.cover_url && s.cover_url.trim() !== "") {
+  coverEl.src = s.cover_url;
+  coverEl.style.display = "block";
+} else {
+  coverEl.style.display = "none";
+}
   // kapakları setle (hem admin hem user)
-  const nowCover = document.getElementById("now-playing-cover"); if(nowCover) nowCover.src = s.cover_url || s.cover || "";
   const userCover = document.getElementById("user-now-playing-cover"); if(userCover) userCover.src = s.cover_url || s.cover || "";
   // now info
   const ni = document.getElementById("now-playing-info"); if(ni) ni.textContent = playerInfo.textContent;
@@ -547,9 +554,6 @@ function escapeAttr(t){ return escapeHtml(t); }
    SON: hata logları göster (console)
    --------------------------- */
 console.log("Music library script loaded. Supabase URL:", SUPABASE_URL);
-
-/* ---------------------------
-   --------------------------- */
 
 </script>
 </body>
