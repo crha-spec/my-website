@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kişisel Müzik Kütüphanesi</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kişisel Müzik Kütüphanesi - Admin + Kullanıcı</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #e63946;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,830 +29,1533 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
             min-height: 100vh;
-            padding-bottom: 120px;
+            padding: 20px;
         }
         
-        .app {
-            max-width: 1200px;
+        .app-container {
+            max-width: 1400px;
             margin: 0 auto;
         }
         
         header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            color: var(--accent);
+            font-size: 2.2rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        
+        h1, h2, h3, h4 {
+            margin-bottom: 1.2rem;
+            color: white;
+        }
+        
+        h2 {
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            margin: 1.5rem 0;
+        }
+        
+        .card {
             background: rgba(255, 255, 255, 0.1);
-            padding: 18px 24px;
-            border-radius: 12px;
-            margin-bottom: 20px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .panel {
+            display: none;
+        }
+        
+        .active-panel {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
         }
         
         .sidebar {
             background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
             backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px 0;
+            box-shadow: var(--card-shadow);
+            height: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .sidebar button {
-            padding: 12px;
-            border: 0;
-            border-radius: 8px;
-            background: transparent;
-            color: #fff;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            width: 100%;
+            padding: 16px 25px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-size: 1.05rem;
+            border-left: 4px solid transparent;
         }
         
         .sidebar button:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
         }
         
         .sidebar button.active {
-            background: #f72585;
-            box-shadow: 0 4px 10px rgba(247, 37, 133, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left: 4px solid var(--accent);
         }
         
-        .card {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+        .main-content {
+            min-height: 600px;
         }
         
         input, textarea, select {
-            padding: 12px;
-            border-radius: 8px;
-            border: 0;
             width: 100%;
-            margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            font-size: 16px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(247, 37, 133, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
         }
         
         .btn {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 26px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
         }
         
-        .btn.danger {
-            background: #e63946;
-            color: #fff;
+        .btn:hover {
+            background: #ff4da6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(247, 37, 133, 0.4);
         }
         
-        .btn.danger:hover {
-            background: #d63031;
-            transform: translateY(-2px);
+        .btn-secondary {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
         
-        .btn.play {
-            background: #4361ee;
-            color: #fff;
+        .btn-secondary:hover {
+            background: #5a75f1;
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
         }
         
-        .btn.play:hover {
-            background: #3a56d4;
-            transform: translateY(-2px);
+        .btn-danger {
+            background: var(--danger);
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
         }
         
-        .btn.edit {
-            background: #f8961e;
-            color: #fff;
+        .btn-danger:hover {
+            background: #d13446;
+            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
         }
         
-        .btn.edit:hover {
-            background: #e67e22;
-            transform: translateY(-2px);
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            box-shadow: none;
         }
         
-        .btn.success {
-            background: #2a9d8f;
-            color: #fff;
+        .btn-outline:hover {
+            background: var(--accent);
+            color: white;
         }
         
-        .btn.success:hover {
-            background: #21867a;
-            transform: translateY(-2px);
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
         }
         
-        .song {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+        .songs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
         
-        .song:hover {
+        .song-card {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 极2);
         }
         
-        #player-bar {
-            position: fixed;
+        .song-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .song-image {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .song-overlay {
+            position: absolute;
+            bottom: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: #000;
-            padding: 15px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        #now-playing-lyrics, #user-now-playing-lyrics {
-            white-space: pre-wrap;
-            margin-top: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
             padding: 15px;
-            border-radius: 8px;
-            line-height: 1.6;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: #2d3748;
-            padding: 25px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-        
-        .delete-all-btn {
-            background: #e63946;
             color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            margin-top: 15px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .delete-all-btn:hover {
-            background: #d63031;
-            transform: translateY(-2px);
-        }
-        
-        h2 {
-            margin-bottom: 20px;
-            font-size: 28px;
-            text-align: center;
-        }
-        
-        h3 {
-            margin-bottom: 15px;
-            font-size: 22px;
-            color: #f72585;
+            display: flex;
+            justify-content: center;
         }
         
         .song-info {
-            flex: 1;
+            padding: 20px;
+        }
+        
+        .song-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .song-artist {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
         }
         
         .song-actions {
             display: flex;
-            gap: 8px;
+            justify-content: space-between;
+            margin-top: 15px;
         }
         
-        .status-msg {
-            padding: 10px;
+        .player-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            padding: 15px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+        }
+        
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .now-playing-img {
+            width: 60px;
+            height: 60px;
             border-radius: 8px;
-            margin-top: 10px;
-            text-align: center;
+            object-fit: cover;
+        }
+        
+        .now-playing-info {
+            flex: 1;
+        }
+        
+        .now-playing-title {
             font-weight: 600;
+            margin-bottom: 5px;
         }
         
-        .success-msg {
-            background: rgba(46, 204, 113, 0.2);
-            color: #27ae60;
+        .now-playing-artist {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
         }
         
-        .error-msg {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 2;
+        }
+        
+        .progress-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
+            height: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-bar {
+            background: var(--accent);
+            height: 100%;
+            border-radius: 5px;
+            width: 0%;
+        }
+        
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 150px;
+        }
+        
+        .volume-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 5px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+        
+        .control-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .control-btn:hover {
+            color: var(--accent);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 50px;
+        }
+        
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-weight: 500;
+        }
+        
+        .status-error {
+            background: rgba(230, 57, 70, 0.2);
+            color: #ff6b6b;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .status-success {
+            background: rgba(76, 201, 极0, 0.2);
+            color: #4cc9f0;
+            border-left: 4px solid var(--success);
+        }
+        
+        .status-info {
+            background: rgba(252, 163, 17, 0.2);
+            color: #fca311;
+            border-left: 4px solid var(--warning);
+        }
+        
+        @media (max-width: 992px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 5px;
+            }
+            
+            .sidebar button {
+                padding: 10px 15px;
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                justify-content: center;
+            }
+            
+            .sidebar button.active {
+                border-left: none;
+                border-bottom: 3px solid var(--accent);
+            }
+            
+            .songs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
         }
         
         @media (max-width: 768px) {
-            .controls {
+            .player-container {
                 flex-direction: column;
+                gap: 15px;
             }
             
-            .song {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .song-actions {
+            .now-playing {
                 width: 100%;
-                justify-content: space-between;
             }
             
-            #player-bar {
-                flex-direction: column;
-                gap: 10px;
+            .player-controls {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-<div class="app">
-    <header>
-        <div>🎵 Müzik Kütüphanesi</div>
-        <div><span id="user-type"></span></div>
-    </header>
-
-    <!-- Admin Panel -->
-    <div id="admin-panel" style="display:none;">
-        <h2>Admin Paneli</h2>
-        <div class="sidebar">
-            <button id="btn-library" class="active"><i class="fas fa-music"></i> Kitaplık</button>
-            <button id="btn-add-song"><i class="fas fa-plus"></i> Şarkı Ekle</button>
-            <button id="btn-now-playing"><i class="fas fa-play"></i> Şu An Çalan</button>
-        </div>
-
-        <div id="library-section" class="card">
-            <h3>Şarkı Kitaplığı</h3>
-            <div class="controls">
-                <input type="text" id="admin-search" placeholder="Şarkı veya sanatçı ara...">
-                <select id="admin-sort">
-                    <option value="id">En Yeni</option>
-                    <option value="name">Ada Göre</option>
-                    <option value="artist">Sanatçıya Göre</option>
-                </select>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <span>Kişisel Müzik Kütüphanesi</span>
             </div>
-            <button id="delete-all-btn" class="delete-all-btn"><i class="fas fa-trash"></i> Tüm Şarkıları Sil</button>
-            <ul id="songs-list"></ul>
-        </div>
-
-        <div id="add-song-section" class="card" style="display:none;">
-            <h3>Yeni Şarkı Ekle</h3>
-            <input id="song-name" placeholder="Şarkı adı">
-            <input id="song-artist" placeholder="Sanatçı">
-            <input id="song-url" placeholder="Şarkı URL'si">
-            <textarea id="song-lyrics" placeholder="Şarkı sözleri (opsiyonel)" rows="4"></textarea>
-            <button id="addSongBtn" class="btn success"><i class="fas fa-plus"></i> Ekle</button>
-            <div id="admin-msg" class="status-msg"></div>
-        </div>
-
-        <div id="now-playing-section" class="card" style="display:none;">
-            <h3>Şu An Çalan</h3>
-            <div id="now-playing-info">Henüz şarkı seçilmedi</div>
-            <div style="margin-top:15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="prevBtn" class="btn"><i class="fas fa-step-backward"></i> Önceki</button>
-                <button id="toggleBtn" class="btn"><i class="fas fa-play"></i> Başlat/Durdur</button>
-                <button id="nextBtn" class="btn">Sonraki <i class="fas fa-step-forward"></i></button>
+            <div class="user-info">
+                <i class="fas fa-user"></i>
+                <span id="user-type">Kullanıcı</span>
             </div>
-            <div id="now-playing-lyrics">Henüz şarkı seçilmedi</div>
-        </div>
-    </div>
+        </header>
 
-    <!-- User Panel -->
-    <div id="user-panel" style="display:none;">
-        <h2>Kullanıcı Paneli</h2>
-        <div class="sidebar">
-            <button id="user-btn-library" class="active"><i class="fas fa-music"></i> Kitaplık</button>
-            <button id="user-btn-now-playing"><i class="fas fa-play"></i> Şu An Çalan</button>
-        </div>
-
-        <div id="user-library-section" class="card">
-            <h3>Şarkı Kitaplığı</h3>
-            <div class="controls">
-                <input type="text" id="user-search" placeholder="Şarkı veya sanatçı ara...">
-                <select id="user-sort">
-                    <option value="id">En Yeni</option>
-                    <option value="name">Ada Göre</option>
-                    <option value="artist">Sanatçıya Göre</option>
-                </select>
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="panel">
+            <h2>🎧 Admin Paneli</h2>
+            <div class="grid-container">
+                <div class="sidebar">
+                    <button id="btn-library" class="active">
+                        <i class="fas fa-compact-disc"></i>
+                        <span>Kitaplık</span>
+                    </button>
+                    <button id="btn-add-song">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Şarkı Ekle</span>
+                    </button>
+                    <button id="btn-song-requests">
+                        <i class="fas fa-envelope"></i>
+                        <span>Şarkı İstekleri</span>
+                    </button>
+                    <button id="btn-access-requests">
+                        <i class="fas fa-user-check"></i>
+                        <span>Giriş Onayları</span>
+                    </button>
+                </div>
+                
+                <div class="main-content">
+                    <!-- Kitaplık Bölümü -->
+                    <div id="library-section" class="active-panel panel">
+                        <div class="card">
+                            <h3>Müzik Kitaplığı</h3>
+                            <div class="songs-grid" id="songs-list">
+                                <!-- Şarkılar buraya dinamik olarak eklenecek -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Şarkı Ekleme Bölümü -->
+                    <div id="add-song-section" class="panel">
+                        <div class="card">
+                            <h3>Şarkı Ekle</h3>
+                            <div class="form-group">
+                                <label>Şarkı Adı</label>
+                                <input id="song-name" placeholder="Örnek: Faded" />
+                            </div>
+                            <div class="form-group">
+                                <label>Sanatçı</label>
+                                <input id="song-artist" placeholder="Örnek: Alan Walker" />
+                            </div>
+                            <div class="form-group">
+                                <label>Kapak Görseli URL (isteğe bağlı)</label>
+                                <input id="song-image" placeholder="https://..." />
+                            </div>
+                            <div class="form-group">
+                                <label>Dosya URL (catbox veya mp3 linki)</label>
+                                <input id="song-url" placeholder="https://..." />
+                            </div>
+                            <div style="display:flex; gap:12px;">
+                                <button id="addSongBtn" class="btn">
+                                    <i class="fas fa-save"></i>
+                                    Şarkıyı Ekle
+                                </button>
+                                <button id="clearBtn" class="btn btn-outline">
+                                    <i class="fas fa-eraser"></i>
+                                    Temizle
+                                </button>
+                            </div>
+                            <div id="admin-msg" class="status-message"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Şarkı İstekleri Bölümü -->
+                    <div id="song-requests-section" class="panel">
+                        <div class="card">
+                            <h3>Şarkı İstekleri</h3>
+                            <div id="song-requests-container">
+                                <ul id="song-requests-list" class="requests-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Giriş Onayları Bölümü -->
+                    <div id="access-requests-section" class="panel">
+                        <div class="card">
+                            <h3>Giriş Onayları</h3>
+                            <button id="approveAllBtn" class="btn btn-secondary" style="margin-bottom: 20px;">
+                                <i class="fas fa-check-double"></i>
+                                Tümünü Onayla
+                            </button>
+                            <div id="access-requests-container">
+                                <ul id="access-requests-list" class="requests-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <ul id="user-songs-list"></ul>
         </div>
 
-        <div id="user-now-playing-section" class="card" style="display:none;">
-            <h3>Şu An Çalan</h3>
-            <div id="user-now-playing-info">Henüz şarkı seçilmedi</div>
-            <div style="margin-top:15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="uPrevBtn" class="btn"><i class="fas fa-step-backward"></i> Önceki</button>
-                <button id="uToggleBtn" class="btn"><i class="fas fa-play"></i> Başlat/Durdur</button>
-                <button id="uNextBtn" class="btn">Sonraki <i class="fas fa-step-forward"></i></button>
+        <!-- User Panel -->
+        <div id="user-panel" class="panel active-panel">
+            <h2>📀 Müzik Kitaplığı</h2>
+            <div class="grid-container">
+                <div class="sidebar">
+                    <button id="user-btn-library" class="active">
+                        <i class="fas fa-compact-disc"></i>
+                        <span>Kitaplık</span>
+                    </button>
+                    <button id="user-btn-song-request">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Şarkı İsteği</span>
+                    </button>
+                </div>
+                
+                <div class="main-content">
+                    <!-- Kullanıcı Kitaplık Bölümü -->
+                    <div id="user-library-section" class="active-panel panel">
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h3>Popüler Şarkılar</h3>
+                                <div style="position: relative;">
+                                    <input type="text" placeholder="Şarkı veya sanatçı ara..." style="width: 250px; margin: 0;" id="search-input">
+                                    <i class="fas fa-search" style="position: absolute; right: 15px; top: 13px; color: rgba(255,255,255,0.7);"></i>
+                                </div>
+                            </div>
+                            <div class="songs-grid" id="user-songs-list">
+                                <!-- Şarkılar buraya dinamik olarak eklenecek -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Şarkı İsteği Bölümü -->
+                    <div id="user-song-request-section" class="panel">
+                        <div class="card">
+                            <h3>Şarkı İsteği Gönder</h3>
+                            <div class="form-group">
+                                <label>Şarkı Adı</label>
+                                <input id="request-song-name" placeholder="Örnek: Faded" />
+                            </div>
+                            <div class="form-group">
+                                <label>Sanatçı</label>
+                                <input id="request-song-artist" placeholder="Örnek: Alan Walker" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Catbox.moe Dosya Linki</label>
+                                <input id="request-song-url" placeholder="https://files.catbox.moe/..." />
+                                <p class="hint" style="color: rgba(255,255,255,0.7); margin-top: 5px;">
+                                    <i class="fas fa-info-circle"></i> Catbox.moe'ya giderek dosyanızı yükleyin ve elde ettiğiniz linki buraya yapıştırın.
+                                    <a href="https://catbox.moe/" target="_blank" style="color: var(--accent);">Catbox.moe'ya Git</a>
+                                </p>
+                            </div>
+                            
+                            <div style="display:flex; gap:12px; margin-top:15px">
+                                <button id="sendRequestBtn" class="btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Şarkı İsteği Gönder
+                                </button>
+                            </div>
+                            <div id="user-request-msg" class="status-message"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="user-now-playing-lyrics">Henüz şarkı seçilmedi</div>
+            <p id="user-ip" class="hint" style="color: rgba(255,255,255,0.7); margin-top: 20px;"></p>
+            <p id="user-msg" class="hint" style="color: rgba(255,255,255,0.7);"></p>
         </div>
-    </div>
-</div>
 
-<!-- Player -->
-<div id="player-bar">
-    <div id="player-info">Henüz şarkı seçilmedi</div>
-    <audio id="main-player" controls></audio>
-</div>
-
-<!-- Düzenleme Modalı -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <h3>Şarkı Düzenle</h3>
-        <input id="edit-song-name" placeholder="Şarkı adı">
-        <input id="edit-song-artist" placeholder="Sanatçı">
-        <input id="edit-song-url" placeholder="URL">
-        <textarea id="edit-song-lyrics" placeholder="Şarkı sözleri" rows="4"></textarea>
-        <div style="margin-top:15px; display: flex; gap: 10px;">
-            <button id="saveEditBtn" class="btn success">Kaydet</button>
-            <button id="cancelEditBtn" class="btn danger">İptal</button>
-        </div>
-    </div>
-</div>
-
-<!-- Tümünü Sil Onay Modalı -->
-<div id="deleteAllModal" class="modal">
-    <div class="modal-content">
-        <h3>Tüm Şarkıları Sil</h3>
-        <p style="margin-bottom: 15px;">Bu işlem tüm şarkıları kalıcı olarak silecektir. Emin misiniz?</p>
-        <div style="display: flex; gap: 10px;">
-            <button id="confirmDeleteAllBtn" class="btn danger">Evet, Tümünü Sil</button>
-            <button id="cancelDeleteAllBtn" class="btn">İptal</button>
-        </div>
-    </div>
-</div>
-
-<script>
-// Basit bir veri depolama sistemi (localStorage kullanarak)
-const MusicLibrary = {
-    songs: JSON.parse(localStorage.getItem('songs')) || [],
-    
-    // Yeni şarkı ekle
-    addSong: function(song) {
-        return new Promise((resolve) => {
-            // ID oluştur
-            song.id = Date.now();
-            song.createdAt = new Date().toISOString();
+        <!-- Müzik Çalar -->
+        <div class="player-container hidden" id="music-player">
+            <div class="now-playing">
+                <img src="https://placehold.co/60x60/4361ee/white?text=♪" class="now-playing-img" id="player-image">
+                <div class="now-playing-info">
+                    <div class="now-playing-title" id="player-title">Şarkı Adı</div>
+                    <div class="now-playing-artist" id="player-artist">Sanatçı</div>
+                </div>
+            </div>
             
-            this.songs.push(song);
-            this.saveToStorage();
-            resolve(song);
-        });
-    },
-    
-    // Tüm şarkıları getir
-    getAllSongs: function() {
-        return new Promise((resolve) => {
-            resolve([...this.songs]);
-        });
-    },
-    
-    // ID'ye göre şarkı getir
-    getSongById: function(id) {
-        return new Promise((resolve) => {
-            const song = this.songs.find(s => s.id == id);
-            resolve(song);
-        });
-    },
-    
-    // Şarkı sil
-    deleteSong: function(id) {
-        return new Promise((resolve) => {
-            this.songs = this.songs.filter(song => song.id != id);
-            this.saveToStorage();
-            resolve(true);
-        });
-    },
-    
-    // Tüm şarkıları sil
-    deleteAllSongs: function() {
-        return new Promise((resolve) => {
-            this.songs = [];
-            this.saveToStorage();
-            resolve(true);
-        });
-    },
-    
-    // Şarkı güncelle
-    updateSong: function(id, updatedData) {
-        return new Promise((resolve) => {
-            const index = this.songs.findIndex(song => song.id == id);
-            if (index !== -1) {
-                this.songs[index] = {...this.songs[index], ...updatedData};
-                this.saveToStorage();
-                resolve(this.songs[index]);
+            <div class="player-controls">
+                <button class="control-btn" id="prev-btn">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button class="control-btn" id="play-pause-btn">
+                    <i class="fas fa-play" id="play-icon"></i>
+                </button>
+                <button class="control-btn" id="next-btn">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+                
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                
+                <div class="volume-container">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="70">
+                </div>
+            </div>
+            
+            <audio id="audio-element"></audio>
+        </div>
+
+        <footer>
+            <div id="debug" class="hint" style="color: rgba(255,255,255,0.7);"></div>
+            <p>Kişisel Müzik Kütüphanesi © 2023</p>
+        </footer>
+    </div>
+
+    <!-- Supabase ESM import (tarayıcıda çalışır) -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // --- SENİN SUPABASE BİLGİLERİN (sen verdiğin) ---
+        const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhbmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- ADMIN IP (senin verdiğin) ---
+        const ADMIN_IP = "151.250.4.2";
+
+        // Elemanlar
+        const adminPanel = document.getElementById('admin-panel');
+        const userPanel = document.getElementById('user-panel');
+        const userIpP = document.getElementById('user-ip');
+        const userType = document.getElementById('user-type');
+        const songsList = document.getElementById('songs-list');
+        const userSongsList = document.getElementById('user-songs-list');
+        const songRequestsList = document.getElementById('song-requests-list');
+        const accessRequestsList = document.getElementById('access-requests-list');
+        const adminMsg = document.getElementById('admin-msg');
+        const userMsg = document.getElementById('user-msg');
+        const userRequestMsg = document.getElementById('user-request-msg');
+        const debug = document.getElementById('debug');
+        const addSongBtn = document.getElementById('addSongBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sendRequestBtn = document.getElementById('sendRequestBtn');
+        const approveAllBtn = document.getElementById('approveAllBtn');
+        const searchInput = document.getElementById('search-input');
+        
+        // Müzik çalar elemanları
+        const musicPlayer = document.getElementById('music-player');
+        const audioElement = document.getElementById('audio-element');
+        const playerTitle = document.getElementById('player-title');
+        const playerArtist = document.getElementById('player-artist');
+        const playerImage = document.getElementById('player-image');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playIcon = document.getElementById('play-icon');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const volumeSlider = document.getElementById('volume-slider');
+        
+        // Oynatma durumu
+        let isPlaying = false;
+        let currentSongIndex = 0;
+        let songs = [];
+
+        // Onaylanmış IP'ler (localStorage'da saklanacak)
+        let approvedIPs = JSON.parse(localStorage.getItem('approvedIPs')) || [];
+
+        // Sayfa açılınca IP'yi al, admin mi kontrol et, şarkıları yükle
+        async function init() {
+            try {
+                const res = await fetch("https://api64.ipify.org?format=json");
+                const d = await res.json();
+                const ip = d.ip || 'unknown';
+                debug.innerText = ""; // başlangıçta temiz
+                console.log("Görünen IP:", ip);
+
+                // IP'yi kaydet
+                localStorage.setItem('currentIP', ip);
+                
+                // Eğer admin IP'si ise
+                if (ip === ADMIN_IP) {
+                    // admin
+                    adminPanel.style.display = 'block';
+                    userPanel.style.display = 'none';
+                    userType.textContent = 'Yönetici';
+                    adminMsg.innerText = `Admin olarak giriş yaptınız (IP: ${ip}).`;
+                    await loadSongRequests(); // Şarkı isteklerini yükle
+                    await loadAccessRequests(); // Giriş isteklerini yükle
+                } else {
+                    // normal kullanıcı
+                    adminPanel.style.display = 'none';
+                    userPanel.style.display = 'block';
+                    userType.textContent = 'Kullanıcı';
+                    userIpP.innerText = `IP adresiniz: ${ip}`;
+                    userMsg.innerText = ``;
+                    
+                    // IP'yi access requests tablosuna kaydet
+                    await saveAccessRequest(ip);
+                }
+
+                // Şarkıları her durumda yükle
+                await loadSongs();
+            } catch (err) {
+                debug.innerText = "IP alınırken hata: " + (err.message || err);
+                console.error(err);
+                // Hata olsa bile şarkıları dene
+                await loadSongs();
+                adminPanel.style.display = 'none';
+                userPanel.style.display = 'block';
+                userType.textContent = 'Kullanıcı';
             }
-            resolve(null);
-        });
-    },
-    
-    // Veriyi localStorage'a kaydet
-    saveToStorage: function() {
-        localStorage.setItem('songs', JSON.stringify(this.songs));
-    }
-};
-
-// Uygulama durumu
-let allSongs = [];
-let currentIndex = -1;
-let sortField = "id";
-let searchTerm = "";
-let currentEditId = null;
-
-// DOM elementleri
-const songsList = document.getElementById("songs-list");
-const userSongsList = document.getElementById("user-songs-list");
-const mainPlayer = document.getElementById("main-player");
-const playerInfo = document.getElementById("player-info");
-
-// Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', async function() {
-    // Admin panelini göster (şimdilik herkese)
-    document.getElementById("admin-panel").style.display = "block";
-    document.getElementById("user-type").textContent = "Admin";
-    
-    setupAdminButtons();
-    await loadSongs();
-});
-
-// Şarkı listeleme
-async function loadSongs() {
-    try {
-        allSongs = await MusicLibrary.getAllSongs();
-        const filteredSongs = allSongs.filter(song => 
-            song.name.toLowerCase().includes(searchTerm) || 
-            song.artist.toLowerCase().includes(searchTerm)
-        );
-        
-        // Sıralama
-        filteredSongs.sort((a, b) => {
-            if (sortField === "id") return b.id - a.id;
-            if (sortField === "name") return a.name.localeCompare(b.name);
-            if (sortField === "artist") return a.artist.localeCompare(b.artist);
-            return 0;
-        });
-        
-        renderList(songsList, filteredSongs, true);
-        renderList(userSongsList, filteredSongs, false);
-    } catch (err) {
-        console.error("Şarkı yükleme hatası:", err);
-        showMessage("admin-msg", "Şarkılar yüklenirken bir hata oluştu: " + err.message, "error");
-    }
-}
-
-function renderList(list, data, isAdmin) {
-    list.innerHTML = "";
-    
-    if (data.length === 0) {
-        list.innerHTML = `<li class="song" style="justify-content: center;">Henüz şarkı eklenmemiş</li>`;
-        return;
-    }
-    
-    data.forEach((song, index) => {
-        const li = document.createElement("li");
-        li.className = "song";
-        li.dataset.id = song.id;
-        
-        li.innerHTML = `
-            <div class="song-info">
-                <div><strong>${song.name}</strong> - ${song.artist}</div>
-                <small>Eklenme: ${new Date(song.createdAt).toLocaleDateString('tr-TR')}</small>
-            </div>
-            <div class="song-actions">
-                <button class="btn play" data-index="${index}"><i class="fas fa-play"></i> Çal</button>
-                ${isAdmin ? `
-                    <button class="btn edit" data-id="${song.id}"><i class="fas fa-edit"></i> Düzenle</button>
-                    <button class="btn danger delete-song" data-id="${song.id}"><i class="fas fa-trash"></i> Sil</button>
-                ` : ""}
-            </div>
-        `;
-        
-        list.appendChild(li);
-    });
-    
-    // Olay dinleyicileri ekle
-    list.querySelectorAll(".play").forEach(btn => {
-        btn.addEventListener('click', () => playSong(parseInt(btn.dataset.index)));
-    });
-    
-    if (isAdmin) {
-        list.querySelectorAll(".delete-song").forEach(btn => {
-            btn.addEventListener('click', () => deleteSong(btn.dataset.id));
-        });
-        
-        list.querySelectorAll(".edit").forEach(btn => {
-            btn.addEventListener('click', () => openEditModal(btn.dataset.id));
-        });
-    }
-}
-
-// Modal işlevleri
-function openEditModal(id) {
-    const song = allSongs.find(s => s.id == id);
-    if (!song) return;
-    
-    currentEditId = id;
-    document.getElementById("edit-song-name").value = song.name;
-    document.getElementById("edit-song-artist").value = song.artist;
-    document.getElementById("edit-song-url").value = song.url;
-    document.getElementById("edit-song-lyrics").value = song.lyrics || "";
-    
-    document.getElementById("editModal").style.display = "flex";
-}
-
-function closeEditModal() {
-    document.getElementById("editModal").style.display = "none";
-    currentEditId = null;
-}
-
-// Şarkı düzenlemeyi kaydet
-async function saveSongEdit() {
-    if (!currentEditId) return;
-    
-    const name = document.getElementById("edit-song-name").value.trim();
-    const artist = document.getElementById("edit-song-artist").value.trim();
-    const url = document.getElementById("edit-song-url").value.trim();
-    const lyrics = document.getElementById("edit-song-lyrics").value.trim();
-
-    if (!name || !artist || !url) {
-        showMessage("admin-msg", "Lütfen tüm zorunlu alanları doldurun.", "error");
-        return;
-    }
-
-    try {
-        await MusicLibrary.updateSong(currentEditId, { name, artist, url, lyrics });
-        showMessage("admin-msg", "✅ Şarkı başarıyla güncellendi", "success");
-        closeEditModal();
-        await loadSongs();
-    } catch (err) {
-        showMessage("admin-msg", "Güncelleme hatası: " + err.message, "error");
-        console.error("Güncelleme hatası:", err);
-    }
-}
-
-// Çalma
-function playSong(index) {
-    if (index < 0 || index >= allSongs.length) return;
-    
-    currentIndex = index;
-    const song = allSongs[index];
-    if (!song) return;
-    
-    mainPlayer.src = song.url;
-    mainPlayer.play().catch(e => console.error("Çalma hatası:", e));
-    
-    playerInfo.textContent = `${song.name} - ${song.artist}`;
-    document.getElementById("now-playing-info").textContent = `${song.name} - ${song.artist}`;
-    document.getElementById("user-now-playing-info").textContent = `${song.name} - ${song.artist}`;
-
-    // Şarkı sözleri
-    const lyricsText = song.lyrics && song.lyrics.trim() ? song.lyrics : "Bu şarkıya söz eklenmemiş.";
-    document.getElementById("now-playing-lyrics").textContent = lyricsText;
-    document.getElementById("user-now-playing-lyrics").textContent = lyricsText;
-}
-
-// Önceki/sonraki
-function prevSong() {
-    if (allSongs.length === 0) return;
-    if (currentIndex <= 0) playSong(allSongs.length - 1);
-    else playSong(currentIndex - 1);
-}
-
-function nextSong() {
-    if (allSongs.length === 0) return;
-    if (currentIndex >= allSongs.length - 1) playSong(0);
-    else playSong(currentIndex + 1);
-}
-
-function togglePlay() {
-    if (mainPlayer.paused) mainPlayer.play();
-    else mainPlayer.pause();
-}
-
-// Şarkı silme
-async function deleteSong(id) {
-    if (!confirm("Bu şarkıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
-
-    try {
-        await MusicLibrary.deleteSong(id);
-        showMessage("admin-msg", "✅ Şarkı tamamen silindi", "success");
-        
-        // Listeleri yeniden yükle
-        await loadSongs();
-        
-        // Eğer silinen şarkı çalınıyorsa, çalmayı durdur
-        if (currentIndex !== -1 && allSongs[currentIndex] && allSongs[currentIndex].id === id) {
-            mainPlayer.pause();
-            mainPlayer.src = "";
-            playerInfo.textContent = "Henüz şarkı seçilmedi";
-            document.getElementById("now-playing-info").textContent = "Henüz şarkı seçilmedi";
-            document.getElementById("user-now-playing-info").textContent = "Henüz şarkı seçilmedi";
-            document.getElementById("now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
-            document.getElementById("user-now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
-            currentIndex = -1;
+            
+            // Müzik çalar event listener'ları
+            setupPlayerEvents();
+            
+            // Arama işlevselliği
+            setupSearch();
+            
+            // Buton event listener'larını kur
+            setupButtonEvents();
         }
-    } catch (err) {
-        showMessage("admin-msg", "Silme hatası: " + err.message, "error");
-        console.error("Silme hatası:", err);
-    }
-}
 
-// Tüm şarkıları silme
-async function deleteAllSongs() {
-    try {
-        await MusicLibrary.deleteAllSongs();
-        showMessage("admin-msg", "✅ Tüm şarkılar başarıyla silindi", "success");
-        
-        // Listeleri yeniden yükle
-        await loadSongs();
-        
-        // Çalmayı durdur
-        mainPlayer.pause();
-        mainPlayer.src = "";
-        playerInfo.textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("now-playing-info").textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("user-now-playing-info").textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
-        document.getElementById("user-now-playing-lyrics").textContent = "Henüz şarkı seçilmedi";
-        currentIndex = -1;
-    } catch (err) {
-        showMessage("admin-msg", "Tüm şarkıları silerken bir hata oluştu: " + err.message, "error");
-        console.error("Tüm şarkıları silme hatası:", err);
-    }
-}
+        // Erişim isteğini kaydet
+        async function saveAccessRequest(ip) {
+            try {
+                // Öncelikle bu IP zaten kayıtlı mı kontrol et
+                const { data: existingRequests, error: checkError } = await supabase
+                    .from('AccessRequests')
+                    .select('*')
+                    .eq('ip', ip);
 
-// Şarkı ekleme
-async function addSong() {
-    const name = document.getElementById("song-name").value.trim();
-    const artist = document.getElementById("song-artist").value.trim();
-    const url = document.getElementById("song-url").value.trim();
-    const lyrics = document.getElementById("song-lyrics").value.trim();
-    
-    if (!name || !artist || !url) {
-        showMessage("admin-msg", "Lütfen tüm zorunlu alanları doldurun.", "error");
-        return;
-    }
-    
-    try {
-        await MusicLibrary.addSong({ name, artist, url, lyrics });
-        showMessage("admin-msg", "✅ Şarkı başarıyla eklendi", "success");
-        
-        // Formu temizle
-        document.getElementById("song-name").value = "";
-        document.getElementById("song-artist").value = "";
-        document.getElementById("song-url").value = "";
-        document.getElementById("song-lyrics").value = "";
-        
-        // Listeyi yenile
-        await loadSongs();
-    } catch (err) {
-        showMessage("admin-msg", "Ekleme hatası: " + err.message, "error");
-        console.error("Ekleme hatası:", err);
-    }
-}
+                if (checkError) {
+                    console.error("Erişim isteği kontrol hatası:", checkError);
+                    return;
+                }
 
-// Mesaj gösterme
-function showMessage(elementId, message, type) {
-    const element = document.getElementById(elementId);
-    element.textContent = message;
-    element.className = `status-msg ${type}-msg`;
-    
-    // 5 saniye sonra mesajı temizle
-    setTimeout(() => {
-        element.textContent = "";
-        element.className = "status-msg";
-    }, 5000);
-}
+                // Eğer bu IP zaten kayıtlı değilse ekle
+                if (!existingRequests || existingRequests.length === 0) {
+                    const { error } = await supabase
+                        .from('AccessRequests')
+                        .insert([{ 
+                            ip: ip, 
+                            status: 'pending',
+                            created_at: new Date().toISOString()
+                        }]);
 
-// Admin menü
-function setupAdminButtons() {
-    const sections = ["library-section", "add-song-section", "now-playing-section"];
-    const buttons = ["btn-library", "btn-add-song", "btn-now-playing"];
-    
-    buttons.forEach((id, i) => {
-        document.getElementById(id).addEventListener('click', () => {
-            sections.forEach((s, j) => {
-                document.getElementById(s).style.display = (i === j) ? "block" : "none";
+                    if (error) {
+                        console.error("Erişim isteği kaydetme hatası:", error);
+                    }
+                }
+            } catch (err) {
+                console.error("Erişim isteği kaydetme hatası:", err);
+            }
+        }
+
+        // Şarkı ekleme
+        async function addSong() {
+            adminMsg.innerText = "";
+            adminMsg.className = "status-message";
+            
+            const name = document.getElementById('song-name').value.trim();
+            const artist = document.getElementById('song-artist').value.trim();
+            const image = document.getElementById('song-image').value.trim();
+            const url = document.getElementById('song-url').value.trim();
+
+            if (!name || !artist || !url) {
+                showMessage(adminMsg, "Lütfen tüm zorunlu alanları doldurun (şarkı adı, sanatçı, url).", "error");
+                return;
+            }
+
+            // insert dene
+            try {
+                showMessage(adminMsg, "Kaydediliyor...", "info");
+                addSongBtn.disabled = true;
+
+                const payload = { 
+                    name, 
+                    artist, 
+                    url,
+                    image: image || "https://placehold.co/400x400/4361ee/white?text=♪"
+                };
+                
+                const { data, error } = await supabase
+                    .from('Songs')    // tablo adı: public.Songs
+                    .insert([payload]);
+
+                if (error) {
+                    // RLS veya benzeri bir problem varsa error.message burada olacak
+                    showMessage(adminMsg, "Hata: " + error.message, "error");
+                    console.error("Supabase insert error:", error);
+                    // Eğer RLS hatasıysa kullanıcıya SQL düzeltmesi gerektiğini söyle
+                    if (error.message && error.message.toLowerCase().includes('row-level')) {
+                        adminMsg.innerText += " — RLS policy izinlerini kontrol et (SQL tarafında insert izni ver).";
+                    }
+                } else {
+                    showMessage(adminMsg, "Şarkı başarıyla eklendi ✅", "success");
+                    // form temizle
+                    document.getElementById('song-name').value = '';
+                    document.getElementById('song-artist').value = '';
+                    document.getElementById('song-image').value = '';
+                    document.getElementById('song-url').value = '';
+                    await loadSongs();
+                }
+            } catch (err) {
+                showMessage(adminMsg, "Beklenmeyen hata: " + (err.message || err), "error");
+                console.error("Insert exception:", err);
+            } finally {
+                addSongBtn.disabled = false;
+            }
+        }
+
+        // Şarkı isteği gönderme
+        async function sendSongRequest() {
+            userRequestMsg.innerText = "";
+            userRequestMsg.className = "status-message";
+            
+            const name = document.getElementById('request-song-name').value.trim();
+            const artist = document.getElementById('request-song-artist').value.trim();
+            const url = document.getElementById('request-song-url').value.trim();
+
+            if (!name || !artist || !url) {
+                showMessage(userRequestMsg, "Lütfen tüm zorunlu alanları doldurun.", "error");
+                return;
+            }
+
+            // URL'nin geçerli bir catbox URL'si olup olmadığını kontrol et
+            if (!url.includes('catbox.moe')) {
+                showMessage(userRequestMsg, "Lütfen geçerli bir catbox.moe URL'si girin.", "error");
+                return;
+            }
+
+            try {
+                showMessage(userRequestMsg, "İstek gönderiliyor...", "info");
+                sendRequestBtn.disabled = true;
+
+                const payload = { 
+                    name, 
+                    artist, 
+                    file_url: url,
+                    status: 'pending' // pending, approved, rejected
+                };
+                
+                const { data, error } = await supabase
+                    .from('SongRequests')    // Yeni tablo
+                    .insert([payload]);
+
+                if (error) {
+                    showMessage(userRequestMsg, "Hata: " + error.message, "error");
+                    console.error("Supabase insert error:", error);
+                } else {
+                    showMessage(userRequestMsg, "Şarkı isteği başarıyla gönderildi ✅", "success");
+                    // form temizle
+                    document.getElementById('request-song-name').value = '';
+                    document.getElementById('request-song-artist').value = '';
+                    document.getElementById('request-song-url').value = '';
+                }
+            } catch (err) {
+                showMessage(userRequestMsg, "Beklenmeyen hata: " + (err.message || err), "error");
+                console.error("Insert exception:", err);
+            } finally {
+                sendRequestBtn.disabled = false;
+            }
+        }
+
+        // Giriş isteklerini yükle (admin için)
+        async function loadAccessRequests() {
+            accessRequestsList.innerHTML = '<li class="status-message status-info">Yükleniyor...</li>';
+            try {
+                const { data, error } = await supabase
+                    .from('AccessRequests')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    accessRequestsList.innerHTML = '<li class="status-message status-error">İstekler yüklenemedi: ' + error.message + '</li>';
+                    console.error("Supabase select error:", error);
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    accessRequestsList.innerHTML = '<li class="status-message status-info">Henüz giriş isteği yok.</li>';
+                    return;
+                }
+
+                accessRequestsList.innerHTML = '';
+                data.forEach(request => {
+                    const li = document.createElement('li');
+                    li.className = 'request-item';
+                    li.innerHTML = `
+                        <div class="request-info">
+                            <div style="font-weight: 600; font-size: 1.1rem; color: white;">IP Adresi: ${escapeHtml(request.ip || '')}</div>
+                            <div style="color: rgba(255,255,255,0.7); margin: 8px 0;">Durum: ${request.status || 'pending'}</div>
+                            <div style="color: rgba(255,255,255,0.7);">İstek Zamanı: ${new Date(request.created_at).toLocaleString('tr-TR')}</div>
+                        </div>
+                        ${request.status === 'pending' ? `
+                            <div class="request-actions">
+                                <button class="btn btn-sm approve-access-btn" data-ip="${escapeAttr(request.ip)}">
+                                    <i class="fas fa-check"></i> Onayla
+                                </button>
+                            </div>
+                        ` : ''}
+                    `;
+                    accessRequestsList.appendChild(li);
+                });
+
+                // Onayla butonlarına event ekle
+                document.querySelectorAll('.approve-access-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const ip = btn.getAttribute('data-ip');
+                        approveAccessRequest(ip);
+                    });
+                });
+
+            } catch (err) {
+                accessRequestsList.innerHTML = '<li class="status-message status-error">Beklenmeyen istek yükleme hatası: ' + (err.message || err) + '</li>';
+                console.error(err);
+            }
+        }
+
+        // Tüm giriş isteklerini onayla
+        async function approveAllAccessRequests() {
+            try {
+                const { data: requests, error: fetchError } = await supabase
+                    .from('AccessRequests')
+                    .select('*')
+                    .eq('status', 'pending');
+
+                if (fetchError) {
+                    console.error("İstekleri getirme hatası:", fetchError);
+                    return;
+                }
+
+                if (!requests || requests.length === 0) {
+                    alert("Onay bekleyen istek bulunamadı.");
+                    return;
+                }
+
+                // Tüm bekleyen istekleri onayla
+                for (const request of requests) {
+                    const { error } = await supabase
+                        .from('AccessRequests')
+                        .update({ status: 'approved' })
+                        .eq('id', request.id);
+
+                    if (error) {
+                        console.error(`IP ${request.ip} onaylama hatası:`, error);
+                    } else {
+                        // Onaylanan IP'yi localStorage'a ekle
+                        if (!approvedIPs.includes(request.ip)) {
+                            approvedIPs.push(request.ip);
+                        }
+                    }
+                }
+
+                // localStorage'ı güncelle
+                localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+                
+                // Listeyi yenile
+                await loadAccessRequests();
+                
+                alert("Tüm istekler onaylandı!");
+            } catch (err) {
+                console.error("Toplu onaylama hatası:", err);
+            }
+        }
+
+        // Giriş isteğini onayla
+        async function approveAccessRequest(ip) {
+            try {
+                const { error } = await supabase
+                    .from('AccessRequests')
+                    .update({ status: 'approved' })
+                    .eq('ip', ip);
+
+                if (error) {
+                    console.error("İstek onaylama hatası:", error);
+                } else {
+                    // Onaylanan IP'yi localStorage'a ekle
+                    if (!approvedIPs.includes(ip)) {
+                        approvedIPs.push(ip);
+                        localStorage.setItem('approvedIPs', JSON.stringify(approvedIPs));
+                    }
+                    
+                    // Listeyi yenile
+                    await loadAccessRequests();
+                }
+            } catch (err) {
+                console.error("İstek onaylama hatası:", err);
+            }
+        }
+
+        // Şarkı isteklerini yükle (admin için)
+        async function loadSongRequests() {
+            songRequestsList.innerHTML = '<li class="status-message status-info">Yükleniyor...</li>';
+            try {
+                const { data, error } = await supabase
+                    .from('SongRequests')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    songRequestsList.innerHTML = '<li class="status-message status-error">İstekler yüklenemedi: ' + error.message + '</li>';
+                    console.error("Supabase select error:", error);
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    songRequestsList.innerHTML = '<li class="status-message status-info">Henüz şarkı isteği yok.</li>';
+                    return;
+                }
+
+                songRequestsList.innerHTML = '';
+                data.forEach(request => {
+                    const li = document.createElement('li');
+                    li.className = 'request-item';
+                    li.innerHTML = `
+                        <div class="request-info">
+                            <div style="font-weight: 600; font-size: 1.1rem; color: white;">${escapeHtml(request.name || '')} - ${escapeHtml(request.artist || '')}</div>
+                            <div style="color: rgba(255,255,255,0.7); margin: 8px 0;">Durum: ${request.status || 'pending'}</div>
+                            <div style="margin-top: 10px;">
+                                <a href="${escapeAttr(request.file_url || '')}" target="_blank" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-play"></i> Dinle
+                                </a>
+                            </div>
+                        </div>
+                        <div class="request-actions">
+                            ${request.status === 'pending' ? `
+                                <button class="btn btn-sm approve-btn" data-id="${request.id}" data-name="${escapeAttr(request.name)}" data-artist="${escapeAttr(request.artist)}" data-url="${escapeAttr(request.file_url)}">
+                                    <i class="fas fa-check"></i> Onayla
+                                </button>
+                                <button class="btn btn-sm btn-danger reject-btn" data-id="${request.id}">
+                                    <i class="fas fa-times"></i> Reddet
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                    songRequestsList.appendChild(li);
+                });
+
+                // Onayla butonlarına event ekle
+                document.querySelectorAll('.approve-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-id');
+                        const name = btn.getAttribute('data-name');
+                        const artist = btn.getAttribute('data-artist');
+                        const fileUrl = btn.getAttribute('data-url');
+                        
+                        // Şarkı ekleme formunu doldur
+                        document.getElementById('song-name').value = name;
+                        document.getElementById('song-artist').value = artist;
+                        document.getElementById('song-url').value = fileUrl;
+                        
+                        // Şarkı isteğini onayla
+                        approveSongRequest(id);
+                        
+                        // Şarkı ekleme bölümüne geç
+                        document.getElementById('btn-add-song').click();
+                    });
+                });
+
+                // Reddet butonlarına event ekle
+                document.querySelectorAll('.reject-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-id');
+                        rejectSongRequest(id);
+                    });
+                });
+
+            } catch (err) {
+                songRequestsList.innerHTML = '<li class="status-message status-error">Beklenmeyen istek yükleme hatası: ' + (err.message || err) + '</li>';
+                console.error(err);
+            }
+        }
+
+        // Şarkı isteğini onayla
+        async function approveSongRequest(id) {
+            try {
+                const { error } = await supabase
+                    .from('SongRequests')
+                    .update({ status: 'approved' })
+                    .eq('id', id);
+
+                if (error) {
+                    console.error("İstek onaylama hatası:", error);
+                } else {
+                    // Listeyi yenile
+                    await loadSongRequests();
+                }
+            } catch (err) {
+                console.error("İstek onaylama hatası:", err);
+            }
+        }
+
+        // Şarkı isteğini reddet
+        async function rejectSongRequest(id) {
+            try {
+                const { error } = await supabase
+                    .from('SongRequests')
+                    .update({ status: 'rejected' })
+                    .eq('id', id);
+
+                if (error) {
+                    console.error("İstek reddetme hatası:", error);
+                } else {
+                    // Listeyi yenile
+                    await loadSongRequests();
+                }
+            } catch (err) {
+                console.error("İstek reddetme hatası:", err);
+            }
+        }
+
+        // Şarkıları yükle / listele
+        async function loadSongs() {
+            const lists = [songsList, userSongsList];
+            
+            for (const list of lists) {
+                if (list) list.innerHTML = '<div class="status-message status-info">Yükleniyor...</div>';
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('Songs')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    const errorMsg = '<div class="status-message status-error">Liste yüklenemedi: ' + error.message + '</div>';
+                    for (const list of lists) {
+                        if (list) list.innerHTML = errorMsg;
+                    }
+                    console.error("Supabase select error:", error);
+                    return;
+                }
+
+                if (!data || data.length === 极) {
+                    const emptyMsg = '<div class="status-message status-info">Henüz şarkı yok.</div>';
+                    for (const list of lists) {
+                        if (list) list.innerHTML = emptyMsg;
+                    }
+                    return;
+                }
+
+                // Şarkıları global değişkende sakla
+                songs = data;
+                
+                for (const list of lists) {
+                    if (!list) continue;
+                    
+                    list.innerHTML = '';
+                    data.forEach((s, index) => {
+                        const songCard = document.createElement('div');
+                        songCard.className = 'song-card';
+                        songCard.innerHTML = `
+                            <div class="song-image" style="background-image: url('${escapeAttr(s.image || 'https://placehold.co/400x400/4361ee/white?text=♪')}')">
+                                <div class="song-overlay">
+                                    <button class="btn btn-sm" onclick="playSong(${index})">
+                                        <i class="fas fa-play"></i> Oynat
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="song-info">
+                                <div class="song-title">${escapeHtml(s.name || '')}</div>
+                                <div class="song-artist">${escapeHtml(s.artist || '')}</div>
+                                <div class="song-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="playSong(${index})">
+                                        <i class="fas fa-play"></i> Oynat
+                                    </button>
+                                    ${isAdmin() ? `
+                                        <button class="btn btn-sm btn-danger" onclick="deleteSong(${s.id})">
+                                            <i class="fas fa-trash"></i> Sil
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                        list.appendChild(songCard);
+                    });
+                }
+            } catch (err) {
+                const errorMsg = '<div class="status-message status-error">Beklenmeyen liste hatası: ' + (err.message || err) + '</div>';
+                for (const list of lists) {
+                    if (list) list.innerHTML = errorMsg;
+                }
+                console.error(err);
+            }
+        }
+
+        // Şarkıyı sil
+        async function deleteSong(id) {
+            if (!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('Songs')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    console.error("Şarkı silme hatası:", error);
+                    alert("Şarkı silinirken bir hata oluştu: " + error.message);
+                } else {
+                    // Listeyi yenile
+                    await loadSongs();
+                }
+            } catch (err) {
+                console.error("Şarkı silme hatası:", err);
+                alert("Şarkı silinirken bir hata oluştu: " + err.message);
+            }
+        }
+
+        // Şarkıyı çal
+        function playSong(index) {
+            if (index < 0 || index >= songs.length) return;
+            
+            currentSongIndex = index;
+            const song = songs[index];
+            
+            // Müzik çaları göster
+            musicPlayer.classList.remove('hidden');
+            
+            // Bilgileri güncelle
+            playerTitle.textContent = song.name;
+            playerArtist.textContent = song.artist;
+            playerImage.src = song.image || 'https://placehold.co/60x60/4361ee/white?text=♪';
+            
+            // Audio element source'unu güncelle
+            audioElement.src = song.url;
+            
+            // Oynat
+            playSong();
+        }
+
+        // Şarkıyı oynat/durdur
+        function togglePlayPause() {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        }
+
+        // Şarkıyı oynat
+        function playSong() {
+            audioElement.play()
+                .then(() => {
+                    isPlaying = true;
+                    playIcon.className = 'fas fa-pause';
+                })
+                .catch(error => {
+                    console.error("Oynatma hatası:", error);
+                });
+        }
+
+        // Şarkıyı duraklat
+        function pauseSong() {
+            audioElement.pause();
+            isPlaying = false;
+            playIcon.className = 'fas fa-play';
+        }
+
+        // Önceki şarkı
+        function prevSong() {
+            currentSongIndex--;
+            if (currentSongIndex < 0) {
+                currentSongIndex = songs.length - 1;
+            }
+            playSong(currentSongIndex);
+        }
+
+        // Sonraki şarkı
+        function nextSong() {
+            currentSongIndex++;
+            if (currentSongIndex >= songs.length) {
+                currentSongIndex = 0;
+            }
+            playSong(currentSongIndex);
+        }
+
+        // İlerleme çubuğunu güncelle
+        function updateProgress(e) {
+            const { duration, currentTime } = e.srcElement;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        }
+
+        // İlerleme çubuğuna tıklama
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioElement.duration;
+            audioElement.currentTime = (clickX / width) * duration;
+        }
+
+        // Ses seviyesini ayarla
+        function setVolume() {
+            audioElement.volume = this.value / 100;
+        }
+
+        // Müzik çalar event listener'larını kur
+        function setupPlayerEvents() {
+            // Oynat/Duraklat
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            
+            // Önceki/Sonraki
+            prevBtn.addEventListener('click', prevSong);
+            nextBtn.addEventListener('click', nextSong);
+            
+            // İlerleme çubuğu
+            audioElement.addEventListener('timeupdate', updateProgress);
+            progressContainer.addEventListener('click', setProgress);
+            
+            // Ses seviyesi
+            volumeSlider.addEventListener('input', setVolume);
+            
+            // Şarkı bitince
+            audioElement.addEventListener('ended', nextSong);
+        }
+
+        // Arama işlevselliği
+        function setupSearch() {
+            searchInput.addEventListener('input', () => {
+                const searchText = searchInput.value.toLowerCase();
+                const songCards = userSongsList.querySelectorAll('.song-card');
+                
+                songCards.forEach(card => {
+                    const title = card.querySelector('.song-title').textContent.toLowerCase();
+                    const artist = card.querySelector('.song-artist').textContent.toLowerCase();
+                    
+                    if (title.includes(searchText) || artist.includes(searchText)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             });
-            document.querySelectorAll("#admin-panel .sidebar button").forEach(b => b.classList.remove("active"));
-            document.getElementById(id).classList.add("active");
-        });
-    });
-    
-    document.getElementById("addSongBtn").addEventListener('click', addSong);
-    document.getElementById("prevBtn").addEventListener('click', prevSong);
-    document.getElementById("nextBtn").addEventListener('click', nextSong);
-    document.getElementById("toggleBtn").addEventListener('click', togglePlay);
-    
-    // Modal olayları
-    document.getElementById("saveEditBtn").addEventListener('click', saveSongEdit);
-    document.getElementById("cancelEditBtn").addEventListener('click', closeEditModal);
-    
-    // Tümünü sil butonu
-    document.getElementById("delete-all-btn").addEventListener('click', () => {
-        document.getElementById("deleteAllModal").style.display = "flex";
-    });
-    
-    document.getElementById("confirmDeleteAllBtn").addEventListener('click', async () => {
-        document.getElementById("deleteAllModal").style.display = "none";
-        await deleteAllSongs();
-    });
-    
-    document.getElementById("cancelDeleteAllBtn").addEventListener('click', () => {
-        document.getElementById("deleteAllModal").style.display = "none";
-    });
-}
+        }
 
-// Arama & sıralama
-document.getElementById("admin-search").addEventListener('input', e => {
-    searchTerm = e.target.value.toLowerCase();
-    loadSongs();
-});
-
-document.getElementById("user-search").addEventListener('input', e => {
-    searchTerm = e.target.value.toLowerCase();
-    loadSongs();
-});
-
-document.getElementById("admin-sort").addEventListener('change', e => {
-    sortField = e.target.value;
-    loadSongs();
-});
-
-document.getElementById("user-sort").addEventListener('change', e => {
-    sortField = e.target.value;
-    loadSongs();
-});
-
-// Modal dışına tıklanınca kapat
-window.addEventListener('click', (e) => {
-    const editModal = document.getElementById("editModal");
-    const deleteModal = document.getElementById("deleteAllModal");
-    
-    if (e.target === editModal) {
-        closeEditModal();
-    }
-    if (e.target === deleteModal) {
-        deleteModal.style.display = "none";
-    }
-});
-
-// Kullanıcı paneli için basit kurulum
-function setupUserButtons() {
-    const sections = ["user-library-section", "user-now-playing-section"];
-    const buttons = ["user-btn-library", "user-btn-now-playing"];
-    
-    buttons.forEach((id, i) => {
-        document.getElementById(id).addEventListener('click', () => {
-            sections.forEach((s, j) => {
-                document.getElementById(s).style.display = (i === j) ? "block" : "none";
+        // Buton event listener'larını kur
+        function setupButtonEvents() {
+            addSongBtn.addEventListener('click', addSong);
+            clearBtn.addEventListener('click', () => {
+                document.getElementById('song-name').value = '';
+                document.getElementById('song-artist').value = '';
+                document.getElementById('song-image').value = '';
+                document.getElementById('song-url').value = '';
+                adminMsg.innerText = '';
+                adminMsg.className = "status-message";
             });
-            document.querySelectorAll("#user-panel .sidebar button").forEach(b => b.classList.remove("active"));
-            document.getElementById(id).classList.add("active");
-        });
-    });
-    
-    document.getElementById("uPrevBtn").addEventListener('click', prevSong);
-    document.getElementById("uNextBtn").addEventListener('click', nextSong);
-    document.getElementById("uToggleBtn").addEventListener('click', togglePlay);
-}
-</script>
+            
+            sendRequestBtn.addEventListener('click', sendSongRequest);
+            approveAllBtn.addEventListener('click', approveAllAccessRequests);
+            
+            // Sidebar butonları için event listener'lar
+            document.getElementById('btn-library').addEventListener('click', () => {
+                showPanel('library-section');
+                setActiveButton('btn-library');
+            });
+            
+            document.getElementById('btn-add-song').addEventListener('click', () => {
+                showPanel('add-song-section');
+                setActiveButton('btn-add-song');
+            });
+            
+            document.getElementById('btn-song-requests').addEventListener('click', () => {
+                showPanel('song-requests-section');
+                setActiveButton('btn-song-requests');
+            });
+            
+            document.getElementById('btn-access-requests').addEventListener('click', () => {
+                showPanel('access-requests-section');
+                setActiveButton('btn-access-requests');
+            });
+            
+            // Kullanıcı paneli butonları
+            document.getElementById('user-btn-library').addEventListener('click', () => {
+                showUserPanel('user-library-section');
+                setActiveUserButton('user-btn-library');
+            });
+            
+            document.getElementById('user-btn-song-request').addEventListener('click', () => {
+                showUserPanel('user-song-request-section');
+                setActiveUserButton('user-btn-song-request');
+            });
+        }
+
+        // Panel göster
+        function showPanel(panelId) {
+            document.querySelectorAll('.main-content > .panel').forEach(panel => {
+                panel.classList.remove('active-panel');
+            });
+            document.getElementById(panelId).classList.add('active-panel');
+        }
+
+        // Kullanıcı paneli göster
+        function showUserPanel(panelId) {
+            document.querySelectorAll('#user-panel .main-content > .panel').forEach(panel => {
+                panel.classList.remove('active-panel');
+            });
+            document.getElementById(panelId).classList.add('active-panel');
+        }
+
+        // Aktif butonu ayarla
+        function setActiveButton(buttonId) {
+            document.querySelectorAll('#admin-panel .sidebar button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(buttonId).classList.add('active');
+        }
+
+        // Aktif kullanıcı butonunu ayarla
+        function setActiveUserButton(buttonId) {
+            document.querySelectorAll('#user-panel .sidebar button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(buttonId).classList.add('active');
+        }
+
+        // Admin kontrolü
+        function isAdmin() {
+            return adminPanel.style.display === 'block';
+        }
+
+        // Mesaj göster
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = "status-message";
+            if (type === "error") element.classList.add("status-error");
+            if (type === "success") element.classList.add("status-success");
+            if (type === "info") element.classList.add("status-info");
+        }
+
+        // Basit escaping yardımcıları
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>"']/g, function (m) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+            });
+        }
+        function escapeAttr(text) { return escapeHtml(text); }
+
+        // başlat
+        init();
+        
+        // Global fonksiyonlar
+        window.playSong = playSong;
+        window.deleteSong = deleteSong;
+    </script>
 </body>
 </html>
