@@ -53,7 +53,7 @@
     .sidebar-panel button { padding: 12px; background: #081323; border: none; border-radius: 6px; color: #fff; cursor: pointer; text-align:left; }
     .small{font-size:13px;color:var(--muted)}
     #lyrics-box, #user-lyrics-box { position:relative; height:72px; overflow:hidden; margin-top:12px; display:flex; align-items:center; justify-content:center; }
-    .lyric-word { position:absolute; opacity:0; transition: opacity .5s linear; font-weight:700; font-size:20px; text-align:center; padding:0 8px; line-height:1.2; }
+    .lyric-word { position:absolute; opacity:0; transition: opacity .2s linear; font-weight:700; font-size:20px; text-align:center; padding:0 8px; line-height:1.2; }
     <div id="lyrics-display" style="
   margin-top:20px;
   min-height:40px;
@@ -479,7 +479,7 @@ function startLyrics(){
   lyricsInterval = setInterval(()=>{
     if(mainPlayer.paused) return;
     showWord();
-  }, 1500); // 1s görünür + 0.5s fade
+  }, 500); // 1s görünür + 0.5s fade
 }
 
 function stopLyrics(){
