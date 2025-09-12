@@ -19,6 +19,8 @@
     .btn.danger { background:#e63946; color:#fff; }
     .btn.play { background:#4361ee; color:#fff; }
     .btn.edit { background:#f8961e; color:#fff; }
+    .btn.approve { background:#2a9d8f; color:#fff; }
+    .btn.reject { background:#e76f51; color:#fff; }
     .song { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.2); }
     #player-bar { position:fixed; left:0; right:0; bottom:0; background:#000; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
     #now-playing-lyrics, #user-now-playing-lyrics { white-space:pre-wrap; margin-top:10px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; }
@@ -37,10 +39,14 @@
     <div class="sidebar">
       <button id="btn-library" class="active">Kitaplık</button>
       <button id="btn-add-song">Şarkı Ekle</button>
+      <button id="btn-requests">Şarkı İstekleri</button>
       <button id="btn-now-playing">Şu An Çalan</button>
     </div>
 
     <div id="library-section" class="card">
+      <h3>Kitaplık</h3>
+      <!-- ✅ Tüm şarkıları sil butonu -->
+      <button id="deleteAllBtn" class="btn danger">🚨 Tüm Şarkıları Sil</button>
       <div class="controls">
         <input type="text" id="admin-search" placeholder="Ara...">
         <select id="admin-sort">
@@ -53,12 +59,19 @@
     </div>
 
     <div id="add-song-section" class="card" style="display:none;">
+      <h3>Şarkı Ekle</h3>
       <input id="song-name" placeholder="Şarkı adı">
       <input id="song-artist" placeholder="Sanatçı">
       <input id="song-url" placeholder="URL">
       <textarea id="song-lyrics" placeholder="Şarkı sözleri (opsiyonel)"></textarea>
+      <input id="song-cover" placeholder="Kapak fotoğrafı URL (opsiyonel)">
       <button id="addSongBtn" class="btn">Ekle</button>
       <div id="admin-msg"></div>
+    </div>
+
+    <div id="requests-section" class="card" style="display:none;">
+      <h3>Şarkı İstekleri</h3>
+      <ul id="requests-list"></ul>
     </div>
 
     <div id="now-playing-section" class="card" style="display:none;">
@@ -78,10 +91,12 @@
     <h2>Kullanıcı Paneli</h2>
     <div class="sidebar">
       <button id="user-btn-library" class="active">Kitaplık</button>
+      <button id="user-btn-request">Şarkı İsteği</button>
       <button id="user-btn-now-playing">Şu An Çalan</button>
     </div>
 
     <div id="user-library-section" class="card">
+      <h3>Kitaplık</h3>
       <div class="controls">
         <input type="text" id="user-search" placeholder="Ara...">
         <select id="user-sort">
@@ -91,6 +106,15 @@
         </select>
       </div>
       <ul id="user-songs-list"></ul>
+    </div>
+
+    <div id="user-request-section" class="card" style="display:none;">
+      <h3>Şarkı İsteği Gönder</h3>
+      <input id="req-name" placeholder="Şarkı adı">
+      <input id="req-artist" placeholder="Sanatçı">
+      <input type="file" id="req-file" accept="audio/*">
+      <button id="sendRequestBtn" class="btn">İstek Gönder</button>
+      <div id="req-msg"></div>
     </div>
 
     <div id="user-now-playing-section" class="card" style="display:none;">
@@ -115,36 +139,52 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient("https://zzlrltqrzxjwmtpuvhsi.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g");
+  "YOUR_SUPABASE_ANON_KEY");
 const ADMIN_IP="151.250.4.2";
 let allSongs=[]; let currentIndex=-1;
+
+// Elementler
 const songsList=document.getElementById("songs-list");
 const userSongsList=document.getElementById("user-songs-list");
 const mainPlayer=document.getElementById("main-player");
 const playerInfo=document.getElementById("player-info");
-let sortField="id"; let searchTerm="";
 
-// IP kontrol
+// Admin / User ayrımı
 (async()=>{
   const ip=(await (await fetch("https://api64.ipify.org?format=json")).json()).ip;
-  if(ip===ADMIN_IP){document.getElementById("admin-panel").style.display="block"; document.getElementById("user-type").textContent="Admin"; setupAdminButtons();}
-  else{document.getElementById("user-panel").style.display="block"; document.getElementById("user-type").textContent="Kullanıcı"; setupUserButtons();}
+  if(ip===ADMIN_IP){
+    let pass=prompt("Admin şifresini gir:");
+    if(pass==="efkaza7634"){
+      document.getElementById("admin-panel").style.display="block";
+      document.getElementById("user-type").textContent="Admin";
+      setupAdminButtons();
+    } else {
+      alert("❌ Yanlış şifre!");
+      document.getElementById("user-panel").style.display="block";
+      document.getElementById("user-type").textContent="Kullanıcı";
+      setupUserButtons();
+    }
+  } else {
+    document.getElementById("user-panel").style.display="block";
+    document.getElementById("user-type").textContent="Kullanıcı";
+    setupUserButtons();
+  }
   loadSongs();
+  loadRequests();
 })();
 
 // Şarkı listeleme
 async function loadSongs(){
-  const {data,error}=await supabase.from("Songs").select("*").order(sortField,{ascending:true});
-  if(error){console.error(error);return;}
+  const {data,error}=await supabase.from("Songs").select("*").order("id",{ascending:false});
+  if(error) return console.error(error);
   allSongs=data;
-  const filter=d=>d.name.toLowerCase().includes(searchTerm)||d.artist.toLowerCase().includes(searchTerm);
-  renderList(songsList,data.filter(filter),true);
-  renderList(userSongsList,data.filter(filter),false);
+  renderList(songsList,data,true);
+  renderList(userSongsList,data,false);
 }
 function renderList(list,data,isAdmin){
   list.innerHTML="";
   data.forEach((s,i)=>{
-    const li=document.createElement("li"); li.className="song"; li.dataset.id=s.id;
+    const li=document.createElement("li"); li.className="song";
     li.innerHTML=`<div><strong>${s.name}</strong> - ${s.artist}</div>
       <div>
         <button class="btn play" data-index="${i}">Çal</button>
@@ -154,109 +194,122 @@ function renderList(list,data,isAdmin){
   });
   list.querySelectorAll(".play").forEach(b=>b.onclick=()=>playSong(parseInt(b.dataset.index)));
   if(isAdmin){
-    list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id,b.closest("li")));
+    list.querySelectorAll(".danger").forEach(b=>b.onclick=()=>deleteSong(b.dataset.id));
     list.querySelectorAll(".edit").forEach(b=>b.onclick=()=>editSong(b.dataset.id));
   }
 }
 
+// ✅ Tüm şarkıları silme
+document.getElementById("deleteAllBtn").onclick=async()=>{
+  if(!confirm("🚨 Tüm şarkılar silinecek. Emin misiniz?")) return;
+  await supabase.from("Songs").delete().neq("id",0);
+  loadSongs();
+  alert("✅ Tüm şarkılar silindi!");
+};
+
 // Çalma
 function playSong(i){
-  currentIndex=i;
-  const s=allSongs[i]; if(!s) return;
+  currentIndex=i; const s=allSongs[i]; if(!s) return;
   mainPlayer.src=s.url; mainPlayer.play();
   playerInfo.textContent=`${s.name} - ${s.artist}`;
-  document.getElementById("now-playing-info").textContent=`${s.name} - ${s.artist}`;
-  document.getElementById("user-now-playing-info").textContent=`${s.name} - ${s.artist}`;
-
-  // ✅ Şarkı sözleri
-  const lyricsText = s.lyrics && s.lyrics.trim() ? s.lyrics : "Bu şarkıya söz eklenmemiş.";
-  document.getElementById("now-playing-lyrics").textContent=lyricsText;
-  document.getElementById("user-now-playing-lyrics").textContent=lyricsText;
+  document.getElementById("now-playing-info").textContent=playerInfo.textContent;
+  document.getElementById("user-now-playing-info").textContent=playerInfo.textContent;
+  document.getElementById("now-playing-lyrics").textContent=s.lyrics||"Bu şarkıya söz eklenmemiş.";
+  document.getElementById("user-now-playing-lyrics").textContent=s.lyrics||"Bu şarkıya söz eklenmemiş.";
 }
 
-// Önceki/sonraki
-function prevSong(){ if(currentIndex>0) playSong(currentIndex-1); }
-function nextSong(){ if(currentIndex<allSongs.length-1) playSong(currentIndex+1); }
-function togglePlay(){ if(mainPlayer.paused) mainPlayer.play(); else mainPlayer.pause(); }
+// Tek şarkı silme
+async function deleteSong(id){
+  if(!confirm("Silinsin mi?")) return;
+  await supabase.from("Songs").delete().eq("id",id);
+  loadSongs();
+}
 
-// Şarkı silme ✅
-async function deleteSong(id,element){
-  if(!confirm("Bu şarkıyı silmek istediğinize emin misiniz?")) return;
-
-  const { error } = await supabase.from("Songs").delete().eq("id", id);
-
-  if(error){ 
-    alert("Silme hatası: "+error.message);
-    console.error(error);
-  } else {
-    if(element) element.remove();
-    await loadSongs();
-    alert("✅ Şarkı tamamen silindi");
-  }
+// Düzenleme
+async function editSong(id){
+  const song=allSongs.find(s=>s.id==id); if(!song) return;
+  const newName=prompt("Şarkı adı:",song.name); if(!newName) return;
+  const newArtist=prompt("Sanatçı:",song.artist); if(!newArtist) return;
+  const newUrl=prompt("URL:",song.url); if(!newUrl) return;
+  const newLyrics=prompt("Sözler:",song.lyrics||"");
+  const newCover=prompt("Kapak URL:",song.cover_url||"");
+  await supabase.from("Songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics,cover_url:newCover}).eq("id",id);
+  loadSongs();
 }
 
 // Şarkı ekleme
-async function addSong(){
+document.getElementById("addSongBtn").onclick=async()=>{
   const name=document.getElementById("song-name").value.trim();
   const artist=document.getElementById("song-artist").value.trim();
   const url=document.getElementById("song-url").value.trim();
   const lyrics=document.getElementById("song-lyrics").value.trim();
-  const msg=document.getElementById("admin-msg");
-  if(!name||!artist||!url){msg.textContent="Lütfen tüm alanları doldurun.";return;}
-  const {error}=await supabase.from("Songs").insert([{name,artist,url,lyrics}]);
-  if(error){ msg.textContent="Hata: "+error.message;}
-  else{ msg.textContent="✅ Eklendi"; loadSongs(); }
-}
-document.getElementById("addSongBtn").onclick=addSong;
+  const cover_url=document.getElementById("song-cover").value.trim();
+  await supabase.from("Songs").insert([{name,artist,url,lyrics,cover_url}]);
+  loadSongs();
+};
 
-// Düzenle
-async function editSong(id){
-  const song=allSongs.find(s=>s.id==id); if(!song) return;
-  const newName=prompt("Şarkı adı:",song.name);
-  if(!newName) return;
-  const newArtist=prompt("Sanatçı:",song.artist);
-  if(!newArtist) return;
-  const newUrl=prompt("URL:",song.url);
-  if(!newUrl) return;
-  const newLyrics=prompt("Şarkı sözleri:",song.lyrics||"");
-  const {error}=await supabase.from("Songs").update({name:newName,artist:newArtist,url:newUrl,lyrics:newLyrics}).eq("id",id);
-  if(error) alert("Güncelleme hatası: "+error.message); else loadSongs();
+// Kullanıcı şarkı isteği
+document.getElementById("sendRequestBtn").onclick=async()=>{
+  const name=document.getElementById("req-name").value.trim();
+  const artist=document.getElementById("req-artist").value.trim();
+  const file=document.getElementById("req-file").files[0];
+  const msg=document.getElementById("req-msg");
+  if(!name||!artist||!file){msg.textContent="❌ Tüm alanları doldurun";return;}
+  const { data:up, error:err }=await supabase.storage.from("requests").upload(`songs/${Date.now()}_${file.name}`,file);
+  if(err){ msg.textContent="❌ Yükleme hatası"; return;}
+  const file_url=supabase.storage.from("requests").getPublicUrl(up.path).data.publicUrl;
+  await supabase.from("SongRequests").insert([{name,artist,file_url}]);
+  msg.textContent="✅ İstek gönderildi!";
+};
+
+// Admin istekler
+async function loadRequests(){
+  const {data,error}=await supabase.from("SongRequests").select("*").order("id",{ascending:false});
+  if(error) return;
+  const list=document.getElementById("requests-list"); list.innerHTML="";
+  data.forEach(r=>{
+    const li=document.createElement("li"); li.className="song";
+    li.innerHTML=`<div><strong>${r.name}</strong> - ${r.artist}</div>
+      <div>
+        <audio controls src="${r.file_url}"></audio>
+        <a href="${r.file_url}" download class="btn">İndir</a>
+        <button class="btn approve">Onayla</button>
+        <button class="btn reject">Reddet</button>
+      </div>`;
+    list.appendChild(li);
+    li.querySelector(".approve").onclick=async()=>{
+      await supabase.from("Songs").insert([{name:r.name,artist:r.artist,url:r.file_url,cover_url:r.cover_url}]);
+      await supabase.from("SongRequests").update({status:"approved"}).eq("id",r.id);
+      loadSongs(); loadRequests();
+    };
+    li.querySelector(".reject").onclick=async()=>{
+      await supabase.from("SongRequests").update({status:"rejected"}).eq("id",r.id);
+      loadRequests();
+    };
+  });
 }
 
-// Admin menü
+// Menü setup
 function setupAdminButtons(){
-  const sections=["library-section","add-song-section","now-playing-section"];
-  ["btn-library","btn-add-song","btn-now-playing"].forEach((id,i)=>{
+  const sections=["library-section","add-song-section","requests-section","now-playing-section"];
+  ["btn-library","btn-add-song","btn-requests","btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
       sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
       document.querySelectorAll("#admin-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
   });
-  document.getElementById("prevBtn").onclick=prevSong;
-  document.getElementById("nextBtn").onclick=nextSong;
-  document.getElementById("toggleBtn").onclick=togglePlay;
 }
-// User menü
 function setupUserButtons(){
-  const sections=["user-library-section","user-now-playing-section"];
-  ["user-btn-library","user-btn-now-playing"].forEach((id,i)=>{
+  const sections=["user-library-section","user-request-section","user-now-playing-section"];
+  ["user-btn-library","user-btn-request","user-btn-now-playing"].forEach((id,i)=>{
     document.getElementById(id).onclick=()=>{
       sections.forEach((s,j)=>{document.getElementById(s).style.display=(i===j?"block":"none");});
       document.querySelectorAll("#user-panel .sidebar button").forEach(b=>b.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     };
   });
-  document.getElementById("uPrevBtn").onclick=prevSong;
-  document.getElementById("uNextBtn").onclick=nextSong;
-  document.getElementById("uToggleBtn").onclick=togglePlay;
 }
-
-// Arama & sıralama
-document.getElementById("admin-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
-document.getElementById("user-search").oninput=e=>{searchTerm=e.target.value.toLowerCase();loadSongs();}
-document.getElementById("admin-sort").onchange=e=>{sortField=e.target.value;loadSongs();}
-document.getElementById("user-sort").onchange=e=>{sortField=e.target.value;loadSongs();}
 </script>
 </body>
 </html>
