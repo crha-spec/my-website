@@ -54,6 +54,14 @@
     .small{font-size:13px;color:var(--muted)}
     #lyrics-box, #user-lyrics-box { position:relative; height:72px; overflow:hidden; margin-top:12px; display:flex; align-items:center; justify-content:center; }
     .lyric-word { position:absolute; opacity:0; transition: opacity .5s linear; font-weight:700; font-size:20px; text-align:center; padding:0 8px; line-height:1.2; }
+    <div id="lyrics-display" style="
+  margin-top:20px;
+  min-height:40px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  color:#fff;
+"></div>
     footer{margin-top:14px;color:var(--muted);text-align:center;font-size:13px}
     a.link{color:#8ab4ff;text-decoration:none}
     .muted{color:var(--muted)}
@@ -450,6 +458,10 @@ function showWord(){
     setTimeout(()=> userBox.style.opacity = "1", 20);
     setTimeout(()=> userBox.style.opacity = "0", 1000);
   }
+  const lyricsDisplay = document.getElementById("lyrics-display");
+if (lyricsDisplay) {
+  lyricsDisplay.textContent = word;
+}
   wordIdx = (wordIdx + 1) % Math.max(1, lyricsWords.length);
 }
 
