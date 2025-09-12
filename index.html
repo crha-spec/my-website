@@ -60,7 +60,7 @@
           <h3>Şarkı Ekle (Admin)</h3>
           <input id="song-name" placeholder="Şarkı adı" />
           <input id="song-artist" placeholder="Sanatçı" />
-          <input id="song-url" placeholder="MP3 URL (catbox veya direkt mp3 linki)" />
+          <input id="song-file_url" placeholder="MP3 URL (catbox veya direkt mp3 linki)" />
           <input id="song-cover" placeholder="Kapak görseli URL (opsiyonel)" />
           <textarea id="song-lyrics" placeholder="Sözler (.lrc time-coded önerilir)"></textarea>
           <div style="display:flex;gap:8px;margin-top:8px">
@@ -82,7 +82,7 @@
           <div style="background:#f1f5f9;padding:10px;border-radius:6px;margin:8px 0">
             <div class="muted">Dosyayı <a href="https://catbox.moe" target="_blank">catbox.moe</a>'ye yükleyin; çıkan linki yapıştırın.</div>
           </div>
-          <input id="req-url" placeholder="Catbox linki (https://files.catbox.moe/...)" />
+          <input id="req-file_url" placeholder="Catbox linki (https://files.catbox.moe/...)" />
           <input id="req-cover" placeholder="Kapak görseli URL (opsiyonel)" />
           <textarea id="req-lyrics" placeholder="Sözler (.lrc zamanlı önerilir)"></textarea>
           <div style="display:flex;gap:8px;margin-top:8px">
@@ -121,8 +121,8 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 /* ================================================================= */
 
 const ADMIN_IP = "151.250.4.2";   // admin IP (gerekirse değiştir)
@@ -287,10 +287,10 @@ function rendersongs(){
     if(!song) return;
     const name = prompt('Şarkı adı:', song.name); if(!name) return;
     const artist = prompt('Sanatçı:', song.artist); if(!artist) return;
-    const url = prompt('URL:', song.url); if(!url) return;
+    const file_url = prompt('URL:', song.file_url); if(!file_url) return;
     const cover = prompt('Kapak URL:', song.cover_url||'');
     const lyrics = prompt('Sözler (.lrc zamanlı tercih):', song.lyrics||'');
-    const { error } = await supabase.from('songs').update({name,artist,url,cover_url:cover,lyrics}).eq('id', id);
+    const { error } = await supabase.from('songs').update({name,artist,file_url,cover_url:cover,lyrics}).eq('id', id);
     if(error) alert('Güncelleme hatası: '+error.message);
     else await loadsongs();
   });
@@ -329,7 +329,7 @@ function renderRequests(){
       if(sel.error || !sel.data){ alert('İstek alınamadı: '+(sel.error?sel.error.message:'')); return; }
       const req = sel.data;
       // songs tablosuna ekle
-      const ins = await supabase.from('songs').insert([{ name:req.name, artist:req.artist, url:req.file_url, cover_url:req.cover_url, lyrics:req.lyrics }]);
+      const ins = await supabase.from('songs').insert([{ name:req.name, artist:req.artist, file_url:req.file_url, cover_url:req.cover_url, lyrics:req.lyrics }]);
       if(ins.error){ alert('Kitaplığa ekleme hatası: '+ins.error.message); console.error(ins.error); return; }
       // request status update
       await supabase.from('songrequests').update({ status:'approved' }).eq('id', id);
@@ -339,7 +339,7 @@ function renderRequests(){
       await sleep(300); // kısa bekle, DB'nin güncellenmesi için
       const all = await supabase.from('songs').select('*').order('id',{ascending:true});
       if(!all.error){
-        const idx = (all.data||[]).findIndex(x => x.url === req.file_url && x.name === req.name);
+        const idx = (all.data||[]).findIndex(x => x.file_url === req.file_url && x.name === req.name);
         if(idx >= 0) playSongByIndex(idx);
       }
     };
@@ -359,7 +359,7 @@ async function handleSendRequest(){
 async function handleSendRequestImpl(){
   const name = document.getElementById('req-name').value.trim();
   const artist = document.getElementById('req-artist').value.trim();
-  const file_url = document.getElementById('req-url').value.trim();
+  const file_url = document.getElementById('req-file_url').value.trim();
   const cover = document.getElementById('req-cover').value.trim();
   const lyrics = document.getElementById('req-lyrics').value.trim();
   const msgEl = document.getElementById('req-msg');
@@ -381,7 +381,7 @@ async function handleSendRequestImpl(){
   // form temizle
   document.getElementById('req-name').value = '';
   document.getElementById('req-artist').value = '';
-  document.getElementById('req-url').value = '';
+  document.getElementById('req-file_url').value = '';
   document.getElementById('req-cover').value = '';
   document.getElementById('req-lyrics').value = '';
   // admin listesi yenile
@@ -392,12 +392,12 @@ async function handleSendRequestImpl(){
 async function handleAddSong(){
   const name = document.getElementById('song-name').value.trim();
   const artist = document.getElementById('song-artist').value.trim();
-  const url = document.getElementById('song-url').value.trim();
+  const file_url = document.getElementById('song-file_url').value.trim();
   const cover = document.getElementById('song-cover').value.trim();
   const lyrics = document.getElementById('song-lyrics').value.trim();
   addMsg.textContent = '';
-  if(!name || !artist || !url){ addMsg.textContent = 'Eksik alanlar'; return; }
-  const res = await supabase.from('songs').insert([{ name, artist, url, cover_url: cover, lyrics }]);
+  if(!name || !artist || !file_url){ addMsg.textContent = 'Eksik alanlar'; return; }
+  const res = await supabase.from('songs').insert([{ name, artist, file_url, cover_url: cover, lyrics }]);
   if(res.error){ addMsg.textContent = 'Hata: '+res.error.message; console.error(res.error); return; }
   addMsg.textContent = '✅ Eklendi';
   clearAddForm();
@@ -407,7 +407,7 @@ async function handleAddSong(){
 function clearAddForm(){
   document.getElementById('song-name').value = '';
   document.getElementById('song-artist').value = '';
-  document.getElementById('song-url').value = '';
+  document.getElementById('song-file_url').value = '';
   document.getElementById('song-cover').value = '';
   document.getElementById('song-lyrics').value = '';
 }
@@ -443,7 +443,7 @@ function showNowPlaying(song){
   npCover.src = song.cover_url || 'https://via.placeholder.com/256x256?text=No+Cover';
   npTitle.textContent = song.name;
   npArtist.textContent = song.artist;
-  audio.src = song.url;
+  audio.src = song.file_url; // DÜZELTME: url yerine file_url
   audio.play().catch(()=>{});
   // lyrics
   lyricSegments = [];
