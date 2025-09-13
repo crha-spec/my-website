@@ -396,13 +396,68 @@ if (s.cover_url && s.cover_url.trim() !== "") {
   // now info
   const ni = document.getElementById("now-playing-info"); if(ni) ni.textContent = playerInfo.textContent;
   const ui = document.getElementById("user-now-playing-info"); if(ui) ui.textContent = playerInfo.textContent;
-// lyrics: prepare words (split by whitespace)
-const raw = (s.lyrics && s.lyrics.trim()) ? s.lyrics : "Bu şarkıya söz eklenmemiş.";
-lyricsWords = raw.replace(/\r/g,'').split(/\s+/).filter(Boolean);
-wordIdx = 0;
-stopLyrics();
-showWord(); // ilk kelimeyi göster
-if(!mainPlayer.paused) startLyrics();
+// lyrics: SQL'den zamanlı sözleri çek
+let timedLyrics = [];
+(async ()=>{
+  const { data, error } = await supabase.from("lyrics").select("*").eq("song_id", s.id).order("time_ms", { ascending: true });
+  if (!error && data) {
+    timedLyrics = data;
+  } else {
+    timedLyrics = [{ line:"Bu şarkıya söz eklenmemiş.", time_ms:0 }];
+  }
+})();
+
+// YENI: SQL'den zamanlı sözleri çek ve oynatıcıya bağla
+(async () => {
+  // Tablo adınız 'song_lyrics_timed' ve zaman sütununuz 'start_time' (saniye)
+  const { data, error } = await supabase
+    .from("song_lyrics_timed")
+    .select("*")
+    .eq("song_id", s.id) // Şarkı ID'sine göre filtrele
+    .order("start_time", { ascending: true }); // Zamanına göre sırala
+
+  if (error) {
+    console.error("Şarkı sözleri çekilemedi:", error);
+    return;
+  }
+
+  const timedLyrics = data || [];
+
+  // Oynatıcının zaman güncelleme olayını dinle
+  mainPlayer.ontimeupdate = () => {
+    const currentTime = mainPlayer.currentTime; // Saniye cinsinden mevcut zaman
+
+    // Şu anki zamanı geçmeyen son söz satırını bul
+    const currentLine = timedLyrics
+      .filter(lyric => lyric.start_time <= currentTime)
+      .pop();
+
+    // Eğer bir satır bulunduysa, tüm ekranlarda göster
+    if (currentLine) {
+      const textToShow = currentLine.text;
+
+      // 1. Admin "Şu An Çalan" kısmı
+      const nowLyricElement = document.getElementById("now-lyric");
+      if (nowLyricElement) {
+        nowLyricElement.textContent = textToShow;
+        nowLyricElement.style.opacity = 1;
+      }
+
+      // 2. Kullanıcı "Şu An Çalan" kısmı
+      const userLyricElement = document.getElementById("user-lyric");
+      if (userLyricElement) {
+        userLyricElement.textContent = textToShow;
+        userLyricElement.style.opacity = 1;
+      }
+
+      // 3. Ana Şarkı Sözü Gösterim Alanı (lyrics-display)
+      const lyricsDisplayElement = document.getElementById("lyrics-display");
+      if (lyricsDisplayElement) {
+        lyricsDisplayElement.textContent = textToShow;
+      }
+    }
+  };
+})();
 }
 
 /* edit (prompt-based minimal) */
@@ -490,7 +545,6 @@ function stopAndReset(){
   const a = document.getElementById("now-lyric"), b = document.getElementById("user-lyric");
   if(a) { a.textContent = "Henüz şarkı seçilmedi"; a.style.opacity = 0; }
   if(b) { b.textContent = "Henüz şarkı seçilmedi"; b.style.opacity = 0; }
-  stopLyrics();
   allSongs = []; currentIndex = -1;
 }
 
