@@ -211,7 +211,7 @@
       color:#fff;
     "></div>
 
-    <footer>Single-file — Supabase ile çalışır. (SQL tabloları: songs, songrequests, accessrequests)</footer>
+    <footer>MusicAdder</footer>
   </div>
 
 <script type="module">
@@ -409,19 +409,25 @@ let timedLyrics = [];
 
 // YENI: SQL'den zamanlı sözleri çek ve oynatıcıya bağla
 (async () => {
-  // Tablo adınız 'song_lyrics_timed' ve zaman sütununuz 'start_time' (saniye)
+  // Şarkının URL'sini al (s.url, şarkı nesnenizde url olarak tutuluyor)
+  const songUrl = s.url;
+  console.log("Şarkı Sözleri Aranıyor. URL:", songUrl); // Debug için
+
+  // DOĞRU TABLO ve SÜTUN İSİMLERİNİ KULLAN
   const { data, error } = await supabase
-    .from("song_lyrics_timed")
+    .from("song_lyrics_timed") // <- DOĞRU TABLO ADI
     .select("*")
-    .eq("song_id", s.id) // Şarkı ID'sine göre filtrele
-    .order("start_time", { ascending: true }); // Zamanına göre sırala
+    .eq("song_url", songUrl) // <- DOĞRU SÜTUN ADI: 'song_url'
+    .order("start_time", { ascending: true }); // <- DOĞRU SÜTUN ADI: 'start_time'
 
   if (error) {
     console.error("Şarkı sözleri çekilemedi:", error);
+    // Hata durumunda kullanıcıya "-" göstermeye devam et
     return;
   }
 
   const timedLyrics = data || [];
+  console.log("Bulunan şarkı sözü satırları:", timedLyrics.length, "adet"); // Debug: Kaç satır bulundu?
 
   // Oynatıcının zaman güncelleme olayını dinle
   mainPlayer.ontimeupdate = () => {
