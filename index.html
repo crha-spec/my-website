@@ -512,7 +512,7 @@ document.getElementById("testCover").onclick = ()=>{
 /* ---------------------------
    LYRICS: kelime-kelime, 1s göster, 0.5s fade
    --------------------------- */
-function showWord(){
+/*function showWord(){
   const adminBox = document.getElementById("now-lyric");
   const userBox = document.getElementById("user-lyric");
   const word = lyricsWords.length ? lyricsWords[wordIdx] : "—";
@@ -545,7 +545,7 @@ function startLyrics(){
 
 function stopLyrics(){
   if(lyricsInterval){ clearInterval(lyricsInterval); lyricsInterval = null; }
-}
+}*/
 function stopAndReset(){
   mainPlayer.pause(); mainPlayer.src = ""; playerInfo.textContent = "Henüz şarkı seçilmedi";
   const a = document.getElementById("now-lyric"), b = document.getElementById("user-lyric");
