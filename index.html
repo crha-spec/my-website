@@ -3,50 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InstaChat Single HTML</title>
+<title>InstaChat Full</title>
 <style>
+/* --- GENEL STİLLER --- */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:linear-gradient(135deg,#6e8efb,#a777e3);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-.container{width:100%;max-width:500px;background:white;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;display:flex;flex-direction:column}
-.header{background:linear-gradient(90deg,#4b6cb7,#182848);color:white;padding:20px;text-align:center}
-.chat-container{padding:20px;height:300px;overflow-y:auto;display:flex;flex-direction:column;flex:1;border-bottom:1px solid #eee}
-.message{padding:12px 16px;border-radius:20px;margin-bottom:15px;max-width:80%;word-break:break-word}
-.user-message{background:#e3f2fd;align-self:flex-end;border-bottom-right-radius:5px}
-.bot-message{background:#f1f0f0;align-self:flex-start;border-bottom-left-radius:5px}
-.input-area{display:flex;padding:15px;background:#f9f9f9}
-#message-input{flex:1;padding:12px 15px;border:1px solid #ddd;border-radius:25px;outline:none;font-size:16px}
-#send-button{background:linear-gradient(90deg,#4b6cb7,#182848);color:white;border:none;border-radius:25px;padding:12px 20px;margin-left:10px;cursor:pointer;transition:all 0.3s ease}
-#send-button:hover{background:linear-gradient(90deg,#182848,#4b6cb7);transform:scale(1.05)}
-.user-list{padding:10px;border-top:1px solid #eee;background:#f5f5f5;display:flex;flex-wrap:wrap}
-.user-item{margin:5px;padding:5px 10px;border-radius:15px;background:#eee;cursor:pointer;position:relative}
-.user-item .online-dot{width:10px;height:10px;border-radius:50%;position:absolute;top:5px;right:5px}
-.user-item .online-dot.green{background:green}
-.user-item .online-dot.grey{background:grey}
-.api-status{text-align:center;padding:10px;font-size:14px;color:#666;background-color:#f5f5f5;border-top:1px solid #eee}
+body{background:#121212;color:white;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px;transition:background 0.3s}
+.container{width:100%;max-width:900px;background:#1e1e1e;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 5px 20px rgba(0,0,0,0.5)}
+.header{background:#232323;padding:15px;text-align:center;font-size:18px;font-weight:bold}
+.main{display:flex;flex:1;overflow:hidden}
+/* Kullanıcı ve sohbet bölümü */
+.sidebar{width:250px;background:#2c2c2c;padding:10px;overflow-y:auto}
+.chat-area{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.message{padding:10px 15px;border-radius:20px;margin-bottom:10px;max-width:80%;word-break:break-word}
+.user-message{background:#4caf50;align-self:flex-end;color:white}
+.other-message{background:#555;align-self:flex-start;color:white}
+.input-area{display:flex;margin-top:10px}
+#message-input{flex:1;padding:10px;border-radius:20px;border:none;outline:none}
+#send-button{margin-left:5px;padding:10px 15px;border:none;border-radius:20px;background:#4caf50;color:white;cursor:pointer}
+.user-list-title{margin-bottom:5px;font-weight:bold}
+.user-item{padding:5px 10px;border-radius:15px;margin-bottom:5px;background:#333;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.user-item .online-dot{width:10px;height:10px;border-radius:50%}
+.online-dot.green{background:green}
+.online-dot.grey{background:grey}
+/* Admin panel */
+#admin-panel{background:#2a2a2a;padding:10px;display:none;margin-top:10px;border-radius:10px}
+.admin-section{margin-bottom:10px}
+/* Şarkı player */
+#music-player{width:100%;margin-top:10px}
+/* Buton sesleri */
+button{position:relative}
 </style>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<!-- Agora RTM -->
-<script src="https://download.agora.io/sdk/release/AgoraRTM_N.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 </head>
 <body>
 <div class="container">
-<div class="header">
-<h1>InstaChat Single HTML</h1>
-<p>Online kullanıcı: <span id="online-count">0</span></p>
+<div class="header">InstaChat Full - Gerçek Zamanlı</div>
+<div class="main">
+    <div class="sidebar">
+        <div class="user-list-title">Online Kullanıcılar</div>
+        <div id="user-list"></div>
+        <div id="admin-panel">
+            <div class="admin-section"><strong>Admin Paneli</strong></div>
+            <div class="admin-section">
+                Tema: 
+                <button class="theme-btn" onclick="changeTheme('dark')">Dark</button>
+                <button class="theme-btn" onclick="changeTheme('light')">Light</button>
+            </div>
+            <div class="admin-section">
+                Şarkı Linki: <input type="text" id="music-url" placeholder="https://...">
+                <button onclick="playMusic()">Çal</button>
+                <button onclick="stopMusic()">Durdur</button>
+            </div>
+        </div>
+    </div>
+    <div class="chat-area">
+        <div id="chat-container" style="flex:1;overflow-y:auto"></div>
+        <div class="input-area">
+            <input type="text" id="message-input" placeholder="Mesaj yaz...">
+            <button id="send-button">Gönder</button>
+        </div>
+        <audio id="music-player" controls></audio>
+    </div>
 </div>
-<div class="user-list" id="user-list"></div>
-<div class="chat-container" id="chat-container"></div>
-<div class="input-area">
-<input type="text" id="message-input" placeholder="Mesajınızı yazın...">
-<button id="send-button">Gönder</button>
-</div>
-<div class="api-status" id="api-status">Durum: Hazır</div>
 </div>
 
 <script>
-// Firebase config
+// --- FIREBASE KONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyAx6kLcjHyoFKCdnRF0YkPrNXml-kxMMgE",
   authDomain: "instachatclone-a37f8.firebaseapp.com",
@@ -57,124 +82,109 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
-// Kullanıcı bilgisi
-let uid, username, userIP;
-const chatContainer = document.getElementById('chat-container');
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-const userListEl = document.getElementById('user-list');
-const onlineCountEl = document.getElementById('online-count');
-let currentChatUser = null;
+// --- KULLANICI KONTROL VE IP ---
+let uid = "user_" + Math.floor(Math.random()*10000);
+let nickname = prompt("Bir nickname girin:","Kullanici"+Math.floor(Math.random()*999));
+let userIP = "";
+(async ()=>{
+    try{
+        const res = await fetch("https://api64.ipify.org?format=json");
+        const j = await res.json();
+        userIP = j.ip || "unknown";
+        db.collection("users").doc(uid).set({
+            nickname,
+            online:true,
+            ip:userIP,
+            lastSeen:new Date()
+        });
+        window.addEventListener("beforeunload",()=>{
+            db.collection("users").doc(uid).update({online:false,lastSeen:new Date()});
+        });
+        loadUsers();
+    }catch(e){ console.error(e); }
+})();
 
-// IP alma
-async function getUserIP(){
-    const res = await fetch('https://api.ipify.org?format=json');
-    const data = await res.json();
-    return data.ip;
-}
-
-// Kullanıcıyı başlat
-async function initUser(){
-    userIP = await getUserIP();
-    const snapshot = await db.collection("users").where("ip","==",userIP).get();
-    if(snapshot.empty){
-        // Yeni kullanıcı
-        username = prompt("Nickname giriniz:");
-        uid = "user_" + Math.floor(Math.random()*10000);
-        db.collection("users").doc(uid).set({name:username,online:true,lastSeen:new Date(),ip:userIP});
-    }else{
-        const doc = snapshot.docs[0];
-        uid = doc.id;
-        username = doc.data().name;
-        db.collection("users").doc(uid).update({online:true,lastSeen:new Date()});
-    }
-
-    window.addEventListener("beforeunload",()=>{db.collection("users").doc(uid).update({online:false,lastSeen:new Date()})});
-    initAgora();
-    loadUsers();
-}
-
-// Agora RTM
-const APP_ID = "3962323028604aeaa62ef04c08298341";
-let client;
-function initAgora(){
-    client = AgoraRTM.createInstance(APP_ID);
-    client.login({uid, token:null}).then(()=>{
-        document.getElementById('api-status').textContent = "Agora RTM bağlandı";
-    });
-}
-
-// Kullanıcı listesi ve online sayısı
+// --- ONLINE KULLANICI LİSTESİ ---
+const userListEl = document.getElementById("user-list");
 function loadUsers(){
-    db.collection("users").onSnapshot(snapshot=>{
+    db.collection("users").onSnapshot(snap=>{
         userListEl.innerHTML='';
         let onlineCount = 0;
-        snapshot.forEach(doc=>{
+        snap.forEach(doc=>{
             const u = doc.data();
-            if(u.ip !== userIP){
-                const div = document.createElement('div');
-                div.className='user-item';
-                div.textContent=u.name;
-                const dot = document.createElement('div');
-                dot.className='online-dot ' + (u.online ? 'green':'grey');
-                div.appendChild(dot);
-                div.onclick=()=>selectChat(doc.id,u.name);
-                userListEl.appendChild(div);
+            if(u.online){
+                onlineCount++;
+                if(u.uid !== uid){
+                    const div = document.createElement('div');
+                    div.className='user-item';
+                    div.textContent = u.nickname;
+                    const dot = document.createElement('div');
+                    dot.className='online-dot green';
+                    div.appendChild(dot);
+                    userListEl.appendChild(div);
+                }
             }
-            if(u.online) onlineCount++;
         });
-        // Kendini dahil et
-        const currentUserDoc = snapshot.docs.find(d=>d.id===uid);
-        if(currentUserDoc && currentUserDoc.data().online) onlineCount++;
-        onlineCountEl.textContent = onlineCount;
+        if(onlineCount===1) userListEl.innerHTML+='<div>Şu anda online kullanıcı yok</div>';
     });
 }
 
-// Chat seçimi
-function selectChat(userId,userName){
-    currentChatUser = userId;
-    chatContainer.innerHTML='';
-    db.collection("messages")
-      .where("participants","array-contains",uid)
-      .orderBy("timestamp")
-      .onSnapshot(snapshot=>{
-          chatContainer.innerHTML='';
-          snapshot.forEach(doc=>{
-              const m = doc.data();
-              if(m.participants.includes(currentChatUser)){
-                  addMessage(m.text,m.sender===uid?'user':'bot');
-              }
-          });
-      });
-}
+// --- MESAJLAŞMA ---
+let currentChat = "global";
+const chatContainer = document.getElementById("chat-container");
+const messageInput = document.getElementById("message-input");
+const sendButton = document.getElementById("send-button");
 
-// Mesaj gönder
-async function sendMessage(){
-    if(!messageInput.value.trim() || !currentChatUser) return;
+sendButton.onclick = sendMessage;
+messageInput.addEventListener("keypress",e=>{if(e.key==='Enter') sendMessage();});
+
+function sendMessage(){
+    playButtonSound();
     const text = messageInput.value.trim();
-    await db.collection("messages").add({
+    if(!text) return;
+    db.collection("messages").add({
         text,
-        sender: uid,
-        participants: [uid,currentChatUser],
-        timestamp: new Date()
+        sender:nickname,
+        timestamp:new Date(),
+        chat:currentChat
     });
-    addMessage(text,'user');
     messageInput.value='';
 }
-
-function addMessage(text,sender){
-    const div=document.createElement('div');
-    div.className='message '+sender+'-message';
-    div.textContent=text;
-    chatContainer.appendChild(div);
+db.collection("messages").where("chat","==","global").orderBy("timestamp")
+.onSnapshot(snapshot=>{
+    chatContainer.innerHTML='';
+    snapshot.forEach(doc=>{
+        const m = doc.data();
+        const div = document.createElement('div');
+        div.className = m.sender===nickname?'message user-message':'message other-message';
+        div.textContent = m.sender+": "+m.text;
+        chatContainer.appendChild(div);
+    });
     chatContainer.scrollTop = chatContainer.scrollHeight;
+});
+
+// --- ADMIN PANEL TEMASI ---
+function changeTheme(t){
+    playButtonSound();
+    if(t==='dark') document.body.style.background="#121212";
+    else document.body.style.background="#f5f5f5";
 }
 
-sendButton.addEventListener('click',sendMessage);
-messageInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMessage();});
+// --- ŞARKI ÇALMA ---
+const musicPlayer = document.getElementById("music-player");
+function playMusic(){
+    playButtonSound();
+    const url = document.getElementById("music-url").value;
+    if(url) musicPlayer.src = url;
+    musicPlayer.play();
+}
+function stopMusic(){ playButtonSound(); musicPlayer.pause(); musicPlayer.currentTime=0; }
 
-initUser();
+// --- BUTON SESLERİ ---
+const btnSound = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
+function playButtonSound(){ btnSound.currentTime=0; btnSound.play(); }
 </script>
 </body>
 </html>
