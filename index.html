@@ -9,8 +9,11 @@
 body{background:linear-gradient(135deg,#6e8efb,#a777e3);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px}
 .container{width:100%;max-width:800px;background:white;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;display:flex;flex-direction:column;margin-top:20px}
 .header{background:linear-gradient(90deg,#4b6cb7,#182848);color:white;padding:20px;text-align:center;position:relative}
-.header h2{display:flex;align-items:center;justify-content:center;gap:10px}
+.header-content{display:flex;justify-content:space-between;align-items:center;}
+.header h2{display:flex;align-items:center;justify-content:center;gap:10px;margin:0}
 .header h2 svg{width:24px;height:24px}
+.user-info{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.2);padding:5px 10px;border-radius:15px;}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#4b6cb7;}
 .chat-area{display:flex;height:400px}
 .user-list-container{width:30%;background:#f5f5f5;border-right:1px solid #eee;overflow-y:auto;padding:10px}
 .chat-container{width:70%;padding:20px;height:100%;overflow-y:auto;display:flex;flex-direction:column;flex:1}
@@ -39,16 +42,28 @@ body{background:linear-gradient(135deg,#6e8efb,#a777e3);min-height:100vh;display
 .loading{text-align:center;padding:20px;color:#666;}
 .loading::after{content:" ...";animation:dots 1.5s infinite;}
 @keyframes dots{0%,20%{content:" .";}40%{content:" ..";}60%,100%{content:" ...";}}
+.connection-status {position: fixed;bottom: 10px;right: 10px;padding: 5px 10px;border-radius: 5px;font-size: 12px;}
+.connection-status.connected {background: #4CAF50;color: white;}
+.connection-status.disconnected {background: #f44336;color: white;}
+.change-nickname-btn {background: none; border: none; color: white; cursor: pointer; font-size: 12px; margin-left: 5px;}
 </style>
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="notification" id="notification">Yeni mesajınız var!</div>
+<div class="connection-status disconnected" id="connection-status">Bağlantı yok</div>
 
 <div class="container">
   <div class="header">
-    <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg> InstaChat+Music</h2>
+    <div class="header-content">
+      <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg> InstaChat+Music</h2>
+      <div class="user-info" id="user-info">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span id="header-nickname">Misafir</span>
+        <button class="change-nickname-btn" onclick="changeNickname()">✎</button>
+      </div>
+    </div>
   </div>
   
   <div id="online-count">Çevrimiçi Kullanıcılar: <span class="loading">Yükleniyor</span></div>
@@ -96,7 +111,7 @@ const ADMIN_IP = "151.250.4.2";
 
 // Kullanıcı bilgileri
 let userIP = "";
-let uid = "user_" + Math.floor(Math.random() * 10000);
+let uid = "";
 let nickname = "";
 let isAdmin = false;
 let onlineUsers = {};
@@ -105,8 +120,19 @@ let supabaseClient = null;
 
 // Sayfa yüklendiğinde
 window.addEventListener('DOMContentLoaded', async function() {
+  // Kullanıcı ID'sini oluştur veya mevcut ID'yi al
+  uid = localStorage.getItem('user_id');
+  if (!uid) {
+    uid = "user_" + Math.floor(Math.random() * 10000);
+    localStorage.setItem('user_id', uid);
+  }
+  
+  // Kullanıcı adını localStorage'dan al
+  nickname = localStorage.getItem('user_nickname');
+  
   // Supabase bağlantısını kur
   supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  updateConnectionStatus(true);
   
   // IP adresini al
   try {
@@ -120,9 +146,16 @@ window.addEventListener('DOMContentLoaded', async function() {
     userIP = "unknown_" + Math.floor(Math.random() * 1000);
   }
 
-  // Kullanıcı adını sor
-  nickname = prompt("Chat için bir kullanıcı adı belirleyin:", "Kullanıcı" + Math.floor(Math.random() * 100));
-  if (!nickname) nickname = uid;
+  // Kullanıcı adı yoksa veya değiştirilmek isteniyorsa sor
+  if (!nickname) {
+    nickname = prompt("Chat için bir kullanıcı adı belirleyin:", "Kullanıcı" + Math.floor(Math.random() * 100));
+    if (!nickname) nickname = "Kullanıcı" + Math.floor(Math.random() * 100);
+    localStorage.setItem('user_nickname', nickname);
+  }
+  
+  // Kullanıcı adını header'da göster
+  document.getElementById('header-nickname').textContent = nickname;
+  document.getElementById('user-avatar').textContent = nickname.charAt(0).toUpperCase();
   
   // Admin ise özellikleri göster
   if (isAdmin) {
@@ -150,36 +183,79 @@ window.addEventListener('DOMContentLoaded', async function() {
     if (e.key === 'Enter') sendMessage();
   });
   
-  // Periyodik olarak online kullanıcıları güncelle
-  setInterval(loadOnlineUsers, 10000);
-  setInterval(updateUserOnlineStatus, 15000);
+  // Periyodik olarak online kullanıcıları güncelle (5 saniyede bir)
+  setInterval(loadOnlineUsers, 5000);
+  setInterval(updateUserOnlineStatus, 10000);
 });
+
+// Kullanıcı adını değiştirme
+function changeNickname() {
+  const newNickname = prompt("Yeni kullanıcı adınızı girin:", nickname);
+  if (newNickname && newNickname.trim() !== "") {
+    nickname = newNickname.trim();
+    localStorage.setItem('user_nickname', nickname);
+    document.getElementById('header-nickname').textContent = nickname;
+    document.getElementById('user-avatar').textContent = nickname.charAt(0).toUpperCase();
+    
+    // Online kullanıcı listesini güncelle
+    updateUserOnlineStatus();
+    
+    showNotification("Kullanıcı adınız güncellendi: " + nickname);
+  }
+}
+
+// Bağlantı durumunu güncelle
+function updateConnectionStatus(connected) {
+  const statusEl = document.getElementById('connection-status');
+  if (connected) {
+    statusEl.textContent = 'Bağlı';
+    statusEl.className = 'connection-status connected';
+  } else {
+    statusEl.textContent = 'Bağlantı kesildi';
+    statusEl.className = 'connection-status disconnected';
+  }
+}
 
 // Kullanıcıyı online listeye ekle
 async function addUserToOnlineList() {
-  const { error } = await supabaseClient
-    .from('online_users')
-    .upsert({
-      uid: uid,
-      nickname: nickname,
-      ip: userIP,
-      last_seen: new Date().toISOString()
-    });
-  
-  if (error) {
-    console.error('Kullanıcı online listeye eklenemedi:', error);
+  try {
+    const { error } = await supabaseClient
+      .from('online_users')
+      .upsert({
+        uid: uid,
+        nickname: nickname,
+        ip: userIP,
+        last_seen: new Date().toISOString()
+      });
+    
+    if (error) {
+      console.error('Kullanıcı online listeye eklenemedi:', error);
+      updateConnectionStatus(false);
+    }
+  } catch (error) {
+    console.error('Kullanıcı eklenirken hata:', error);
+    updateConnectionStatus(false);
   }
 }
 
 // Kullanıcının online durumunu güncelle
 async function updateUserOnlineStatus() {
-  const { error } = await supabaseClient
-    .from('online_users')
-    .update({ last_seen: new Date().toISOString() })
-    .eq('uid', uid);
-  
-  if (error) {
-    console.error('Online durum güncellenemedi:', error);
+  try {
+    const { error } = await supabaseClient
+      .from('online_users')
+      .update({ 
+        nickname: nickname,
+        last_seen: new Date().toISOString() 
+      })
+      .eq('uid', uid);
+    
+    if (error) {
+      console.error('Online durum güncellenemedi:', error);
+      updateConnectionStatus(false);
+    }
+  } catch (error) {
+    console.error('Durum güncellenirken hata:', error);
+    updateConnectionStatus(false);
   }
 }
 
@@ -196,6 +272,7 @@ async function loadOnlineUsers() {
     
     if (error) {
       console.error('Online kullanıcılar yüklenemedi:', error);
+      updateConnectionStatus(false);
       return;
     }
     
@@ -227,21 +304,26 @@ async function loadOnlineUsers() {
     
     // Online kullanıcıları göster
     renderUsers(onlineCount);
+    updateConnectionStatus(true);
     
   } catch (error) {
     console.error('Online kullanıcılar yüklenirken hata:', error);
+    updateConnectionStatus(false);
   }
 }
 
 // Online kullanıcıları listeleme
 function renderUsers(onlineCount) {
   const userListEl = document.getElementById('user-list');
-  userListEl.innerHTML = '';
   
-  if (Object.keys(onlineUsers).length === 0) {
+  // Eğer hiç kullanıcı yoksa
+  if (onlineCount === 0) {
     userListEl.innerHTML = '<div class="loading">Çevrimiçi kullanıcı bulunamadı</div>';
+    document.getElementById('online-count').innerHTML = `Çevrimiçi Kullanıcılar: 0`;
     return;
   }
+  
+  userListEl.innerHTML = '';
   
   for (const userId in onlineUsers) {
     const user = onlineUsers[userId];
