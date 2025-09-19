@@ -59,37 +59,60 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Kullanıcı bilgisi
-let uid = "user_" + Math.floor(Math.random()*10000);
-let username = uid;
-
-// Agora RTM
-const APP_ID = "3962323028604aeaa62ef04c08298341";
-let client = AgoraRTM.createInstance(APP_ID);
-client.login({uid, token:null}).then(()=>{
-    document.getElementById('api-status').textContent = "Agora RTM bağlandı";
-});
-
-// Online kullanıcıları Firebase'de ekle
-db.collection("users").doc(uid).set({name:username,online:true,lastSeen:new Date()});
-window.addEventListener("beforeunload",()=>{db.collection("users").doc(uid).update({online:false,lastSeen:new Date()})});
-
-// UI
+let uid, username, userIP;
 const chatContainer = document.getElementById('chat-container');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 const userListEl = document.getElementById('user-list');
 const onlineCountEl = document.getElementById('online-count');
-
 let currentChatUser = null;
 
-// Kullanıcı listesi göster ve online sayısını güncelle
+// IP alma
+async function getUserIP(){
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    return data.ip;
+}
+
+// Kullanıcıyı başlat
+async function initUser(){
+    userIP = await getUserIP();
+    const snapshot = await db.collection("users").where("ip","==",userIP).get();
+    if(snapshot.empty){
+        // Yeni kullanıcı
+        username = prompt("Nickname giriniz:");
+        uid = "user_" + Math.floor(Math.random()*10000);
+        db.collection("users").doc(uid).set({name:username,online:true,lastSeen:new Date(),ip:userIP});
+    }else{
+        const doc = snapshot.docs[0];
+        uid = doc.id;
+        username = doc.data().name;
+        db.collection("users").doc(uid).update({online:true,lastSeen:new Date()});
+    }
+
+    window.addEventListener("beforeunload",()=>{db.collection("users").doc(uid).update({online:false,lastSeen:new Date()})});
+    initAgora();
+    loadUsers();
+}
+
+// Agora RTM
+const APP_ID = "3962323028604aeaa62ef04c08298341";
+let client;
+function initAgora(){
+    client = AgoraRTM.createInstance(APP_ID);
+    client.login({uid, token:null}).then(()=>{
+        document.getElementById('api-status').textContent = "Agora RTM bağlandı";
+    });
+}
+
+// Kullanıcı listesi ve online sayısı
 function loadUsers(){
     db.collection("users").onSnapshot(snapshot=>{
         userListEl.innerHTML='';
         let onlineCount = 0;
         snapshot.forEach(doc=>{
             const u = doc.data();
-            if(doc.id !== uid){
+            if(u.ip !== userIP){
                 const div = document.createElement('div');
                 div.className='user-item';
                 div.textContent=u.name;
@@ -101,13 +124,12 @@ function loadUsers(){
             }
             if(u.online) onlineCount++;
         });
-        // Kendini de online sayıya dahil et
+        // Kendini dahil et
         const currentUserDoc = snapshot.docs.find(d=>d.id===uid);
         if(currentUserDoc && currentUserDoc.data().online) onlineCount++;
         onlineCountEl.textContent = onlineCount;
     });
 }
-loadUsers();
 
 // Chat seçimi
 function selectChat(userId,userName){
@@ -151,6 +173,8 @@ function addMessage(text,sender){
 
 sendButton.addEventListener('click',sendMessage);
 messageInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMessage();});
+
+initUser();
 </script>
 </body>
 </html>
