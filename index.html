@@ -25,6 +25,7 @@ body{background:linear-gradient(135deg,#6e8efb,#a777e3);min-height:100vh;display
 #online-count{padding:10px;text-align:center;background:#f5f5f5;font-weight:bold}
 .audio-player{margin-top:10px;text-align:center}
 .theme-button{margin:5px;padding:5px 10px;border-radius:10px;cursor:pointer;background:#ddd;border:none}
+.admin-feature{display:none;}
 </style>
 <!-- Supabase -->
 <script type="module">
@@ -33,8 +34,12 @@ const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
 const supabase = createClient(SUPABASE_URL,SUPABASE_KEY);
 
+const ADMIN_IP = "151.250.4.2"; // admin IP - değiştirilebilir
+
 let userIP = "", uid = "user_" + Math.floor(Math.random()*10000), nickname = "";
 let onlineUsers = {};
+let isAdmin = false;
+let selectedUser = null;
 
 async function init(){
   // IP al
@@ -42,51 +47,129 @@ async function init(){
     const res = await fetch("https://api64.ipify.org?format=json");
     const j = await res.json();
     userIP = j.ip;
+    isAdmin = (userIP === ADMIN_IP);
   }catch(e){console.warn("IP alınamadı",e)}
+
+  // Admin kontrollerini göster/gizle
+  if(isAdmin) {
+    document.querySelectorAll('.admin-feature').forEach(el => {
+      el.style.display = 'block';
+    });
+  }
 
   // Nickname sor
   nickname = prompt("Bir nickname belirleyin:","Kullanici"+Math.floor(Math.random()*100));
   if(!nickname) nickname = uid;
 
   // online kullanıcı kaydı
-  await supabase.from("online_users").upsert({uid,nickname,ip:userIP,last_seen:new Date()});
+  await supabase.from("online_users").upsert({
+    uid, 
+    nickname, 
+    ip: userIP, 
+    last_seen: new Date()
+  });
 
   // Online users update loop
-  setInterval(async ()=>{
-    const { data } = await supabase.from("online_users").select("*");
-    onlineUsers = {};
-    let count=0;
-    data.forEach(u=>{
-      if(u.uid!==uid){
-        onlineUsers[u.uid] = {nickname:u.nickname,online:true};
-        count++;
-      }
-    });
-    renderUsers(count);
-  },2000);
-
+  setInterval(updateOnlineUsers, 2000);
+  
   // Mesaj dinleme
-  supabase.from(`messages:participants=eq.${uid}`).on('INSERT',payload=>{
-    const msg = payload.new;
-    if(msg.sender!==uid) addMessage(msg.text,'bot');
-  }).subscribe();
+  supabase
+    .channel('messages')
+    .on('postgres_changes', 
+      { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'messages',
+        filter: `receiver=eq.${uid}` 
+      }, 
+      (payload) => {
+        const msg = payload.new;
+        if(msg.sender !== uid) {
+          addMessage(`${msg.sender_nickname}: ${msg.text}`, 'bot');
+        }
+      }
+    )
+    .subscribe();
 }
-init();
+
+async function updateOnlineUsers() {
+  const { data, error } = await supabase
+    .from("online_users")
+    .select("*")
+    .gt('last_seen', new Date(Date.now() - 10000).toISOString()); // Sadece son 10 saniye içinde aktif olanlar
+  
+  if(error) {
+    console.error("Online kullanıcılar alınamadı:", error);
+    return;
+  }
+  
+  onlineUsers = {};
+  let count = 0;
+  
+  data.forEach(u => {
+    if(u.uid !== uid) {
+      onlineUsers[u.uid] = {nickname: u.nickname, online: true};
+      count++;
+    }
+  });
+  
+  // Kendimizi de güncelle
+  await supabase.from("online_users").upsert({
+    uid, 
+    nickname, 
+    ip: userIP, 
+    last_seen: new Date()
+  });
+  
+  renderUsers(count);
+}
 
 function renderUsers(count){
   const userListEl = document.getElementById('user-list');
-  userListEl.innerHTML='';
-  Object.keys(onlineUsers).forEach(k=>{
+  userListEl.innerHTML = '';
+  
+  Object.keys(onlineUsers).forEach(k => {
     const u = onlineUsers[k];
     const div = document.createElement('div');
-    div.className='user-item';
+    div.className = 'user-item';
     div.textContent = u.nickname;
+    div.onclick = () => selectUser(k, u.nickname);
+    
     const dot = document.createElement('div');
-    dot.className='online-dot green';
+    dot.className = 'online-dot green';
     div.appendChild(dot);
     userListEl.appendChild(div);
   });
-  document.getElementById('online-count').textContent = "Online Kullanıcı: "+count;
+  
+  document.getElementById('online-count').textContent = "Online Kullanıcı: " + count;
+}
+
+function selectUser(userId, userName) {
+  selectedUser = userId;
+  document.getElementById('chat-container').innerHTML = '';
+  document.getElementById('online-count').textContent = `${userName} ile sohbet`;
+  
+  // Önceki mesajları getir
+  loadMessages(userId);
+}
+
+async function loadMessages(targetUserId) {
+  // İki yönlü mesajları getir
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .or(`and(sender.eq.${uid},receiver.eq.${targetUserId}),and(sender.eq.${targetUserId},receiver.eq.${uid})`)
+    .order('timestamp', { ascending: true });
+  
+  if(error) {
+    console.error("Mesajlar yüklenemedi:", error);
+    return;
+  }
+  
+  data.forEach(msg => {
+    const type = msg.sender === uid ? 'user' : 'bot';
+    addMessage(`${msg.sender_nickname}: ${msg.text}`, type);
+  });
 }
 
 const chatContainer = document.getElementById('chat-container');
@@ -94,25 +177,46 @@ const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 
 async function sendMessage(){
+  if(!selectedUser) {
+    alert("Önce bir kullanıcı seçin!");
+    return;
+  }
+  
   const text = messageInput.value.trim();
   if(!text) return;
-  await supabase.from("messages").insert([{text,sender:uid,participants:[uid],timestamp:new Date()}]);
-  addMessage(text,'user');
-  messageInput.value='';
+  
+  const { error } = await supabase.from("messages").insert([{
+    text, 
+    sender: uid,
+    sender_nickname: nickname,
+    receiver: selectedUser,
+    receiver_nickname: onlineUsers[selectedUser].nickname,
+    timestamp: new Date()
+  }]);
+  
+  if(error) {
+    console.error("Mesaj gönderilemedi:", error);
+    return;
+  }
+  
+  addMessage(`${nickname}: ${text}`, 'user');
+  messageInput.value = '';
 }
 
-function addMessage(text,type){
+function addMessage(text, type){
   const div = document.createElement('div');
-  div.className='message '+type+'-message';
+  div.className = 'message ' + type + '-message';
   div.textContent = text;
   chatContainer.appendChild(div);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-sendButton.addEventListener('click',sendMessage);
-messageInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMessage();});
+sendButton.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', e => {
+  if(e.key === 'Enter') sendMessage();
+});
 
-// Tema değiştir
+// Tema değiştir (sadece admin)
 const themes = [
   {bg:'#6e8efb',gradient:'#a777e3'},
   {bg:'#ff9a9e',gradient:'#fad0c4'},
@@ -120,10 +224,18 @@ const themes = [
 ];
 let themeIdx=0;
 function changeTheme(){
+  if(!isAdmin) {
+    alert("Sadece admin tema değiştirebilir!");
+    return;
+  }
+  
   themeIdx=(themeIdx+1)%themes.length;
   const t = themes[themeIdx];
   document.body.style.background = `linear-gradient(135deg,${t.bg},${t.gradient})`;
 }
+
+// Sayfa yüklendiğinde init çalıştır
+window.addEventListener('DOMContentLoaded', init);
 </script>
 </head>
 <body>
@@ -136,7 +248,7 @@ function changeTheme(){
     <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
     <button id="send-button">Gönder</button>
   </div>
-  <div class="audio-player">
+  <div class="audio-player admin-feature">
     <input type="text" id="song-link" placeholder="Şarkı direct link girin">
     <button onclick="playSong()" class="theme-button">Başlat</button>
     <button onclick="document.getElementById('main-player').pause()" class="theme-button">Durdur</button>
