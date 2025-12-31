@@ -1,546 +1,198 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InstaChat+Music</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:linear-gradient(135deg,#6e8efb,#a777e3);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px}
-.container{width:100%;max-width:800px;background:white;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;display:flex;flex-direction:column;margin-top:20px}
-.header{background:linear-gradient(90deg,#4b6cb7,#182848);color:white;padding:20px;text-align:center;position:relative}
-.header-content{display:flex;justify-content:space-between;align-items:center;}
-.header h2{display:flex;align-items:center;justify-content:center;gap:10px;margin:0}
-.header h2 svg{width:24px;height:24px}
-.user-info{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.2);padding:5px 10px;border-radius:15px;}
-.user-avatar{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#4b6cb7;}
-.chat-area{display:flex;height:400px}
-.user-list-container{width:30%;background:#f5f5f5;border-right:1px solid #eee;overflow-y:auto;padding:10px}
-.chat-container{width:70%;padding:20px;height:100%;overflow-y:auto;display:flex;flex-direction:column;flex:1}
-.message{padding:12px 16px;border-radius:20px;margin-bottom:15px;max-width:80%;word-break:break-word;position:relative}
-.user-message{background:#e3f2fd;align-self:flex-end;border-bottom-right-radius:5px}
-.bot-message{background:#f1f0f0;align-self:flex-start;border-bottom-left-radius:5px}
-.message-sender{font-size:12px;font-weight:bold;margin-bottom:5px}
-.input-area{display:flex;padding:15px;background:#f9f9f9;border-top:1px solid #eee}
-#message-input{flex:1;padding:12px 15px;border:1px solid #ddd;border-radius:25px;outline:none;font-size:16px}
-#send-button{background:linear-gradient(90deg,#4b6cb7,#182848);color:white;border:none;border-radius:25px;padding:12px 20px;margin-left:10px;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:5px}
-#send-button:hover{background:linear-gradient(90deg,#182848,#4b6cb7);transform:scale(1.05)}
-.user-item{margin:5px 0;padding:10px;border-radius:10px;background:#eee;cursor:pointer;position:relative;display:flex;align-items:center;gap:10px;transition:all 0.3s ease}
-.user-item:hover{background:#e0e0e0;transform:translateX(5px)}
-.user-item .online-dot{width:12px;height:12px;border-radius:50%;background:green}
-.user-item .user-info{flex:1}
-.user-item .user-name{font-weight:bold}
-.user-item .user-status{font-size:12px;color:#666}
-#online-count{padding:10px;text-align:center;background:#f5f5f5;font-weight:bold;border-bottom:1px solid #eee}
-.audio-player{margin-top:10px;text-align:center;padding:15px;border-top:1px solid #eee}
-.theme-button{margin:5px;padding:8px 15px;border-radius:10px;cursor:pointer;background:#ddd;border:none;transition:all 0.3s ease}
-.theme-button:hover{background:#ccc}
-.admin-badge{background:gold;color:black;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:bold;margin-left:5px}
-.admin-feature{display:none;}
-.admin-panel{background:#fff3cd;border:1px solid #ffeaa7;border-radius:10px;padding:10px;margin:10px 0;}
-.notification{position:fixed;top:20px;right:20px;background:#4CAF50;color:white;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,0.2);z-index:1000;display:none;}
-.loading{text-align:center;padding:20px;color:#666;}
-.loading::after{content:" ...";animation:dots 1.5s infinite;}
-@keyframes dots{0%,20%{content:" .";}40%{content:" ..";}60%,100%{content:" ...";}}
-.connection-status {position: fixed;bottom: 10px;right: 10px;padding: 5px 10px;border-radius: 5px;font-size: 12px;}
-.connection-status.connected {background: #4CAF50;color: white;}
-.connection-status.disconnected {background: #f44336;color: white;}
-.change-nickname-btn {background: none; border: none; color: white; cursor: pointer; font-size: 12px; margin-left: 5px;}
-</style>
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sana Özel Yılbaşı Mesajı 🦆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Kar taneleri */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            animation: fall linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            text-align: center;
+            animation: slideIn 1s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .duck-image {
+            max-width: 250px;
+            max-height: 250px;
+            width: auto;
+            height: auto;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            object-fit: cover;
+            border: 5px solid #ffd700;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            font-size: 1.3em;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .highlight {
+            color: #764ba2;
+            font-weight: bold;
+            font-size: 1.4em;
+        }
+
+        .hearts {
+            font-size: 2em;
+            margin: 20px 0;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .year {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .sparkle {
+            display: inline-block;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
-<div class="notification" id="notification">Yeni mesajınız var!</div>
-<div class="connection-status disconnected" id="connection-status">Bağlantı yok</div>
+    <div class="container">
+        <img src="https://files.catbox.moe/k1djam.gif" 
+             alt="🪞" 
+             class="duck-image">
+        
+        <h1>🎉 Yeni Yıla Merhaba! 🎉</h1>
+        
+        <div class="hearts">💕✨💕</div>
+        
+        <div class="message">
+            <p>Herkes yeni yıla,</p>
+            <p><span class="highlight">Sen yıllarıma...</span></p>
+        </div>
 
-<div class="container">
-  <div class="header">
-    <div class="header-content">
-      <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg> InstaChat+Music</h2>
-      <div class="user-info" id="user-info">
-        <div class="user-avatar" id="user-avatar">?</div>
-        <span id="header-nickname">Misafir</span>
-        <button class="change-nickname-btn" onclick="changeNickname()">✎</button>
-      </div>
+        <div class="year">2025</div>
+
+        <div class="message">
+            <p class="sparkle">✨</p>
+            <p>Sana baştan beri aşıktım <span class="highlight">Meyve</span></p>
+            <p class="sparkle">✨</p>
+        </div>
+
+        <div class="hearts">💛💕💛</div>
+
+        <div class="footer">
+            <p>Yeni yılın sana sağlık, mutluluk ve</p>
+            <p>en güzel anılar getirmesi dileğiyle... 🌟</p>
+        </div>
     </div>
-  </div>
-  
-  <div id="online-count">Çevrimiçi Kullanıcılar: <span class="loading">Yükleniyor</span></div>
-  
-  <div class="chat-area">
-    <div class="user-list-container">
-      <div class="user-list" id="user-list">
-        <div class="loading">Kullanıcılar yükleniyor</div>
-      </div>
-    </div>
-    
-    <div class="chat-container" id="chat-container">
-      <div class="message bot-message">
-        <div class="message-sender">Sistem</div>
-        <div>Chat uygulamasına hoş geldiniz! Soldaki listeden bir kullanıcı seçerek sohbete başlayabilirsiniz.</div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="input-area">
-    <input type="text" id="message-input" placeholder="Mesajınızı yazın..." disabled>
-    <button id="send-button" disabled>
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      Gönder
-    </button>
-  </div>
-  
-  <div class="audio-player admin-feature">
-    <h3>Admin Müzik Kontrolleri</h3>
-    <input type="text" id="song-link" placeholder="Şarkı direct link girin">
-    <button onclick="playSong()" class="theme-button">Başlat</button>
-    <button onclick="document.getElementById('main-player').pause()" class="theme-button">Durdur</button>
-    <audio id="main-player" controls></audio>
-    <button onclick="changeTheme()" class="theme-button">Tema Değiştir</button>
-  </div>
-</div>
 
-<script>
-// Supabase bağlantı bilgileri
-const SUPABASE_URL = "https://zzlrltqrzxjwmtpuvhsi.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bHJsdHFyenhqd210cHV2aHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1MzU1MTEsImV4cCI6MjA3MzExMTUxMX0.nEW-3ctSbAaQj-d-I01AzkvTM70QzoXBiZmHdC1Yv8g";
-
-// Admin IP adresi
-const ADMIN_IP = "151.250.4.2";
-
-// Kullanıcı bilgileri
-let userIP = "";
-let uid = "";
-let nickname = "";
-let isAdmin = false;
-let onlineUsers = {};
-let selectedUser = null;
-let supabaseClient = null;
-
-// Sayfa yüklendiğinde
-window.addEventListener('DOMContentLoaded', async function() {
-  // Kullanıcı ID'sini oluştur veya mevcut ID'yi al
-  uid = localStorage.getItem('user_id');
-  if (!uid) {
-    uid = "user_" + Math.floor(Math.random() * 10000);
-    localStorage.setItem('user_id', uid);
-  }
-  
-  // Kullanıcı adını localStorage'dan al
-  nickname = localStorage.getItem('user_nickname');
-  
-  // Supabase bağlantısını kur
-  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  updateConnectionStatus(true);
-  
-  // IP adresini al
-  try {
-    const res = await fetch("https://api64.ipify.org?format=json");
-    const data = await res.json();
-    userIP = data.ip;
-    isAdmin = (userIP === ADMIN_IP);
-    console.log("IP adresiniz:", userIP, isAdmin ? "(Admin)" : "");
-  } catch(e) {
-    console.warn("IP alınamadı", e);
-    userIP = "unknown_" + Math.floor(Math.random() * 1000);
-  }
-
-  // Kullanıcı adı yoksa veya değiştirilmek isteniyorsa sor
-  if (!nickname) {
-    nickname = prompt("Chat için bir kullanıcı adı belirleyin:", "Kullanıcı" + Math.floor(Math.random() * 100));
-    if (!nickname) nickname = "Kullanıcı" + Math.floor(Math.random() * 100);
-    localStorage.setItem('user_nickname', nickname);
-  }
-  
-  // Kullanıcı adını header'da göster
-  document.getElementById('header-nickname').textContent = nickname;
-  document.getElementById('user-avatar').textContent = nickname.charAt(0).toUpperCase();
-  
-  // Admin ise özellikleri göster
-  if (isAdmin) {
-    document.querySelectorAll('.admin-feature').forEach(el => {
-      el.style.display = 'block';
-    });
-  }
-  
-  // Kullanıcıyı online listeye ekle
-  await addUserToOnlineList();
-  
-  // Online kullanıcıları yükle
-  await loadOnlineUsers();
-  
-  // Mesajları dinlemeye başla
-  setupMessageListener();
-  
-  // Input ve butonları aktif et
-  document.getElementById('message-input').disabled = false;
-  document.getElementById('send-button').disabled = false;
-  
-  // Mesaj gönderme butonu
-  document.getElementById('send-button').addEventListener('click', sendMessage);
-  document.getElementById('message-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') sendMessage();
-  });
-  
-  // Periyodik olarak online kullanıcıları güncelle (5 saniyede bir)
-  setInterval(loadOnlineUsers, 5000);
-  setInterval(updateUserOnlineStatus, 10000);
-});
-
-// Kullanıcı adını değiştirme
-function changeNickname() {
-  const newNickname = prompt("Yeni kullanıcı adınızı girin:", nickname);
-  if (newNickname && newNickname.trim() !== "") {
-    nickname = newNickname.trim();
-    localStorage.setItem('user_nickname', nickname);
-    document.getElementById('header-nickname').textContent = nickname;
-    document.getElementById('user-avatar').textContent = nickname.charAt(0).toUpperCase();
-    
-    // Online kullanıcı listesini güncelle
-    updateUserOnlineStatus();
-    
-    showNotification("Kullanıcı adınız güncellendi: " + nickname);
-  }
-}
-
-// Bağlantı durumunu güncelle
-function updateConnectionStatus(connected) {
-  const statusEl = document.getElementById('connection-status');
-  if (connected) {
-    statusEl.textContent = 'Bağlı';
-    statusEl.className = 'connection-status connected';
-  } else {
-    statusEl.textContent = 'Bağlantı kesildi';
-    statusEl.className = 'connection-status disconnected';
-  }
-}
-
-// Kullanıcıyı online listeye ekle
-async function addUserToOnlineList() {
-  try {
-    const { error } = await supabaseClient
-      .from('online_users')
-      .upsert({
-        uid: uid,
-        nickname: nickname,
-        ip: userIP,
-        last_seen: new Date().toISOString()
-      });
-    
-    if (error) {
-      console.error('Kullanıcı online listeye eklenemedi:', error);
-      updateConnectionStatus(false);
-    }
-  } catch (error) {
-    console.error('Kullanıcı eklenirken hata:', error);
-    updateConnectionStatus(false);
-  }
-}
-
-// Kullanıcının online durumunu güncelle
-async function updateUserOnlineStatus() {
-  try {
-    const { error } = await supabaseClient
-      .from('online_users')
-      .update({ 
-        nickname: nickname,
-        last_seen: new Date().toISOString() 
-      })
-      .eq('uid', uid);
-    
-    if (error) {
-      console.error('Online durum güncellenemedi:', error);
-      updateConnectionStatus(false);
-    }
-  } catch (error) {
-    console.error('Durum güncellenirken hata:', error);
-    updateConnectionStatus(false);
-  }
-}
-
-// Online kullanıcıları yükle
-async function loadOnlineUsers() {
-  try {
-    // 30 saniye içinde aktif olan kullanıcıları getir
-    const thirtySecondsAgo = new Date(Date.now() - 30000).toISOString();
-    
-    const { data, error } = await supabaseClient
-      .from('online_users')
-      .select('*')
-      .gt('last_seen', thirtySecondsAgo);
-    
-    if (error) {
-      console.error('Online kullanıcılar yüklenemedi:', error);
-      updateConnectionStatus(false);
-      return;
-    }
-    
-    onlineUsers = {};
-    let onlineCount = 0;
-    
-    // Kullanıcıları işle
-    data.forEach(user => {
-      if (user.uid !== uid) {
-        onlineUsers[user.uid] = {
-          nickname: user.nickname,
-          online: true,
-          ip: user.ip,
-          isAdmin: user.ip === ADMIN_IP
-        };
-        onlineCount++;
-      } else {
-        // Kendimizi de listeye ekleyelim
-        onlineUsers[user.uid] = {
-          nickname: user.nickname,
-          online: true,
-          ip: user.ip,
-          isMe: true,
-          isAdmin: user.ip === ADMIN_IP
-        };
-        onlineCount++;
-      }
-    });
-    
-    // Online kullanıcıları göster
-    renderUsers(onlineCount);
-    updateConnectionStatus(true);
-    
-  } catch (error) {
-    console.error('Online kullanıcılar yüklenirken hata:', error);
-    updateConnectionStatus(false);
-  }
-}
-
-// Online kullanıcıları listeleme
-function renderUsers(onlineCount) {
-  const userListEl = document.getElementById('user-list');
-  
-  // Eğer hiç kullanıcı yoksa
-  if (onlineCount === 0) {
-    userListEl.innerHTML = '<div class="loading">Çevrimiçi kullanıcı bulunamadı</div>';
-    document.getElementById('online-count').innerHTML = `Çevrimiçi Kullanıcılar: 0`;
-    return;
-  }
-  
-  userListEl.innerHTML = '';
-  
-  for (const userId in onlineUsers) {
-    const user = onlineUsers[userId];
-    
-    const userItem = document.createElement('div');
-    userItem.className = 'user-item';
-    if (user.isMe) userItem.style.background = '#d1ecf1';
-    
-    userItem.innerHTML = `
-      <div class="online-dot"></div>
-      <div class="user-info">
-        <div class="user-name">${user.nickname} ${user.isAdmin ? '<span class="admin-badge">Admin</span>' : ''} ${user.isMe ? '<span style="color:#17a2b8;">(Siz)</span>' : ''}</div>
-        <div class="user-status">Çevrimiçi - ${user.ip}</div>
-      </div>
-    `;
-    
-    // Kendimiz dışındaki kullanıcılara tıklanabilirlik ekle
-    if (!user.isMe) {
-      userItem.style.cursor = 'pointer';
-      userItem.addEventListener('click', () => selectUser(userId, user.nickname));
-    }
-    
-    userListEl.appendChild(userItem);
-  }
-  
-  document.getElementById('online-count').innerHTML = `Çevrimiçi Kullanıcılar: ${onlineCount}`;
-}
-
-// Kullanıcı seçme
-async function selectUser(userId, userName) {
-  selectedUser = userId;
-  
-  // Sohbet konteynırını güncelle
-  const chatContainer = document.getElementById('chat-container');
-  chatContainer.innerHTML = `
-    <div class="message bot-message">
-      <div class="message-sender">Sistem</div>
-      <div>${userName} ile sohbet ediyorsunuz. Mesajlaşmaya başlayabilirsiniz.</div>
-    </div>
-  `;
-  
-  // Önceki mesajları yükle
-  await loadMessages(userId);
-  
-  // Bildirim göster
-  showNotification(`${userName} ile sohbet başlatıldı`);
-}
-
-// Mesajları yükle
-async function loadMessages(targetUserId) {
-  try {
-    // İki yönlü mesajları getir
-    const { data, error } = await supabaseClient
-      .from('messages')
-      .select('*')
-      .or(`and(sender.eq.${uid},receiver.eq.${targetUserId}),and(sender.eq.${targetUserId},receiver.eq.${uid})`)
-      .order('timestamp', { ascending: true });
-    
-    if (error) {
-      console.error("Mesajlar yüklenemedi:", error);
-      return;
-    }
-    
-    // Mesajları göster
-    data.forEach(msg => {
-      const type = msg.sender === uid ? 'user' : 'bot';
-      const senderName = msg.sender === uid ? 'Siz' : onlineUsers[msg.sender]?.nickname || 'Bilinmeyen';
-      addMessage(`${senderName}: ${msg.text}`, type);
-    });
-    
-  } catch (error) {
-    console.error("Mesajlar yüklenirken hata:", error);
-  }
-}
-
-// Mesaj gönderme
-async function sendMessage() {
-  const messageInput = document.getElementById('message-input');
-  const text = messageInput.value.trim();
-  
-  if (!text) return;
-  
-  if (!selectedUser) {
-    showNotification("Lütfen önce bir kullanıcı seçin");
-    return;
-  }
-  
-  try {
-    // Mesajı veritabanına kaydet
-    const { error } = await supabaseClient
-      .from('messages')
-      .insert([{
-        text: text,
-        sender: uid,
-        sender_nickname: nickname,
-        receiver: selectedUser,
-        receiver_nickname: onlineUsers[selectedUser].nickname,
-        timestamp: new Date().toISOString()
-      }]);
-    
-    if (error) {
-      console.error("Mesaj gönderilemedi:", error);
-      showNotification("Mesaj gönderilemedi: " + error.message);
-      return;
-    }
-    
-    // Mesajı sohbete ekle
-    addMessage(`Siz: ${text}`, 'user');
-    
-    // Input'u temizle
-    messageInput.value = '';
-    
-  } catch (error) {
-    console.error("Mesaj gönderilirken hata:", error);
-    showNotification("Mesaj gönderilemedi");
-  }
-}
-
-// Mesaj dinleyiciyi kur
-function setupMessageListener() {
-  // Gerçek zamanlı mesaj dinleme
-  const subscription = supabaseClient
-    .channel('messages-channel')
-    .on('postgres_changes', 
-      { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'messages',
-        filter: `receiver=eq.${uid}`
-      }, 
-      (payload) => {
-        const newMessage = payload.new;
-        if (newMessage.sender !== uid) {
-          const senderName = onlineUsers[newMessage.sender]?.nickname || 'Bilinmeyen';
-          addMessage(`${senderName}: ${newMessage.text}`, 'bot');
-          
-          // Bildirim göster (eğer seçili kullanıcı değilse veya sohbet ekranında değilse)
-          if (!selectedUser || selectedUser !== newMessage.sender) {
-            showNotification(`${senderName}'dan yeni mesaj: ${newMessage.text.substring(0, 30)}...`);
-          }
+    <script>
+        // Kar taneleri oluştur
+        function createSnowflakes() {
+            const snowflakes = ['❄', '❅', '❆'];
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+                document.body.appendChild(snowflake);
+            }
         }
-      }
-    )
-    .subscribe();
-}
-
-// Mesaj ekleme
-function addMessage(text, type) {
-  const chatContainer = document.getElementById('chat-container');
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `message ${type}-message`;
-  
-  // Mesajı parçalara ayır (göndereni ve içeriği ayır)
-  const parts = text.split(':');
-  if (parts.length > 1) {
-    messageDiv.innerHTML = `
-      <div class="message-sender">${parts[0]}</div>
-      <div>${parts.slice(1).join(':')}</div>
-    `;
-  } else {
-    messageDiv.textContent = text;
-  }
-  
-  chatContainer.appendChild(messageDiv);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-// Bildirim gösterme
-function showNotification(message) {
-  const notification = document.getElementById('notification');
-  notification.textContent = message;
-  notification.style.display = 'block';
-  
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 3000);
-}
-
-// Şarkı çalma (admin özelliği)
-function playSong() {
-  const link = document.getElementById('song-link').value.trim();
-  if (!link) {
-    showNotification("Lütfen bir şarkı linki girin");
-    return;
-  }
-  
-  if (!isAdmin) {
-    showNotification("Bu özellik sadece yöneticiler için");
-    return;
-  }
-  
-  const player = document.getElementById('main-player');
-  player.src = link;
-  player.play();
-  showNotification("Şarkı çalınıyor...");
-}
-
-// Tema değiştirme (admin özelliği)
-function changeTheme() {
-  if (!isAdmin) {
-    showNotification("Bu özellik sadece yöneticiler için");
-    return;
-  }
-  
-  const themes = [
-    {bg:'#6e8efb', gradient:'#a777e3'},
-    {bg:'#ff9a9e', gradient:'#fad0c4'},
-    {bg:'#a1c4fd', gradient:'#c2e9fb'},
-    {bg:'#6a11cb', gradient:'#2575fc'},
-    {bg:'#ff758c', gradient:'#ff7eb3'}
-  ];
-  
-  const randomTheme = themes[Math.floor(Math.random() * themes.length)];
-  document.body.style.background = `linear-gradient(135deg, ${randomTheme.bg}, ${randomTheme.gradient})`;
-  
-  showNotification("Tema değiştirildi!");
-}
-</script>
+        
+        createSnowflakes();
+    </script>
 </body>
 </html>
