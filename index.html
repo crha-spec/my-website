@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sana Özel Yılbaşı Mesajı 🦆</title>
+    <title>FBI Epstein Belgeleri</title>
     <style>
         * {
             margin: 0;
@@ -12,187 +12,843 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
+            flex-direction: column;
         }
 
-        /* Kar taneleri */
-        .snowflake {
-            position: absolute;
-            top: -10px;
-            color: white;
-            font-size: 1em;
-            animation: fall linear infinite;
-            opacity: 0.8;
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #ffd700;
         }
 
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #ffd700;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            text-align: center;
-            animation: slideIn 1s ease-out;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
             position: relative;
-            z-index: 1;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .page-viewer {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
         }
 
-        .duck-image {
-            max-width: 250px;
-            max-height: 250px;
-            width: auto;
-            height: auto;
-            border-radius: 50%;
-            margin: 0 auto 30px;
-            object-fit: cover;
-            border: 5px solid #ffd700;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: bounce 2s ease-in-out infinite;
+        .page-content {
+            position: relative;
+            min-height: 600px;
         }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        h1 {
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .message {
-            font-size: 1.3em;
+        .page {
+            display: none;
+            padding: 40px;
             color: #333;
-            line-height: 1.8;
-            margin-bottom: 30px;
+            line-height: 1.6;
         }
 
-        .highlight {
-            color: #764ba2;
+        .page.active {
+            display: block;
+        }
+
+        .page h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 10px;
+        }
+
+        .page h3 {
+            color: #2a5298;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .page ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .page li {
+            margin-bottom: 8px;
+        }
+
+        .page strong {
+            color: #1e3c72;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
             font-weight: bold;
-            font-size: 1.4em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .hearts {
-            font-size: 2em;
-            margin: 20px 0;
-            animation: pulse 1.5s ease-in-out infinite;
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .year {
-            font-size: 3em;
+        .page-indicator {
+            font-size: 16px;
+            color: #333;
             font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 20px 0;
         }
 
-        .footer {
-            margin-top: 30px;
-            font-style: italic;
-            color: #666;
-            font-size: 0.9em;
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+            border-radius: 4px;
         }
 
-        .sparkle {
-            display: inline-block;
-            animation: sparkle 1s ease-in-out infinite;
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #0c5460;
         }
 
-        @keyframes sparkle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .timeline-item {
+            border-left: 3px solid #2a5298;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .timeline-date {
+            color: #1e3c72;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                padding: 20px;
+            }
+
+            .navigation {
+                padding: 15px 20px;
+            }
+
+            .nav-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>🔒 FBI Jeffrey Epstein Soruşturmaları</h1>
+        <p>UNCLASSIFIED - Resmi FBI Belgeleri</p>
+    </div>
+
     <div class="container">
-        <img src="https://files.catbox.moe/k1djam.gif" 
-             alt="🪞" 
-             class="duck-image">
-        
-        <h1>🎉 Yeni Yıla Merhaba! 🎉</h1>
-        
-        <div class="hearts">💕✨💕</div>
-        
-        <div class="message">
-            <p>Herkes yeni yıla,</p>
-            <p><span class="highlight">Sen yıllarıma...</span></p>
-        </div>
+        <div class="page-viewer">
+            <div class="page-content">
+                <!-- Sayfa 1 -->
+                <div class="page active" data-page="1">
+                    <h2>📋 Jeffrey Epstein Soruşturmaları</h2>
+                    <div class="info-box">
+                        <strong>Dört Ana Soruşturma Dosyası:</strong>
+                    </div>
+                    <ul>
+                        <li><strong>31E-MM-108062:</strong> Çocuk Cinsel Ticareti</li>
+                        <li><strong>72-MM-113327:</strong> Adaleti Engelleme</li>
+                        <li><strong>50D-NY-3027571:</strong> Çocuk Cinsel Ticareti</li>
+                        <li><strong>90A-NY-3151227:</strong> Ölüm Soruşturması</li>
+                    </ul>
+                    <div class="warning">
+                        ⚠️ Bu belge FBI tarafından "UNCLASSIFIED" (Gizli Değil) olarak işaretlenmiştir.
+                    </div>
+                </div>
 
-        <div class="year">2025</div>
+                <!-- Sayfa 2 -->
+                <div class="page" data-page="2">
+                    <h2>📅 Zaman Çizelgesi</h2>
+                    <div class="timeline-item">
+                        <div class="timeline-date">24 Temmuz 2006</div>
+                        FBI West Palm Beach soruşturma başlattı
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Haziran 2008</div>
+                        Epstein savunma anlaşmasını kabul etti
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Eylül 2008</div>
+                        Epstein 18 aylık cezaya başladı
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">6 Aralık 2018</div>
+                        FBI New York, Epstein soruşturması başlattı
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2 Temmuz 2019</div>
+                        Epstein iddianame ile suçlandı
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">6 Temmuz 2019</div>
+                        Epstein, Teterboro havaalanında tutuklandı
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">23 Temmuz 2019</div>
+                        İlk intihar girişimi
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">10 Ağustos 2019</div>
+                        Epstein intihar etti - Ölüm soruşturması başlatıldı
+                    </div>
+                </div>
 
-        <div class="message">
-            <p class="sparkle">✨</p>
-            <p>Sana baştan beri aşıktım <span class="highlight">Meyve</span></p>
-            <p class="sparkle">✨</p>
-        </div>
+                <!-- Sayfa 3 -->
+                <div class="page" data-page="3">
+                    <h2>📁 Soruşturma: 31E-MM-108062</h2>
+                    <h3>İlk Çocuk Cinsel Ticareti Davası</h3>
+                    <div class="timeline-item">
+                        <div class="timeline-date">24 Temmuz 2006</div>
+                        FBI West Palm Beach Resident Agency, Palm Beach County'nin talebi üzerine soruşturma açtı (1 eyalet ağır suç iddianamesi)
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Mayıs 2007</div>
+                        Epstein'a karşı 60 maddelik iddianame hazırlandı
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Temmuz 2007</div>
+                        Epstein'ın avukatları ve Güney Florida Bölgesi savcıları görüştü
+                    </div>
+                    <div class="info-box">
+                        <strong>Savunma Anlaşması Detayları:</strong>
+                        <ul>
+                            <li>2 eyalet düzeyinde suçlama (fuhuş teşviki ve küçükle fuhuş teşviki)</li>
+                            <li>18 ay hapis cezası</li>
+                            <li>Cinsel suçlu olarak kayıt</li>
+                            <li>Epstein ve 4 suç ortağını kapsayan Kovuşturmama Anlaşması</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Haziran 2008</div>
+                        Epstein anlaşmayı kabul etti
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Eylül 2008</div>
+                        Epstein hapishaneye girdi - Günde 12 saat vakfında çalışmasına izin verildi
+                    </div>
+                </div>
 
-        <div class="hearts">💛💕💛</div>
+                <!-- Sayfa 4 -->
+                <div class="page" data-page="4">
+                    <h2>📁 Soruşturma: 72-MM-113327</h2>
+                    <h3>Adaleti Engelleme Davası</h3>
+                    <div class="timeline-item">
+                        <div class="timeline-date">28 Ekim 2009</div>
+                        FBI Miami Palm Beach, Epstein'ın eski çalışanı Alfredo Rodriguez hakkında adaleti engelleme davası açtı
+                    </div>
+                    <div class="info-box">
+                        <strong>Olayın Özeti:</strong>
+                        <p>Rodriguez federal mahkeme celbine uymayı reddetti ve talep edilen belgeleri avukata 50.000$'a satmaya çalıştı.</p>
+                    </div>
+                    <h3>Belgeler:</h3>
+                    <ul>
+                        <li>Küçük siyah ciltli defter</li>
+                        <li>Mağdurlara yapılan ödemelere ilişkin el yazısı notlar</li>
+                    </ul>
+                    <div class="timeline-item">
+                        <div class="timeline-date">8 Aralık 2009</div>
+                        Rodriguez, gizli operasyon sırasında tutuklandı ve belgeler ele geçirildi
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2010</div>
+                        Suçlu bulundu ve 18 ay hapis cezasına çarptırıldı
+                    </div>
+                </div>
 
-        <div class="footer">
-            <p>Yeni yılın sana sağlık, mutluluk ve</p>
-            <p>en güzel anılar getirmesi dileğiyle... 🌟</p>
+                <!-- Sayfa 5 -->
+                <div class="page" data-page="5">
+                    <h2>📁 Soruşturma: 50D-NY-3027571</h2>
+                    <h3>İkinci Çocuk Cinsel Ticareti Davası</h3>
+                    <div class="timeline-item">
+                        <div class="timeline-date">6 Aralık 2018</div>
+                        New York Güney Bölgesi Savcılığı'nın talebi üzerine FBI New York soruşturma başlattı
+                    </div>
+                    <div class="info-box">
+                        <strong>İddia:</strong> Jeffrey Epstein'ın 2000'li yılların ortalarında çeşitli yerlerde (New York'taki ikametgahı dahil) küçükleri cinsel istismar ettiği
+                    </div>
+                    <h3>Soruşturma İstatistikleri:</h3>
+                    <ul>
+                        <li><strong>291</strong> NTOC (Ulusal Tehdit Operasyonları Merkezi) ihbarı</li>
+                        <li>52'si anonim</li>
+                        <li>FBI, 239 ihbarı takip etti, 27'si ikinci kontakla sonuçlandı</li>
+                        <li><strong>93 tanımlanmış mağdur</strong></li>
+                        <li>Çok sayıda tanımlanamayan mağdur olduğu biliniyor</li>
+                        <li>Yurt dışı mağdurlar: İngiltere ve İsveç</li>
+                        <li><strong>153 delil parçası</strong> mühür altında ele geçirildi</li>
+                    </ul>
+                    <div class="warning">
+                        ⚠️ 3 Koruma Emri tüm dosya kayıtlarını kapsamaktadır
+                    </div>
+                </div>
+
+                <!-- Sayfa 6 -->
+                <div class="page" data-page="6">
+                    <h2>🔍 Arama Emirleri</h2>
+                    <h3>6 Temmuz 2019 - 9 East 71st St, New York, NY</h3>
+                    <ul>
+                        <li>2 parça ele geçirildi (planlar, tablet)</li>
+                    </ul>
+                    
+                    <h3>7 Temmuz 2019 - 9 East 71st St (Genişletme)</h3>
+                    <ul>
+                        <li>23 parça ele geçirildi (CD'ler, fotoğraflar, kostümler, erotik heykeller, seks oyuncakları, masaj masası, nakit ödeme kayıtları, mektuplar)</li>
+                    </ul>
+                    
+                    <h3>11 Temmuz 2019 - 9 East 71st St (Geniş Kapsam)</h3>
+                    <ul>
+                        <li>43 parça ele geçirildi (masaüstü bilgisayarlar, sabit diskler, kayıt cihazları, tabletler, CD/DVD'ler, USB'ler, kamera, telefon, SD kart, sunucu, nakit zarflar, pasaport)</li>
+                    </ul>
+                    
+                    <h3>12 Ağustos 2019 - Little Saint James Adası</h3>
+                    <ul>
+                        <li>48 parça ele geçirildi (sunucular, güvenlik sistemi, telefon sistemi, CD/DVD'ler, sabit diskler, masaüstü bilgisayarlar, dizüstü bilgisayarlar, tabletler, kayıt defterleri, çalışan kayıtları, fotoğraflar, yenileme belgeleri, şifre listesi)</li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>Not:</strong> Tüm arama emirleri 2002-2005 yılları arasını kapsamaktadır.
+                        <br>4 ek arama emri, bu aramalarda ele geçirilen eşyalar için alındı.
+                    </div>
+                </div>
+
+                <!-- Sayfa 7 -->
+                <div class="page" data-page="7">
+                    <h2>💰 Mali Bilgiler</h2>
+                    <div class="info-box">
+                        <h3>Ödeme Yöntemi:</h3>
+                        <p>Mağdurlara <strong>nakit</strong> olarak ödeme yapıldı.</p>
+                    </div>
+                    
+                    <h3>Para Transferleri:</h3>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2007-2011 Arası</div>
+                        <strong>21 milyon dolardan fazla</strong> Epstein'ın hesaplarından Maxwell'in hesaplarına transfer edildi ve ardından hızla Epstein ile ilişkili diğer hesaplara taşındı.
+                    </div>
+                    
+                    <h3>Ele Geçirilen Nakit:</h3>
+                    <ul>
+                        <li>9 East 71st Street'teki arama sırasında yaklaşık <strong>17.000$</strong> nakit ele geçirildi</li>
+                    </ul>
+                </div>
+
+                <!-- Sayfa 8 -->
+                <div class="page" data-page="8">
+                    <h2>💻 Dijital Deliller (CSAM)</h2>
+                    <h3>Yüksek İlgili Materyal Analizi (85 GB):</h3>
+                    <div class="info-box">
+                        <p>Epstein'ın cihazlarından <strong>1 milyondan fazla</strong> görüntü ve video çıkarıldı.</p>
+                        <p>Bunlardan yaklaşık <strong>34.000'i</strong> ilgili olarak işaretlendi.</p>
+                    </div>
+                    
+                    <h3>İçerik Dağılımı:</h3>
+                    <ul>
+                        <li><strong>Yaklaşık %90:</strong> Yetişkin pornografisi / yetişkin erotik içerik / yaş belirsiz pornografi ve erotika</li>
+                        <li><strong>Yaklaşık %9:</strong> Kişisel veya genel internet görüntüleri</li>
+                        <li><strong>Yaklaşık 15-20 görüntü (<%1):</strong> CSAM (Çocuk İstismar Materyali) - kendi üretimi değil</li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Teknik Not:</strong> CSAM, Griffeye (dijital içeriği analiz etmek için kullanılan adli araç) tarafından "bilinen seriler" olarak tanımlandı.
+                    </div>
+                </div>
+
+                <!-- Sayfa 9 -->
+                <div class="page" data-page="9">
+                    <h2>👥 Mağdurlar</h2>
+                    <div class="info-box">
+                        <p><strong>Toplam Tanımlanmış Mağdur:</strong> 93 kişi</p>
+                        <p>Soruşturmacılar, öne çıkmayan ve araştırma yöntemleriyle tanımlanamayan çok sayıda mağdur olduğunu biliyor.</p>
+                    </div>
+                    
+                    <h3>Coğrafi Dağılım:</h3>
+                    <ul>
+                        <li>ABD içi: Çok sayıda mağdur</li>
+                        <li><strong>Yurt dışı mağdurlar:</strong>
+                            <ul>
+                                <li>İngiltere (United Kingdom)</li>
+                                <li>İsveç (Sweden)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>Önemli Not:</strong> Mağdur bilgileri gizlilik nedeniyle bu sunumda detaylandırılmamıştır.
+                    </div>
+                </div>
+
+                <!-- Sayfa 10 -->
+                <div class="page" data-page="10">
+                    <h2>⚖️ İddianame</h2>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Temmuz 2019</div>
+                        İddianame hazırlandı
+                    </div>
+                    
+                    <h3>Suçlamalar:</h3>
+                    <ul>
+                        <li><strong>Cinsel Ticaret Komplosu</strong> (Sex Trafficking Conspiracy)</li>
+                        <li><strong>Cinsel Ticaret</strong> (Sex Trafficking)</li>
+                    </ul>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">6 Temmuz 2019</div>
+                        Epstein, New Jersey'deki Teterboro havaalanında tutuklandı
+                    </div>
+                </div>
+
+                <!-- Sayfa 11 -->
+                <div class="page" data-page="11">
+                    <h2>🗣️ İfade Verme Anlaşmaları (Proffers)</h2>
+                    
+                    <h3>FBI'ın Katıldığı İfadeler:</h3>
+                    <ul>
+                        <li>Lesley Groff</li>
+                        <li>Larry Visoski</li>
+                        <li>David Rodgers</li>
+                        <li>Anthony Figueroa</li>
+                        <li>Ghislaine Maxwell (Sadece avukat)</li>
+                        <li>[Birkaç isim karartılmış]</li>
+                    </ul>
+                    
+                    <h3>SDNY Savcılarının İfadeye Aldığı Kişiler:</h3>
+                    <ul>
+                        <li>Les Wexner</li>
+                        <li>Abigail Wexner</li>
+                        <li>[Bir isim karartılmış]</li>
+                    </ul>
+                </div>
+
+                <!-- Sayfa 12 -->
+                <div class="page" data-page="12">
+                    <h2>☠️ Ölüm Soruşturması: 90A-NY-3151227</h2>
+                    
+                    <div class="warning">
+                        <strong>10 Ağustos 2019, sabah 6:30 civarı:</strong> Epstein, MCC hapishanesindeki hücresinde yanıt vermeyen halde bulundu.
+                    </div>
+                    
+                    <p>Ön soruşturma, MCC personelinin bir dizi protokol ihlali ve MCC içindeki teknik arıza/eksiklikler ortaya çıkardı. Bunun sonucunda ölüm soruşturması başlatıldı.</p>
+                    
+                    <h3>Zaman Çizelgesi:</h3>
+                    <div class="timeline-item">
+                        <div class="timeline-date">9 Ağustos 2019, ~19:49</div>
+                        Epstein son kez videoda görüldü - izlenmeyen telefon görüşmesi yaptıktan sonra Special Housing Unit (SHU) katına doğru yönlendirildi
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">9 Ağustos 2019, 22:00</div>
+                        Kat için kapatma (lock down)
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">9 Ağustos 2019, ~22:30</div>
+                        Koruma görevlisi Tova Noel, videoda her kata yürürken görüldü
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">9 Ağustos 2019, ~22:40</div>
+                        Tova Noel olduğu düşünülen bir görevli, çarşaf veya mahkum kıyafeti ile L Katına çıktı - SHU katının tek girişine yaklaşan son görevli
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">10 Ağustos 2019, 06:33</div>
+                        MCC personeli Epstein'ı hücresinde asılı halde buldu
+                    </div>
+                </div>
+
+                <!-- Sayfa 13 -->
+                <div class="page" data-page="13">
+                    <h2>🎥 Ölüm Soruşturması - Video ve Bulgular</h2>
+                    
+                    <h3>Video İncelemesi:</h3>
+                    <ul>
+                        <li><strong>400 saatten fazla</strong> video incelendi (23 Temmuz - 10 Ağustos 2019)</li>
+                        <li>MCC'de toplam yaklaşık <strong>150 kamera</strong> bulunuyor</li>
+                        <li><strong>DVR1:</strong> Çalışıyor</li>
+                        <li><strong>DVR2:</strong> 29 Temmuz 2019'da sistem arızası - kayıt yapmıyor. BOP, 8 Ağustos 2019'da DVR #2'nin kayıt yapmadığını öğrendi.</li>
+                    </ul>
+                    
+                    <h3>Protokol İhlalleri:</h3>
+                    <ul>
+                        <li>23 Temmuz - 9 Ağustos arasında <strong>5 kez</strong> mahkum sayımı yapılmadı</li>
+                        <li>Koruma görevlisi Michael Thomas, bu 5 vardiyadan 2'sinde çalışıyordu (Epstein'ın intihar ettiği vardiya dahil)</li>
+                    </ul>
+                    
+                    <h3>Görüşmeler:</h3>
+                    <ul>
+                        <li><strong>43 görüşme</strong> yapıldı</li>
+                        <li>28 MCC personeli (2 görüşmede sadece OIG vardı)</li>
+                        <li>15 mahkum (çoğu SHU'dan)</li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>Soruşturma Sonucu (5 Aralık 2022):</strong>
+                        <p>Epstein'ın ölümüyle ilgili hiçbir suç unsuru bulunamadı.</p>
+                        <p>OCME otopsi raporu: Ölüm nedeni asılma, ölüm şekli intihar.</p>
+                    </div>
+                    
+                    <div class="warning">
+                        <strong>Koruma Görevlileri Hakkında Dava:</strong>
+                        <p>SDNY, Michael Thomas ve Tova Noel'i Sahte Kayıt ve Komplo ile suçladı ve Mayıs 2021'de 6 aylık ertelenmiş kovuşturma anlaşması yaptı. Dava kapanırken şartlar yerine getirilmişti.</p>
+                    </div>
+                </div>
+
+                <!-- Sayfa 14 -->
+                <div class="page" data-page="14">
+                    <h2>👤 Ghislaine Maxwell</h2>
+                    
+                    <div class="info-box">
+                        <strong>Suçlama:</strong> Maxwell, küçükleri işe alarak, hazırlayarak ve istismar ederek Epstein'ın küçüklerin istismarına yardım etmek, kolaylaştırmak ve katkıda bulunmakla suçlandı.
+                    </div>
+                    
+                    <h3>İlk İddianame - 29 Haziran 2020</h3>
+                    <p><strong>Soruşturma zaman dilimi:</strong> 1994-1997</p>
+                    <ul>
+                        <li>Küçükleri Yasadışı Cinsel Eylemlerde Bulunmaya Yolculuk Etmeye Teşvik Komplosu</li>
+                        <li>Küçüğü Yasadışı Cinsel Eylemlerde Bulunmaya Yolculuk Etmeye Teşvik</li>
+                        <li>Küçükleri Suç Teşkil Eden Cinsel Faaliyete Girme Niyetiyle Taşıma Komplosu</li>
+                        <li>Küçüğü Suç Teşkil Eden Cinsel Faaliyete Girme Niyetiyle Taşıma</li>
+                        <li>Yalan Yere Yemin (2 suçlama)</li>
+                    </ul>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">2 Temmuz 2020</div>
+                        New Hampshire'da tutuklandı - 1 telefon ele geçirildi
+                    </div>
+                    
+                    <h3>Ek İddianame - Mart 2021</h3>
+                    <p><strong>Soruşturma zaman dilimi:</strong> 1994 - 2000'lerin başı</p>
+                    <ul>
+                        <li><strong>Eklenen suçlamalar:</strong> Küçüğü cinsel ticareti ve cinsel ticaret komplosu</li>
+                    </ul>
+                </div>
+
+                <!-- Sayfa 15 -->
+                <div class="page" data-page="15">
+                    <h2>⚖️ Maxwell Davası</h2>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">29 Kasım - 29 Aralık 2021</div>
+                        Dava görüldü
+                    </div>
+                    
+                    <h3>Suçlamalar ve Sonuçlar:</h3>
+                    <ul>
+                        <li><strong>Suçlama 1:</strong> Küçükleri Yasadışı Cinsel Eylemlerde Bulunmaya Yolculuk Etmeye Teşvik Komplosu - <span style="color: #c00;">SUÇLU</span></li>
+                        <li><strong>Suçlama 2:</strong> Küçüğü Yasadışı Cinsel Eylemlerde Bulunmaya Yolculuk Etmeye Teşvik - <span style="color: #060;">SUÇSUZ</span></li>
+                        <li><strong>Suçlama 3:</strong> Küçükleri Suç Teşkil Eden Cinsel Faaliyete Girme Niyetiyle Taşıma Komplosu - <span style="color: #c00;">SUÇLU</span></li>
+                        <li><strong>Suçlama 4:</strong> Küçüğü Suç Teşkil Eden Cinsel Faaliyete Girme Niyetiyle Taşıma - <span style="color: #c00;">SUÇLU</span></li>
+                        <li><strong>Suçlama 5:</strong> Cinsel Ticaret Komplosu - <span style="color: #c00;">SUÇLU</span></li>
+                        <li><strong>Suçlama 6:</strong> Küçüğün Cinsel Ticareti - <span style="color: #c00;">SUÇLU</span></li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>Yalan Yere Yemin Suçlamaları:</strong> 2 yalan yere yemin suçlaması daha sonra görülmek üzere planlanmıştı, ancak SDNY ilk davadan sonra bu suçlamaları takip etmemeyi seçti.
+                    </div>
+                    
+                    <h3>Savunma Stratejisi:</h3>
+                    <p>Savunma, tanıkların güvenilirliğini sorgulamaya, onlarca yıl önceki olayları hatırlama yeteneklerini sorglamaya odaklandı ve Maxwell'i koşulların kurbanı ve Epstein'ın günah keçisi olarak göstermeyi amaçladı. Maxwell'in Epstein tarafından hedef alındığını ve Epstein'ın sakladığı sırlar nedeniyle istismardan haberi olmadığını iddia etti.</p>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">28 Haziran 2022</div>
+                        <strong>Ceza:</strong> 20 yıl hapis + 5 yıl denetimli serbestlik + 750.000$ para cezası
+                    </div>
+                </div>
+
+                <!-- Sayfa 16 -->
+                <div class="page" data-page="16">
+                    <h2>👥 Maxwell Davası Mağdurları</h2>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Gizlilik Uyarısı</strong>
+                        <p>Bu sayfada mağdur bilgileri gizlilik nedeniyle karartılmıştır.</p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p>Maxwell davasında tanıklık yapan mağdurlar, Epstein ve Maxwell'in organize ettiği istismar sisteminin farklı yönlerini anlattılar.</p>
+                        
+                        <p>Mağdurlar genellikle:</p>
+                        <ul>
+                            <li>Genç yaşta (14-17 arası) işe alındıklarını</li>
+                            <li>Maxwell'in güven kazandığını</li>
+                            <li>Sistematik istismara maruz kaldıklarını</li>
+                            <li>Başka genç kızları işe almaya teşvik edildiklerini</li>
+                        </ul>
+                        belirttiler.
+                    </div>
+                </div>
+
+                <!-- Sayfa 17 -->
+                <div class="page" data-page="17">
+                    <h2>📋 Maxwell - Dava Sonrası</h2>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">7 Temmuz 2022</div>
+                        Cinsel ticaret mahkumiyetine karşı temyiz başvurusu
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">17 Eylül 2024</div>
+                        Federal mahkeme mahkumiyeti onayladı - Temyiz reddedildi
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">10 Nisan 2025</div>
+                        Yüksek Mahkeme'ye (Supreme Court) Writ of Certiorari başvurusu yapıldı
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">22 Temmuz 2025</div>
+                        Adalet Bakanlığı (DOJ) resmi olarak başvuruya karşı çıktı
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">24-25 Temmuz 2025</div>
+                        DOJ'nin Maxwell ile görüşmesi yapıldı
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>Mevcut Durum:</strong> Maxwell halen federal hapishanede cezasını çekiyor. Yüksek Mahkeme başvurusu beklemede.
+                    </div>
+                </div>
+
+                <!-- Sayfa 18 -->
+                <div class="page" data-page="18">
+                    <h2>⭐ Öne Çıkan İsimler</h2>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Önemli Uyarı:</strong> Aşağıdaki bilgiler mağdur ifadelerine ve NTOC ihbarlarına dayanmaktadır. Bazı iddiaların doğruluğu tespit edilememiştir.
+                    </div>
+                    
+                    <h3>Donald Trump:</h3>
+                    <ul>
+                        <li>Bir mağdur: Epstein'ın kendisini Trump'a tanıttığını ve ardından tecavüz girişiminde bulunduğunu iddia etti (1983-1985, 13-15 yaş)</li>
+                        <li>Başka bir mağdur: Epstein'ın kendisini Trump'a tanıttığını hatırlıyor (~1984, 14 yaş)</li>
+                    </ul>
+                    
+                    <h3>Harvey Weinstein:</h3>
+                    <ul>
+                        <li>Birden fazla mağdur, Weinstein'a masaj yaptıklarını ve cinsel tacize uğradıklarını bildirdi</li>
+                    </ul>
+                    
+                    <h3>Prens Andrew:</h3>
+                    <ul>
+                        <li>Mağdur ifadesi: Maxwell'in kendisine Prens Andrew'u mutlu etmesini söylediğini bildirdi</li>
+                        <li>Tanık ifadesi: Prens Andrew'un Epstein'ın adasında genç bir kızla dans ettiği görüldü</li>
+                        <li>Bir mağdur: Prens Andrew ve Epstein'ın uçakta orgiler yaptığını iddia etti</li>
+                    </ul>
+                    
+                    <h3>Leon Black:</h3>
+                    <ul>
+                        <li>Birden fazla mağdur, Black'e masaj yaptıklarını ve cinsel saldırıya uğradıklarını bildirdi</li>
+                        <li>Bir mağdur: Black'in kendisine birçok kez tecavüz ettiğini ve cinsel ticaretini yaptığını iddia etti</li>
+                    </ul>
+                    
+                    <h3>Les Wexner:</h3>
+                    <ul>
+                        <li>Bir ifade: Epstein'ın parasını Wexner ile homoseksüel ilişkiden kazandığını iddia etti</li>
+                    </ul>
+                    
+                    <h3>Diğer İsimler:</h3>
+                    <ul>
+                        <li><strong>Jes Staley:</strong> Cinsel saldırı iddiaları</li>
+                        <li><strong>Glenn Dubin:</strong> Masaj ve cinsel içerik iddiaları</li>
+                        <li><strong>Alan Dershowitz:</strong> Masaj iddiası (mağdur küçük değildi)</li>
+                        <li><strong>Bill Clinton:</strong> Epstein davasında mağdur değil. Bir kişi Clinton ile orji davetinden bahsetti ancak katılmadı</li>
+                        <li><strong>William Barr / Leon Black:</strong> NTOC ihbarında istismar sırasında mevcut olduklarına dair iddia</li>
+                    </ul>
+                    
+                    <div class="info-box">
+                        <strong>Not:</strong> Çok sayıda anonim NTOC ihbarı, öne çıkan kişilere karşı iddialar içeriyordu.
+                    </div>
+                </div>
+
+                <!-- Sayfa 19 -->
+                <div class="page" data-page="19">
+                    <h2>❌ Yanlış Anlamalar</h2>
+                    
+                    <div class="info-box">
+                        <p><strong>FBI'ın delil incelemesi ve mağdur ifadelerine dayanarak:</strong></p>
+                    </div>
+                    
+                    <h3>1. İki Erkekli Orgiler:</h3>
+                    <p>❌ <strong>Yanlış:</strong> İki erkek içeren orgiler veya üçlü ilişkiler gerçekleşmedi.</p>
+                    
+                    <h3>2. Esir Tutma:</h3>
+                    <p>❌ <strong>Yanlış:</strong> Mağdurlar esir tutulmadı. Mağdurlar gidip gelebiliyordu.</p>
+                    
+                    <h3>3. Fuhşa Zorlama:</h3>
+                    <p>❌ <strong>Yanlış:</strong> Epstein, mağdurları düzenli olarak para karşılığında fuhuşa zorlamadı.</p>
+                    
+                    <div class="warning">
+                        <strong>Önemli Not:</strong> Bu yanlış anlamalar, medyada ve kamuoyunda yaygın olan ancak FBI'ın soruşturmasında doğrulanmayan iddialarla ilgilidir. Bu, istismarın ciddiyetini azaltmaz.
+                    </div>
+                </div>
+
+                <!-- Sayfa 20 -->
+                <div class="page" data-page="20">
+                    <h2>🛂 Pasaport</h2>
+                    
+                    <div class="info-box">
+                        <strong>Avusturya Cumhuriyeti Pasaportu</strong>
+                        <p><strong>İsim:</strong> Marius Robert Fortelni</p>
+                        <p><strong>Kullanım Dönemi:</strong> 1982-1983</p>
+                    </div>
+                    
+                    <h3>Detaylar:</h3>
+                    <ul>
+                        <li>Giriş damgaları Fransa, Büyük Britanya ve Suudi Arabistan'da gibi görünüyor</li>
+                        <li>Pasaport 2019'da kefalet aleyhine argümanda kullanıldı</li>
+                    </ul>
+                    
+                    <div class="warning">
+                        <strong>Önemli Not:</strong> Bu sahte pasaport, Epstein'ın uluslararası seyahatlerinde farklı kimlikler kullandığını ve kaçma riski taşıdığını göstermek için mahkemede delil olarak sunuldu.
+                    </div>
+                </div>
+
+                <!-- Sayfa 21 -->
+                <div class="page" data-page="21">
+                    <h2>❓ Sorular?</h2>
+                    
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 30px;">🔍</div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">FBI New York Criminal Division</h3>
+                        <h3 style="color: #2a5298;">Violent Crime - Threat</h3>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>Belge Özeti:</strong></p>
+                        <p>Bu sunum, FBI'ın Jeffrey Epstein ve Ghislaine Maxwell ile ilgili dört ana soruşturmasını özetlemektedir:</p>
+                        <ul>
+                            <li>2006-2008: İlk soruşturma ve tartışmalı savunma anlaşması</li>
+                            <li>2009: Adaleti engelleme davası</li>
+                            <li>2018-2019: Yeniden açılan soruşturma ve Epstein'ın ölümü</li>
+                            <li>2020-2022: Ghislaine Maxwell davası ve mahkumiyeti</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Uyarı:</strong> Bu belge FBI tarafından "UNCLASSIFIED" (Gizli Değil) olarak işaretlenmiştir. İçerik hassas niteliktedir.
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 40px; color: #666;">
+                        <strong>Belge Sonu</strong>
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="navigation">
+                <button class="nav-btn" id="prevBtn" onclick="changePage(-1)">◀ Önceki</button>
+                <span class="page-indicator">
+                    <span id="currentPage">1</span> / <span id="totalPages">21</span>
+                </span>
+                <button class="nav-btn" id="nextBtn" onclick="changePage(1)">Sonraki ▶</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Kar taneleri oluştur
-        function createSnowflakes() {
-            const snowflakes = ['❄', '❅', '❆'];
-            for (let i = 0; i < 50; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
-                snowflake.style.left = Math.random() * 100 + '%';
-                snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
-                snowflake.style.animationDelay = Math.random() * 5 + 's';
-                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
-                document.body.appendChild(snowflake);
+        let currentPage = 1;
+        const totalPages = 21;
+
+        function showPage(pageNumber) {
+            // Tüm sayfaları gizle
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Seçili sayfayı göster
+            const selectedPage = document.querySelector(`[data-page="${pageNumber}"]`);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
+
+            // Sayfa numarasını güncelle
+            document.getElementById('currentPage').textContent = pageNumber;
+
+            // Butonları güncelle
+            document.getElementById('prevBtn').disabled = pageNumber === 1;
+            document.getElementById('nextBtn').disabled = pageNumber === totalPages;
+
+            // Sayfayı yukarı kaydır
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                showPage(currentPage);
             }
         }
-        
-        createSnowflakes();
+
+        // Klavye navigasyonu
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changePage(-1);
+            } else if (e.key === 'ArrowRight') {
+                changePage(1);
+            }
+        });
+
+        // İlk sayfayı göster
+        showPage(1);
     </script>
 </body>
 </html>
